@@ -35,4 +35,13 @@ public class CommentController {
         Long userId = 1L; //수동 설정
         return ApplicationResponse.ok(commentService.update(postId, commentId, userId, commentReq));
     }
+
+    @Operation(summary = "댓글 삭제 API", description = "특정 댓글을 삭제합니다.")
+    @DeleteMapping("/{post-id}/{comment-id}")
+    public ApplicationResponse<?> deleteComment(@PathVariable(value = "post-id") Long postId,
+                                                         @PathVariable(value = "comment-id") Long commentId) {
+        Long userId = 1L; //수동 설정
+        commentService.delete(postId, commentId, userId);
+        return ApplicationResponse.ok();
+    }
 }

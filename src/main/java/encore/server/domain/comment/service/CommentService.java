@@ -68,4 +68,22 @@ public class CommentService {
         //return: 수정된 댓글 정보 반환
         return CommentConverter.toResponse(comment);
     }
+
+    @Transactional
+    public void delete(Long postId, Long commentId, Long userId) {
+        //validation: user, post, comment 유효성 및 댓글 작성자인지 확인
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        Comment comment = commentRepository.findByIdAndPostAndDeletedAtIsNull(commentId, post)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
+
+        if(!comment.getUser().equals(user)) {
+            throw new ApplicationException(ErrorCode.COMMENT_NOT_OWNER_EXCEPTION);
+        }
+
+        //business logic: 댓글 논리적 삭제
+        commentRepository.delete(comment);
+    }
 }
