@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class CommentService {
         commentRepository.save(comment);
 
         //return: 생성된 댓글 정보 반환
-        return CommentConverter.toResponse(comment);
+        return CommentConverter.toResponse(comment, user);
     }
 
     @Transactional
@@ -66,7 +68,7 @@ public class CommentService {
         comment.update(commentReq.content());
 
         //return: 수정된 댓글 정보 반환
-        return CommentConverter.toResponse(comment);
+        return CommentConverter.toResponse(comment, user);
     }
 
     @Transactional
@@ -85,5 +87,19 @@ public class CommentService {
 
         //business logic: 댓글 논리적 삭제
         commentRepository.delete(comment);
+    }
+
+    public List<CommentRes> getComments(Long postId, Long userId) {
+        //validation: post 유효성 확인
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        //business logic: 게시글의 댓글 목록 반환
+        List<Comment> comments = commentRepository.findAllByPostAndDeletedAtIsNull(post);
+
+        //return: 댓글 목록 반환
+        return CommentConverter.toListResponse(comments, user);
     }
 }

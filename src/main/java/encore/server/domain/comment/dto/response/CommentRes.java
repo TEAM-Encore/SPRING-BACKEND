@@ -27,6 +27,9 @@ public record CommentRes(
         @Schema(description = "작성자 여부", example = "true")
         Boolean isPostOwner,
 
+        @Schema(description = "나의 댓글인지 여부", example = "true")
+        Boolean isMyComment,
+
         @Schema(description = "생성일시", example = "2021-07-01T00:00:00")
         LocalDateTime createdAt,
 
