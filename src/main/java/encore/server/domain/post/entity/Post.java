@@ -36,6 +36,12 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "text")
     private String content;
 
+    @Column(nullable = false, columnDefinition = "tinyint(1)")
+    private Boolean isNotice;
+
+    @Column(nullable = false, columnDefinition = "tinyint(1)")
+    private Boolean isTemporarySave;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private PostType postType;
