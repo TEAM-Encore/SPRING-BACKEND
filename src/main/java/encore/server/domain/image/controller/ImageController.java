@@ -1,6 +1,8 @@
-package encore.server.global.util.s3;
+package encore.server.domain.image.controller;
 
 
+import encore.server.domain.image.dto.ImageNameDTO;
+import encore.server.domain.image.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/image")
-@Tag(name = "이미지", description = "Presigned URL 발급과 관련된 API")
+@RequestMapping("/api/v1/image")
+@Tag(name = "이미지", description = "Presigned URL 발급과 관련된 API입니다.")
 public class ImageController {
 
     private final ImageService imageService;

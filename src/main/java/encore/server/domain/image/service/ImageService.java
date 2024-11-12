@@ -1,4 +1,4 @@
-package encore.server.global.util.s3;
+package encore.server.domain.image.service;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;

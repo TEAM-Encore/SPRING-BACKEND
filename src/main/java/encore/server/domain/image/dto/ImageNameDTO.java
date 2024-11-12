@@ -1,4 +1,4 @@
-package encore.server.global.util.s3;
+package encore.server.domain.image.dto;
 
 import lombok.Builder;
 
