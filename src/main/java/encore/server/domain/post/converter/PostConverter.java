@@ -1,15 +1,20 @@
 package encore.server.domain.post.converter;
 
 
+import encore.server.domain.hashtag.entity.PostHashtag;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
+import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.entity.Post;
+import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.user.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 @Component
@@ -43,5 +48,30 @@ public class PostConverter {
         );
     }
 
+    public PostDetailsGetRes postDetailsGetResFrom(Post post, List<String> hashtags, List<String> postImages, String userName) {
+
+        Boolean isModified = true;
+
+        if (Objects.equals(post.getModifiedAt(), post.getCreatedAt())) {
+            isModified = false;
+        }
+
+        return new PostDetailsGetRes(
+                post.getId(),
+                userName,
+                post.getTitle(),
+                post.getContent(),
+                post.getIsNotice(),
+                post.getIsTemporarySave(),
+                post.getPostType().name(),
+                post.getCategory().name(),
+                hashtags,
+                postImages,
+                post.getCreatedAt(),
+                post.getModifiedAt(),
+                isModified
+        );
+
+    }
 
 }

@@ -1,14 +1,13 @@
 package encore.server.domain.post.controller;
 
-import encore.server.domain.post.converter.PostConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
+import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.service.PostService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.ErrorCode;
-import encore.server.global.exception.UserNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class PostController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationResponse<Long> post(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
+    public ApplicationResponse<Long> createPost(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
 
         log.info("[POST]-[PostController]-[post] post API call");
 
@@ -58,7 +58,7 @@ public class PostController {
 
     @PutMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse<Long> postUpdate(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
+    public ApplicationResponse<Long> updatePost(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
 
         log.info("[POST]-[PostController]-[postUpdate] update API call");
 
@@ -84,7 +84,7 @@ public class PostController {
 
     @DeleteMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse postDelete(@PathVariable("post_id") Long postIdToDelete){
+    public ApplicationResponse deletePost(@PathVariable("post_id") Long postIdToDelete){
 
         log.info("[POST]-[PostController]-[postDelete] post delete API call");
 
@@ -95,6 +95,28 @@ public class PostController {
         return ApplicationResponse.ok();
     }
 
+    /*
+    @GetMapping("/posts")
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResponse<List<Post>> getAllPosts(){
+        log.info("[POST]-[PostController]-[getAllPosts] /post/posts API call");
+
+
+    }
+
+     */
+
+    @GetMapping("/{post_id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResponse<PostDetailsGetRes> getPostDetails(@PathVariable("post_id") Long postId){
+
+        log.info("[POST]-[PostController]-[getPostDetails] /post/{post_id} API call");
+
+        PostDetailsGetRes postDetailsGetRes = postService.getPostDetails(postId);
+
+        return ApplicationResponse.ok(postDetailsGetRes);
+
+    }
 
 
     public Long mockUserIdProvide(){

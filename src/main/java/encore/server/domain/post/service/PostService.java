@@ -1,13 +1,16 @@
 package encore.server.domain.post.service;
 
+import encore.server.domain.hashtag.converter.PostHashtagConverter;
 import encore.server.domain.hashtag.entity.Hashtag;
 import encore.server.domain.hashtag.entity.PostHashtag;
 import encore.server.domain.hashtag.repository.HashtagRepository;
 import encore.server.domain.hashtag.repository.PostHashtagRepository;
 import encore.server.domain.hashtag.service.HashtagService;
 import encore.server.domain.post.converter.PostConverter;
+import encore.server.domain.post.converter.PostImageConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
+import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
@@ -39,10 +42,33 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
-    private final PostConverter postConverter;
     private final UserRepository userRepository;
     private final HashtagRepository hashtagRepository;
     private final PostHashtagRepository postHashtagRepository;
+
+    private final PostConverter postConverter;
+    private final PostHashtagConverter postHashtagConverter;
+    private final PostImageConverter postImageConverter;
+
+    public PostDetailsGetRes getPostDetails(Long postId) {
+
+        //Post Image와 User 를 Fetch Join 하여 Post 객체를 가져옴
+        Post post = postRepository.findFetchJoinPostImageAndUserByIdAndDeletedAtIsNull(postId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        //Post와 연관된 PostHashtag를 Fetch Join 하여 가져옴
+        List<PostHashtag> allByPost = postHashtagRepository.findFetchHashtagAllByPostAndDeletedAtIsNull(post);
+
+        //Post Image와 PostHashtag를 List<String> 으로 변환
+        List<String> stringListFromPostHashtag = postHashtagConverter.stringListFrom(allByPost);
+        List<String> stringListFromPostImage = postImageConverter.stringListFrom(post.getPostImages());
+
+
+        //**userEntity 에 Name 필드 추가 필요
+        //PostDetailGetRes 생성하여 return
+        return postConverter.postDetailsGetResFrom(post, stringListFromPostHashtag,
+                stringListFromPostImage, String.valueOf(post.getUser().getId()));
+    }
 
     @Transactional
     public void deletePost(Long postId) {
