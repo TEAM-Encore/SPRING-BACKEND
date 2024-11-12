@@ -7,8 +7,6 @@ import java.util.List;
 
 public record PostUpdateReq(
         @NotNull(message = "category is null")
-        Long postId,
-        @NotNull(message = "category is null")
         String category,
         @NotNull(message = "postType is null")
         String postType,

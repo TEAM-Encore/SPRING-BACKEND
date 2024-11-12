@@ -60,14 +60,19 @@ public class PostService {
     }
 
     @Transactional
-    public Long updatePost(PostUpdateReq postUpdateReq) {
+    public Long updatePost(Long postIdToUpdate, PostUpdateReq postUpdateReq) {
 
         log.info("[POST]-[PostService]-[updatePost] method call");
 
-        // 1. Read target Post ID
-        Long postId = postUpdateReq.postId();
+        // 1. Read target Post ID and Validation
+        Long postId = postIdToUpdate;
 
-        // 2. Update Post
+        //검증
+        if(!postRepository.existsById(postId)){
+            throw new BadRequestException("Post does not exist");
+        }
+
+        // 2. Update Post (영속성 컨텍스트 초기화)
         int numOfUpdatedPost = postRepository.updatePost(Category.valueOf(postUpdateReq.category()), PostType.valueOf(postUpdateReq.postType()),
                 postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.isNotice(), postUpdateReq.isTemporarySave(), postId);
 
@@ -78,11 +83,11 @@ public class PostService {
         postImageRepository.deleteByPostId(postId);
         log.info("[POST]-[PostService]-[updatePost] PostImage deleted successfully");
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("Post not found"));
-
         //업데이트할 이미지 url 들
         List<String> imgUrls = postUpdateReq.imgUrls();
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
         
         //이미지 업데이트
         List<PostImage> imagesToSave = new ArrayList<>();
