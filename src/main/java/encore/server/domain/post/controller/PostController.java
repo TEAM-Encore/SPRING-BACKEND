@@ -81,6 +81,21 @@ public class PostController {
         return new ApplicationResponse<>(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post updated successfully", postId);
     }
 
+
+    @DeleteMapping("/{post_id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResponse postDelete(@PathVariable("post_id") Long postIdToDelete){
+
+        log.info("[POST]-[PostController]-[postDelete] post delete API call");
+
+        postService.deletePost(postIdToDelete);
+
+        log.info("[POST]-[PostController]-[postDelete] post delete API terminated successfully");
+
+        return ApplicationResponse.ok();
+    }
+
+
     public Long mockUserIdProvide(){
         return 1L;
     }

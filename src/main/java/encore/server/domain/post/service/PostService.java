@@ -17,6 +17,7 @@ import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.common.ApplicationResponse;
+import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +45,26 @@ public class PostService {
     private final PostHashtagRepository postHashtagRepository;
 
     @Transactional
+    public void deletePost(Long postId) {
+
+        if(!postRepository.existsById(postId)){
+            throw new BadRequestException("Post does not exist");
+        }
+
+        postHashtagRepository.softDeleteByPostId(postId);
+        postImageRepository.softDeleteByPostId(postId);
+        postRepository.softDeleteByPostId(postId);
+
+        //postLike, comment 삭제 repository 생성 시 충돌날 것 같으므로 이후 추가
+
+    }
+
+    @Transactional
     public Long updatePost(PostUpdateReq postUpdateReq) {
 
         log.info("[POST]-[PostService]-[updatePost] method call");
 
-        // 1. Read target Post
+        // 1. Read target Post ID
         Long postId = postUpdateReq.postId();
 
         // 2. Update Post

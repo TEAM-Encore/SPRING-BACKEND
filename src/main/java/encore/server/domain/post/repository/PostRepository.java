@@ -27,4 +27,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("isTemporarySave") boolean isTemporarySave,
             @Param("id") Long id
     );
+
+    @Modifying
+    @Query("UPDATE Post p SET p.deletedAt = CURRENT_TIMESTAMP WHERE p.id = :postId")
+    void softDeleteByPostId(@Param("postId") Long postId);
+
 }
