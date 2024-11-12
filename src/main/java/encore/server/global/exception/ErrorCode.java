@@ -30,6 +30,7 @@ public enum ErrorCode {
 
     // 5000: Comment Error
     COMMENT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 5000, "존재하지 않는 댓글입니다."),
+    COMMENT_NOT_OWNER_EXCEPTION(HttpStatus.FORBIDDEN, 5001, "댓글 작성자만 수정할 수 있습니다."),
 
     // 6000: Like Error
     LIKE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 6000, "존재하지 않는 좋아요입니다."),
