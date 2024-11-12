@@ -2,6 +2,7 @@ package encore.server.domain.post.controller;
 
 import encore.server.domain.post.converter.PostConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
+import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.service.PostService;
 import encore.server.global.common.ApplicationResponse;
@@ -46,13 +47,38 @@ public class PostController {
             throw new BadRequestException(errorMessages.toString());
         }
 
-        //비즈니스 로직
+        //Business logic
         Long postId = postService.createPost(postCreateReq, mockUserIdProvide());
 
         log.info("[POST]-[PostController]-[post] post API terminated successfully");
 
         //Response Create
         return new ApplicationResponse(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post created successfully", postId);
+    }
+
+    @PutMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResponse<Long> postUpdate(@RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
+
+        log.info("[POST]-[PostController]-[postUpdate] update API call");
+
+        //Request Validation
+        if(bindingResult.hasErrors()) {
+
+            StringBuilder errorMessages = new StringBuilder();
+            bindingResult.getAllErrors().forEach(error -> {
+                errorMessages.append(error.getDefaultMessage()).append(",");
+            });
+
+            log.info("[POST]-[PostController]-[postUpdate] update API validation error: {}", errorMessages.toString());
+
+            throw new BadRequestException(errorMessages.toString());
+        }
+
+        //Business logic
+        Long postId = postService.updatePost(postUpdateReq);
+
+        return new ApplicationResponse<>(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post updated successfully", postId);
     }
 
     public Long mockUserIdProvide(){

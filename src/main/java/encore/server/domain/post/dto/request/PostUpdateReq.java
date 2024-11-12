@@ -2,12 +2,12 @@ package encore.server.domain.post.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-public record PostCreateReq(
+public record PostUpdateReq(
+        @NotNull(message = "category is null")
+        Long postId,
         @NotNull(message = "category is null")
         String category,
         @NotNull(message = "postType is null")
@@ -23,7 +23,7 @@ public record PostCreateReq(
 ) {
 
     //compact 생성자
-    public PostCreateReq {
+    public PostUpdateReq {
         // imgUrls와 hashTags가 null일 경우 빈 리스트로 초기화
         imgUrls = imgUrls == null ? Collections.emptyList() : List.copyOf(imgUrls);
         hashTags = hashTags == null ? Collections.emptyList() : List.copyOf(hashTags);

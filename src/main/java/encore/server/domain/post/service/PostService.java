@@ -7,8 +7,11 @@ import encore.server.domain.hashtag.repository.PostHashtagRepository;
 import encore.server.domain.hashtag.service.HashtagService;
 import encore.server.domain.post.converter.PostConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
+import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
+import encore.server.domain.post.enumerate.Category;
+import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.post.repository.PostImageRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +43,45 @@ public class PostService {
     private final HashtagRepository hashtagRepository;
     private final PostHashtagRepository postHashtagRepository;
 
+    @Transactional
+    public Long updatePost(PostUpdateReq postUpdateReq) {
+
+        log.info("[POST]-[PostService]-[updatePost] method call");
+
+        // 1. Read target Post
+        Long postId = postUpdateReq.postId();
+
+        // 2. Update Post
+        int numOfUpdatedPost = postRepository.updatePost(Category.valueOf(postUpdateReq.category()), PostType.valueOf(postUpdateReq.postType()),
+                postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.isNotice(), postUpdateReq.isTemporarySave(), postId);
+
+        log.info("[POST]-[PostService]-[updatePost] Post updated successfully. post_id: {}", postId);
+
+        // 3. PostImg update
+        // Post와 관련된 이미지 전부 삭제 (영속성 컨텍스트 초기화)
+        postImageRepository.deleteByPostId(postId);
+        log.info("[POST]-[PostService]-[updatePost] PostImage deleted successfully");
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        //업데이트할 이미지 url 들
+        List<String> imgUrls = postUpdateReq.imgUrls();
+        
+        //이미지 업데이트
+        List<PostImage> imagesToSave = new ArrayList<>();
+        for(String imgUrl : imgUrls){
+            PostImage imageToSave = new PostImage(null, imgUrl, post); //id는 왜 있지
+            imagesToSave.add(imageToSave);
+        }
+        postImageRepository.saveAll(imagesToSave);
+        log.info("[POST]-[PostService]-[updatePost] PostImage saved successfully");
+
+        //4. hashtag update
+
+        return postId;
+
+    }
 
     @Transactional
     public Long createPost(PostCreateReq postCreateReq, Long userId){
