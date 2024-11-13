@@ -11,5 +11,5 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
     Optional<Hashtag> findByName(String name);
 
-    List<Hashtag> findByNameInOrderByNameAsc(List<String> hashTagNames);
+    List<Hashtag> findByNameInAndDeletedAtIsNull(List<String> hashTagNames);
 }

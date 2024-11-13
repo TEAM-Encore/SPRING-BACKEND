@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
+import java.util.Optional;
+
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Modifying(clearAutomatically = true)
@@ -39,4 +41,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findFetchJoinPostImageAndUserByIdAndDeletedAtIsNull(Long postId);
 
 
+    Optional<Post> findByIdAndDeletedAtIsNull(Long id);
 }

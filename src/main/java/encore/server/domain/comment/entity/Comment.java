@@ -15,7 +15,7 @@ import java.util.List;
 
 @Getter
 @Entity
-@SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE comment SET deleted_at = NOW() where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
 
@@ -48,5 +48,9 @@ public class Comment extends BaseTimeEntity {
         this.user = user;
         this.content = content;
         this.parentId = parentId;
+    }
+
+    public void update(String content) {
+        this.content = content;
     }
 }

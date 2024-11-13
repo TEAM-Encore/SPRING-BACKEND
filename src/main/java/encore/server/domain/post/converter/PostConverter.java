@@ -48,7 +48,10 @@ public class PostConverter {
         );
     }
 
-    public PostDetailsGetRes postDetailsGetResFrom(Post post, List<String> hashtags, List<String> postImages, String userName) {
+    public PostDetailsGetRes postDetailsGetResFrom(
+            Post post, List<String> hashtags, List<String> postImages,
+            String userName, Integer numOfLike, Integer numOfComment
+    ) {
 
         Boolean isModified = true;
 
@@ -69,7 +72,9 @@ public class PostConverter {
                 postImages,
                 post.getCreatedAt(),
                 post.getModifiedAt(),
-                isModified
+                isModified,
+                numOfLike,
+                numOfComment
         );
 
     }

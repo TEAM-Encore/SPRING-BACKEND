@@ -22,7 +22,9 @@ public record PostDetailsGetRes(
         List<String> postImages,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
-        Boolean isModified
+        Boolean isModified,
+        Integer numOfLike,
+        Integer numOfComment
 
 ) {
 

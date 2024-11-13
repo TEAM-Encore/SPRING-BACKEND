@@ -95,16 +95,6 @@ public class PostController {
         return ApplicationResponse.ok();
     }
 
-    /*
-    @GetMapping("/posts")
-    @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse<List<Post>> getAllPosts(){
-        log.info("[POST]-[PostController]-[getAllPosts] /post/posts API call");
-
-
-    }
-
-     */
 
     @GetMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
@@ -117,6 +107,23 @@ public class PostController {
         return ApplicationResponse.ok(postDetailsGetRes);
 
     }
+
+    /*
+    @GetMapping("/{hashtag_name}/{post_type}/{sort_by}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationResponse getPostsWithHashtag(
+            @PathVariable("hashtag_name") String hashtagName,
+            @PathVariable("post_type") String postType,
+            @PathVariable("sort_by") String sortBy
+    ){
+
+        log.info("[POST]-[PostController]-[getPostsWithHashtag] /post/{hashtag_name}/{post_type}/{sort_by} API call");
+
+
+
+    }
+
+     */
 
 
     public Long mockUserIdProvide(){

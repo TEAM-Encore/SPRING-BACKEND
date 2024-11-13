@@ -1,5 +1,6 @@
 package encore.server.domain.post.service;
 
+import encore.server.domain.comment.repository.CommentRepository;
 import encore.server.domain.hashtag.converter.PostHashtagConverter;
 import encore.server.domain.hashtag.entity.Hashtag;
 import encore.server.domain.hashtag.entity.PostHashtag;
@@ -16,6 +17,7 @@ import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.post.repository.PostImageRepository;
+import encore.server.domain.post.repository.PostLikeRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
@@ -24,6 +26,7 @@ import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -45,10 +48,13 @@ public class PostService {
     private final UserRepository userRepository;
     private final HashtagRepository hashtagRepository;
     private final PostHashtagRepository postHashtagRepository;
+    private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
 
     private final PostConverter postConverter;
     private final PostHashtagConverter postHashtagConverter;
     private final PostImageConverter postImageConverter;
+
 
     public PostDetailsGetRes getPostDetails(Long postId) {
 
@@ -63,11 +69,14 @@ public class PostService {
         List<String> stringListFromPostHashtag = postHashtagConverter.stringListFrom(allByPost);
         List<String> stringListFromPostImage = postImageConverter.stringListFrom(post.getPostImages());
 
+        Integer numOfLike = postLikeRepository.countByPostAndDeletedAtIsNull(post);
+        Integer numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
+
 
         //**userEntity 에 Name 필드 추가 필요
         //PostDetailGetRes 생성하여 return
         return postConverter.postDetailsGetResFrom(post, stringListFromPostHashtag,
-                stringListFromPostImage, String.valueOf(post.getUser().getId()));
+                stringListFromPostImage, String.valueOf(post.getUser().getId()), numOfLike, numOfComment);
     }
 
     @Transactional
@@ -80,8 +89,8 @@ public class PostService {
         postHashtagRepository.softDeleteByPostId(postId);
         postImageRepository.softDeleteByPostId(postId);
         postRepository.softDeleteByPostId(postId);
-
-        //postLike, comment 삭제 repository 생성 시 충돌날 것 같으므로 이후 추가
+        postLikeRepository.softDeleteByPostId(postId);
+        commentRepository.softDeleteByPostId(postId);
 
     }
 
@@ -93,10 +102,10 @@ public class PostService {
         // 1. Read target Post ID and Validation
         Long postId = postIdToUpdate;
 
-        //검증
         if(!postRepository.existsById(postId)){
             throw new BadRequestException("Post does not exist");
         }
+
 
         // 2. Update Post (영속성 컨텍스트 초기화)
         int numOfUpdatedPost = postRepository.updatePost(Category.valueOf(postUpdateReq.category()), PostType.valueOf(postUpdateReq.postType()),
@@ -106,7 +115,7 @@ public class PostService {
 
         // 3. PostImg update
         // Post와 관련된 이미지 전부 삭제 (영속성 컨텍스트 초기화)
-        postImageRepository.deleteByPostId(postId);
+        postImageRepository.softDeleteByPostId(postId);
         log.info("[POST]-[PostService]-[updatePost] PostImage deleted successfully");
 
         //업데이트할 이미지 url 들
@@ -122,9 +131,49 @@ public class PostService {
             imagesToSave.add(imageToSave);
         }
         postImageRepository.saveAll(imagesToSave);
+
         log.info("[POST]-[PostService]-[updatePost] PostImage saved successfully");
 
         //4. hashtag update
+        List<String> hashTags = postUpdateReq.hashTags();
+        //전체 postHashTag 삭제 (삭제 후 재저장)
+        postHashtagRepository.softDeleteByPostId(postId);
+
+        // 해시태그 테이블에 존재하는 해시태그
+        List<Hashtag> existingHashTags = hashtagRepository.findByNameInAndDeletedAtIsNull(hashTags);
+        List<String> existingHashTagsStringList = existingHashTags.stream()
+                .map(Hashtag::getName)
+                .collect(Collectors.toList());
+
+        // 해시태그 테이블에 존재하지 않는 해시태그를 필터링
+        List<String> nonExistingHashTags = hashTags.stream()
+                .filter(tag -> !existingHashTagsStringList.contains(tag))
+                .toList();
+
+        List<Hashtag> hashtagsToSave = new ArrayList<>();
+
+        for(String hashTagToSave : nonExistingHashTags){
+            hashtagsToSave.add(new Hashtag(hashTagToSave));
+        }
+
+        List<Hashtag> savedHashTags = hashtagRepository.saveAll(hashtagsToSave);
+
+        Post savedPost = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        List<PostHashtag> phashTagsToSave = new ArrayList<>();
+
+        for(Hashtag hashTag : existingHashTags){
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+            phashTagsToSave.add(pHashtagToSave);
+        }
+        for(Hashtag hashTag : savedHashTags){
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+            phashTagsToSave.add(pHashtagToSave);
+        }
+
+        postHashtagRepository.saveAll(phashTagsToSave);
+
 
         return postId;
 
@@ -160,33 +209,41 @@ public class PostService {
 
 
         //4. Hash Tag processing
-        //hash태그 저장 프로세스 논의가 필요할듯
         //post hash tag 저장 (hashtag가 있는지 없는지 확인)
-        /*
-        Collections.sort(hashTags);
-        List<Hashtag> existingHashTags = hashtagRepository.findByNameInOrderByNameAsc(hashTags);
 
-        // 존재하지 않는 해시태그를 필터링
+        // 해시태그 테이블에 존재하는 해시태그
+        List<Hashtag> existingHashTags = hashtagRepository.findByNameInAndDeletedAtIsNull(hashTags);
+        List<String> existingHashTagsStringList = existingHashTags.stream()
+                .map(Hashtag::getName)
+                .collect(Collectors.toList());
+
+        // 해시태그 테이블에 존재하지 않는 해시태그를 필터링
         List<String> nonExistingHashTags = hashTags.stream()
-                .filter(tag -> !existingHashTags.contains(tag))
+                .filter(tag -> !existingHashTagsStringList.contains(tag))
                 .toList();
 
-        List<PostHashtag> hashTagsToSave = new ArrayList<>();
+        List<Hashtag> hashtagsToSave = new ArrayList<>();
 
-        for(String hashTag : hashTags){
-            if(nonExistingHashTags.contains(hashTag)){
-                //save
-                new Hashtag
-            }
-
-            PostHashtag hashtagToSave = new PostHashtag(null, savedPost,); //id는 왜 있지
-            hashTagsToSave.add(hashtagToSave);
-
+        for(String hashTagToSave : nonExistingHashTags){
+            hashtagsToSave.add(new Hashtag(hashTagToSave));
         }
 
-         */
+        List<Hashtag> savedHashTags = hashtagRepository.saveAll(hashtagsToSave);
+
+
+        List<PostHashtag> phashTagsToSave = new ArrayList<>();
+
+        for(Hashtag hashTag : existingHashTags){
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+            phashTagsToSave.add(pHashtagToSave);
+        }
+        for(Hashtag hashTag : savedHashTags){
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+            phashTagsToSave.add(pHashtagToSave);
+        }
+
+        postHashtagRepository.saveAll(phashTagsToSave);
 
         return savedPost.getId();
-
     }
 }
