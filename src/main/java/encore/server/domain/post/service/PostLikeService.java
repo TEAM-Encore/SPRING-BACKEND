@@ -7,10 +7,12 @@ import encore.server.domain.post.repository.PostLikeRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.global.exception.ApplicationException;
+import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +26,10 @@ public class PostLikeService {
     public void toggleLike(PostLikeReq postLikeReq) throws Exception {
 
         User user = userRepository.findById(postLikeReq.getUserId())
-                .orElseThrow(() -> new NotFoundException("Could not found user id : " + postLikeReq.getUserId()));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Post post = postRepository.findById(postLikeReq.getPostId())
-                .orElseThrow(() -> new NotFoundException("Could not found post id : " + postLikeReq.getPostId()));
-
+                .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
         // PostLike 객체가 있는지 확인
         PostLike postLike = postLikeRepository.findByUserAndPost(user, post).orElse(null);
