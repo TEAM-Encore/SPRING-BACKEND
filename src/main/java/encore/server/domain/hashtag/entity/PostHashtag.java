@@ -1,6 +1,7 @@
 package encore.server.domain.hashtag.entity;
 
 import encore.server.domain.post.entity.Post;
+import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostHashtag {
+public class PostHashtag extends BaseTimeEntity {
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
