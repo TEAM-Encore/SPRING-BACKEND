@@ -1,5 +1,6 @@
 package encore.server.domain.hashtag.entity;
 
+import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Hashtag {
+public class Hashtag extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, columnDefinition = "bigint")
@@ -19,7 +20,7 @@ public class Hashtag {
     private String name;
 
     @Builder
-    private Hashtag(String name) {
+    public Hashtag(String name) {
         this.name = name;
     }
 }

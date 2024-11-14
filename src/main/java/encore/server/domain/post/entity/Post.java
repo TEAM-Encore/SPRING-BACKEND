@@ -63,10 +63,12 @@ public class Post extends BaseTimeEntity {
     private Long commentCount;
 
     @Builder
-    public Post(User user, String title, String content, PostType postType, Category category, List<PostHashtag> postHashtags, List<PostImage> postImages) {
+    public Post(User user, String title, String content,Boolean isNotice, Boolean isTemporarySave, PostType postType, Category category, List<PostHashtag> postHashtags, List<PostImage> postImages) {
         this.user = user;
         this.title = title;
         this.content = content;
+        this.isNotice = isNotice;
+        this.isTemporarySave = isTemporarySave;
         this.postType = postType;
         this.category = category;
         this.postHashtags = postHashtags;
