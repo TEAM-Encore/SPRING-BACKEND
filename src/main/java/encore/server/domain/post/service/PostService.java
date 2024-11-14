@@ -12,6 +12,7 @@ import encore.server.domain.post.converter.PostImageConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
+import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
@@ -27,6 +28,8 @@ import encore.server.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -123,7 +126,7 @@ public class PostService {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post not found"));
-        
+
         //이미지 업데이트
         List<PostImage> imagesToSave = new ArrayList<>();
         for(String imgUrl : imgUrls){
@@ -245,5 +248,15 @@ public class PostService {
         postHashtagRepository.saveAll(phashTagsToSave);
 
         return savedPost.getId();
+    }
+
+    public Slice<SimplePostRes> getPostPagination(Long cursor, String category,
+                                                  String type, String searchWord, Pageable pageable) {
+
+        return postRepository.findPostsByCursor(cursor, category, type, searchWord, pageable);
+    }
+
+    public Slice<SimplePostRes> getPostPaginationByHashtag(Long cursor, String hashtag, Pageable pageable) {
+        return postRepository.findPostsByHashtag(cursor, hashtag, pageable);
     }
 }

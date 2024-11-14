@@ -3,15 +3,20 @@ package encore.server.domain.post.controller;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
+import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.service.PostService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -108,22 +113,23 @@ public class PostController {
 
     }
 
-    /*
-    @GetMapping("/{hashtag_name}/{post_type}/{sort_by}")
-    @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse getPostsWithHashtag(
-            @PathVariable("hashtag_name") String hashtagName,
-            @PathVariable("post_type") String postType,
-            @PathVariable("sort_by") String sortBy
-    ){
-
-        log.info("[POST]-[PostController]-[getPostsWithHashtag] /post/{hashtag_name}/{post_type}/{sort_by} API call");
-
-
-
+    @GetMapping("/list")
+    @Operation(summary = "게시글 페이징 조회", description = "게시글을 커서 기반 페이징으로 조회합니다.")
+    public ApplicationResponse<Slice<SimplePostRes>> getPostPagination(@RequestParam(name = "cursor", required = false) Long cursor,
+                                                                       @RequestParam(name = "category", required = false) String category,
+                                                                       @RequestParam(name = "type", required = false) String type,
+                                                                       @RequestParam(name = "search_word", required = false) String searchWord,
+                                                                       @PageableDefault(size = 3) Pageable pageable) {
+        return ApplicationResponse.ok(postService.getPostPagination(cursor, category, type, searchWord, pageable));
     }
 
-     */
+    @GetMapping("/hashtag-list")
+    @Operation(summary = "해시태그별 게시글 페이징 조회", description = "해시태그별 게시글을 커서 기반 페이징으로 조회합니다.")
+    public ApplicationResponse<Slice<SimplePostRes>> getPostPaginationByHashtag(@RequestParam(name = "cursor", required = false) Long cursor,
+                                                                                @RequestParam(name = "hashtag", required = false) String hashtag,
+                                                                                @PageableDefault(size = 3) Pageable pageable) {
+        return ApplicationResponse.ok(postService.getPostPaginationByHashtag(cursor, hashtag, pageable));
+    }
 
 
     public Long mockUserIdProvide(){

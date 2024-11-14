@@ -5,6 +5,7 @@ import encore.server.domain.hashtag.entity.PostHashtag;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
+import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
@@ -77,6 +78,21 @@ public class PostConverter {
                 numOfComment
         );
 
+    }
+
+    public static final SimplePostRes toSimplePostRes(Post post, User user) {
+        return SimplePostRes.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory() != null ? post.getCategory().getCategory() : null)
+                .type(post.getPostType() != null ? post.getPostType().getType() : null)
+                .thumbnail(post.getPostImages().isEmpty() ? null : post.getPostImages().get(0).getUrl())
+                .likeCount(post.getLikeCount())
+                .commentCount(post.getCommentCount())
+                .userId(user.getId())
+                .nickname(user.getNickName())
+                .build();
     }
 
 }
