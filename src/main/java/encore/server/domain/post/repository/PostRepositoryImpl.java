@@ -35,7 +35,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         predicate.and(addCursorCondition(cursor))
                 .and(addCategoryCondition(category))
                 .and(addTypeCondition(type))
-                .and(addSearchWordCondition(searchWord));
+                .and(addSearchWordCondition(searchWord))
+                .and(post.deletedAt.isNull());
 
         List<Post> posts = queryFactory.selectFrom(post)
                 .where(predicate)
@@ -58,7 +59,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public Slice<SimplePostRes> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable) {
         BooleanBuilder predicate = new BooleanBuilder();
         predicate.and(addCursorCondition(cursor))
-                .and(addHashtagCondition(hashtag));
+                .and(addHashtagCondition(hashtag))
+                .and(post.deletedAt.isNull());
 
         List<Post> posts = queryFactory.selectFrom(post)
                 .where(predicate)
