@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/comments")
+@RequestMapping("api/v1/comment")
 @Tag(name = "댓글 API", description = "댓글 작성/수정/조회/삭제 API입니다.")
 public class CommentController {
 

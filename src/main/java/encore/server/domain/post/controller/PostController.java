@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/post")
-@Tag(name = "Post", description = "게시글 API")
+@Tag(name = "게시판 API", description = "게시판 관련 기능 API입니다.")
 @Slf4j
 public class PostController {
 
@@ -35,6 +35,7 @@ public class PostController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "게시글 작성 API", description = "게시글을 작성합니다.")
     public ApplicationResponse<Long> createPost(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
 
         log.info("[POST]-[PostController]-[post] post API call");
@@ -63,6 +64,7 @@ public class PostController {
 
     @PutMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "게시글 수정 API", description = "게시글을 수정합니다.")
     public ApplicationResponse<Long> updatePost(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
 
         log.info("[POST]-[PostController]-[postUpdate] update API call");
@@ -89,6 +91,7 @@ public class PostController {
 
     @DeleteMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")
     public ApplicationResponse deletePost(@PathVariable("post_id") Long postIdToDelete){
 
         log.info("[POST]-[PostController]-[postDelete] post delete API call");
@@ -103,6 +106,7 @@ public class PostController {
 
     @GetMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "게시글 상세 조회 API", description = "게시글 상세 정보를 조회합니다.")
     public ApplicationResponse<PostDetailsGetRes> getPostDetails(@PathVariable("post_id") Long postId){
 
         log.info("[POST]-[PostController]-[getPostDetails] /post/{post_id} API call");
@@ -114,7 +118,7 @@ public class PostController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "게시글 페이징 조회", description = "게시글을 커서 기반 페이징으로 조회합니다.")
+    @Operation(summary = "게시글 페이징 조회 API", description = "게시글을 커서 기반 페이징으로 조회합니다.")
     public ApplicationResponse<Slice<SimplePostRes>> getPostPagination(@RequestParam(name = "cursor", required = false) Long cursor,
                                                                        @RequestParam(name = "category", required = false) String category,
                                                                        @RequestParam(name = "type", required = false) String type,
@@ -124,7 +128,7 @@ public class PostController {
     }
 
     @GetMapping("/hashtag-list")
-    @Operation(summary = "해시태그별 게시글 페이징 조회", description = "해시태그별 게시글을 커서 기반 페이징으로 조회합니다.")
+    @Operation(summary = "해시태그별 게시글 페이징 조회 API", description = "해시태그별 게시글을 커서 기반 페이징으로 조회합니다.")
     public ApplicationResponse<Slice<SimplePostRes>> getPostPaginationByHashtag(@RequestParam(name = "cursor", required = false) Long cursor,
                                                                                 @RequestParam(name = "hashtag", required = false) String hashtag,
                                                                                 @PageableDefault(size = 3) Pageable pageable) {
