@@ -28,4 +28,12 @@ public class PostController {
                                                               @PageableDefault(size = 3) Pageable pageable) {
         return ApplicationResponse.ok(postService.getPostPagination(cursor, category, type, searchWord, pageable));
     }
+
+    @GetMapping("/hashtag-list")
+    @Operation(summary = "해시태그별 게시글 페이징 조회", description = "해시태그별 게시글을 커서 기반 페이징으로 조회합니다.")
+    public ApplicationResponse<Slice<SimplePostRes>> getPostPaginationByHashtag(@RequestParam(name = "cursor", required = false) Long cursor,
+                                                              @RequestParam(name = "hashtag", required = false) String hashtag,
+                                                              @PageableDefault(size = 3) Pageable pageable) {
+        return ApplicationResponse.ok(postService.getPostPaginationByHashtag(cursor, hashtag, pageable));
+    }
 }

@@ -21,4 +21,8 @@ public class PostService {
 
         return postRepository.findPostsByCursor(cursor, category, type, searchWord, pageable);
     }
+
+    public Slice<SimplePostRes> getPostPaginationByHashtag(Long cursor, String hashtag, Pageable pageable) {
+        return postRepository.findPostsByHashtag(cursor, hashtag, pageable);
+    }
 }

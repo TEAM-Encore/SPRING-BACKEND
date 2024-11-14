@@ -54,6 +54,29 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 
+    @Override
+    public Slice<SimplePostRes> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable) {
+        BooleanBuilder predicate = new BooleanBuilder();
+        predicate.and(addCursorCondition(cursor))
+                .and(addHashtagCondition(hashtag));
+
+        List<Post> posts = queryFactory.selectFrom(post)
+                .where(predicate)
+                .leftJoin(post.user, user).fetchJoin()
+                .orderBy(getSortOrder(pageable))
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = posts.size() > pageable.getPageSize();
+
+        List<SimplePostRes> postResponses = posts.stream()
+                .limit(pageable.getPageSize())
+                .map(post -> PostConverter.toSimplePostRes(post, post.getUser()))
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(postResponses, pageable, hasNext);
+    }
+
     private OrderSpecifier<?>[] getSortOrder(Pageable pageable) {
         return pageable.getSort().stream()
                 .map(order -> {
@@ -95,6 +118,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         if (searchWord != null && !searchWord.isEmpty()) {
             return post.title.containsIgnoreCase(searchWord)
                     .or(post.content.containsIgnoreCase(searchWord));
+        }
+        return null;
+    }
+
+    private BooleanExpression addHashtagCondition(String hashtag) {
+        if (hashtag != null && !hashtag.isEmpty()) {
+            return post.postHashtags.any().hashtag.name.eq(hashtag);
         }
         return null;
     }
