@@ -19,11 +19,15 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "bigint")
     private Long id;
 
+    @Column(nullable = false, columnDefinition = "varchar(255)")
+    private String nickName;
+
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long point;
 
     @Builder
-    public User(Long point) {
+    public User(String nickName, Long point) {
+        this.nickName = nickName;
         this.point = point;
     }
 }
