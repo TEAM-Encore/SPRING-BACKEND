@@ -11,7 +11,9 @@ import java.util.List;
 public record PostDetailsGetRes(
 
         Long postId,
-        String userName,
+        Long userId,
+        String nickName,
+        String profileImageUrl,
         String title,
         String content,
         Boolean isNotice,

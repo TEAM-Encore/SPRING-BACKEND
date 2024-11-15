@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/image")
-@Tag(name = "이미지", description = "Presigned URL 발급과 관련된 API입니다.")
+@Tag(name = "이미지 API", description = "Presigned URL 발급과 관련된 API입니다.")
 public class ImageController {
 
     private final ImageService imageService;

@@ -56,6 +56,12 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostImage> postImages = new ArrayList<>();
 
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long likeCount;
+
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long commentCount;
+
     @Builder
     public Post(User user, String title, String content,Boolean isNotice, Boolean isTemporarySave, PostType postType, Category category, List<PostHashtag> postHashtags, List<PostImage> postImages) {
         this.user = user;
