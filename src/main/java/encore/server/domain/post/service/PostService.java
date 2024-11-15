@@ -72,6 +72,7 @@ public class PostService {
         List<String> stringListFromPostHashtag = postHashtagConverter.stringListFrom(allByPost);
         List<String> stringListFromPostImage = postImageConverter.stringListFrom(post.getPostImages());
 
+        //Postlike 에서 Post 의 likeCount를 수정하는 로직이 있나?
         Integer numOfLike = postLikeRepository.countByPostAndDeletedAtIsNull(post);
         Integer numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
 
