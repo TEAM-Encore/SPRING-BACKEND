@@ -1,0 +1,26 @@
+services:
+  redis:
+    container_name: encore-redis
+    image: redis:7.0.11
+    ports:
+      - "6379:6379"
+    networks:
+      - encore_network
+
+  mysql:
+    container_name: encore-db
+    image: mysql:8.0.33
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: encoredb
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    depends_on:
+      - redis
+    networks:
+      - encore_network
+
+networks:
+  encore_network:
+    driver: bridge
