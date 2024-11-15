@@ -1,10 +1,12 @@
 package encore.server.domain.post.controller;
 
 import encore.server.domain.post.dto.request.PostCreateReq;
+import encore.server.domain.post.dto.request.PostLikeReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
+import encore.server.domain.post.service.PostLikeService;
 import encore.server.domain.post.service.PostService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.BadRequestException;
@@ -32,6 +34,13 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final PostLikeService postLikeService;
+
+    @PostMapping("/likes")
+    public ApplicationResponse<Void> toggleLike(@RequestBody @Valid PostLikeReq postLikeReq) throws Exception {
+        postLikeService.toggleLike(postLikeReq);
+        return  ApplicationResponse.ok();
+    }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
