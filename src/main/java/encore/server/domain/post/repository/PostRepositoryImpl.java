@@ -88,7 +88,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         case "likecount":
                             return new OrderSpecifier<>(Order.DESC, post.likeCount);
                         default:
-                            return new OrderSpecifier<>(Order.DESC, post.createdAt);
+                            return new OrderSpecifier<>(Order.DESC, post.id);
                     }
                 })
                 .toArray(OrderSpecifier[]::new);

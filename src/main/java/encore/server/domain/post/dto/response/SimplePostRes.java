@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record SimplePostRes(
@@ -21,7 +23,7 @@ public record SimplePostRes(
         @Schema(description = "게시글 카테고리", example = "OPERA_GLASS_RENTAL | MUSICAL_TERMS | EVENTS | VIEW_REVIEW | GOODS_REVIEW | PERFORMANCE_REVIEW")
         String category,
 
-        @Schema(description = "게시글 타입", example = "NOTICE | FREE | QNA | REVIEW")
+        @Schema(description = "게시글 타입", example = "INFORMATION | FREE | ACTOR | REVIEW")
         String type,
 
         @Schema(description = "게시글 썸네일", example = "게시글 썸네일")
@@ -37,6 +39,9 @@ public record SimplePostRes(
         Long userId,
 
         @Schema(description = "게시글 작성자 닉네임", example = "작성자 닉네임")
-        String nickname
+        String nickname,
+
+        @Schema(description = "게시글 생성일", example = "2021-07-01 00:00:00")
+        LocalDateTime createdAt
 ) {
 }

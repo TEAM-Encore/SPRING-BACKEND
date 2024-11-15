@@ -123,7 +123,7 @@ public class PostController {
                                                                        @RequestParam(name = "category", required = false) String category,
                                                                        @RequestParam(name = "type", required = false) String type,
                                                                        @RequestParam(name = "search_word", required = false) String searchWord,
-                                                                       @PageableDefault(size = 3) Pageable pageable) {
+                                                                       @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
         return ApplicationResponse.ok(postService.getPostPagination(cursor, category, type, searchWord, pageable));
     }
 
@@ -131,7 +131,7 @@ public class PostController {
     @Operation(summary = "해시태그별 게시글 페이징 조회 API", description = "해시태그별 게시글을 커서 기반 페이징으로 조회합니다.")
     public ApplicationResponse<Slice<SimplePostRes>> getPostPaginationByHashtag(@RequestParam(name = "cursor", required = false) Long cursor,
                                                                                 @RequestParam(name = "hashtag", required = false) String hashtag,
-                                                                                @PageableDefault(size = 3) Pageable pageable) {
+                                                                                @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
         return ApplicationResponse.ok(postService.getPostPaginationByHashtag(cursor, hashtag, pageable));
     }
 
