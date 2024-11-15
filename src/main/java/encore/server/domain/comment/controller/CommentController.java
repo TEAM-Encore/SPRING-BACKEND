@@ -51,4 +51,12 @@ public class CommentController {
         commentService.delete(postId, commentId, userId);
         return ApplicationResponse.ok();
     }
+
+    @Operation(summary = "댓글 좋아요 API", description = "특정 댓글에 좋아요를 누릅니다.")
+    @PostMapping("/{post_id}/{comment_id}/like")
+    public ApplicationResponse<?> likeComment(@PathVariable(value = "post_id") Long postId,
+                                              @PathVariable(value = "comment_id") Long commentId) {
+        Long userId = 1L; //수동 설정
+        return ApplicationResponse.ok(commentService.like(postId, commentId, userId));
+    }
 }

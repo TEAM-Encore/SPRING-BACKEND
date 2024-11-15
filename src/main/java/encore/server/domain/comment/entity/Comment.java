@@ -39,8 +39,11 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "parent_id", columnDefinition = "bigint")
     private Comment parentId;
 
-    @OneToMany(mappedBy = "parentId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> childComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CommentLike> likes = new ArrayList<>();
 
     @Builder
     public Comment(Post post, User user, String content, Comment parentId) {
@@ -52,5 +55,9 @@ public class Comment extends BaseTimeEntity {
 
     public void update(String content) {
         this.content = content;
+    }
+
+    public void setChildComment(List<Comment> comments) {
+        this.childComments = comments;
     }
 }
