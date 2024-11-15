@@ -21,4 +21,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("UPDATE Comment c SET c.deletedAt = CURRENT_TIMESTAMP WHERE c.post.id = :postId")
     void softDeleteByPostId(@Param("postId") Long postId);
 
+    List<Comment> findByParentIdAndDeletedAtIsNull(Comment comment);
 }

@@ -1,8 +1,10 @@
 package encore.server.domain.comment.converter;
 
 import encore.server.domain.comment.dto.request.CommentReq;
+import encore.server.domain.comment.dto.response.CommentLikeRes;
 import encore.server.domain.comment.dto.response.CommentRes;
 import encore.server.domain.comment.entity.Comment;
+import encore.server.domain.comment.entity.CommentLike;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.user.entity.User;
 
@@ -19,6 +21,7 @@ public class CommentConverter {
     }
 
     public static CommentRes toResponse(Comment comment, User user) {
+
         return CommentRes.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
@@ -28,6 +31,12 @@ public class CommentConverter {
                 .isMyComment(comment.getUser().getId().equals(user.getId()))
                 .createdAt(comment.getCreatedAt())
                 .modifiedAt(comment.getModifiedAt())
+                .userId(comment.getUser().getId())
+                .nickname(comment.getUser().getNickName())
+                .profileImageUrl(comment.getUser().getProfileImageUrl())
+                .likeCount((long) comment.getLikes().size())
+                .isLiked(comment.getLikes().stream().anyMatch(like -> like.getUser().getId().equals(user.getId())))
+                .childCommentCount((long) comment.getChildComments().size())
                 .build();
     }
 
@@ -35,5 +44,14 @@ public class CommentConverter {
         return comments.stream()
                 .map(comment -> toResponse(comment, user))
                 .toList();
+    }
+
+    public static CommentLikeRes toLikeResponse(CommentLike commentlike, Long count) {
+        return CommentLikeRes.builder()
+                .commentId(commentlike.getComment().getId())
+                .userId(commentlike.getUser().getId())
+                .isLiked(commentlike.isLiked())
+                .likeCount(count)
+                .build();
     }
 }
