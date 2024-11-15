@@ -79,7 +79,7 @@ public class PostService {
         //**userEntity 에 Name 필드 추가 필요
         //PostDetailGetRes 생성하여 return
         return postConverter.postDetailsGetResFrom(post, stringListFromPostHashtag,
-                stringListFromPostImage, String.valueOf(post.getUser().getId()), numOfLike, numOfComment);
+                stringListFromPostImage, numOfLike, numOfComment);
     }
 
     @Transactional

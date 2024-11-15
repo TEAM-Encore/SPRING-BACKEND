@@ -50,8 +50,7 @@ public class PostConverter {
     }
 
     public PostDetailsGetRes postDetailsGetResFrom(
-            Post post, List<String> hashtags, List<String> postImages,
-            String userName, Integer numOfLike, Integer numOfComment
+            Post post, List<String> hashtags, List<String> postImages, Integer numOfLike, Integer numOfComment
     ) {
 
         Boolean isModified = true;
@@ -62,7 +61,9 @@ public class PostConverter {
 
         return new PostDetailsGetRes(
                 post.getId(),
-                userName,
+                post.getUser().getId(),
+                post.getUser().getNickName(),
+                post.getUser().getProfileImageUrl(),
                 post.getTitle(),
                 post.getContent(),
                 post.getIsNotice(),
@@ -92,6 +93,7 @@ public class PostConverter {
                 .commentCount(post.getCommentCount())
                 .userId(user.getId())
                 .nickname(user.getNickName())
+                .createdAt(post.getCreatedAt())
                 .build();
     }
 
