@@ -23,31 +23,24 @@ public class PostConverter {
 
     //PostCreateReq -> Post 로 변환
     public Post convert(PostCreateReq postCreateReq, User user){
-        return new Post(user,
-                postCreateReq.title(),
-                postCreateReq.content(),
-                postCreateReq.isNotice(),
-                postCreateReq.isTemporarySave(),
-                PostType.valueOf(postCreateReq.postType()),
-                Category.valueOf(postCreateReq.category()),
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
+
+        return Post.builder()
+                .user(user)
+                .title(postCreateReq.title())
+                .content(postCreateReq.content())
+                .isNotice(postCreateReq.isNotice())
+                .isTemporarySave(postCreateReq.isTemporarySave())
+                .postType(PostType.valueOf(postCreateReq.postType()))
+                .category(Category.valueOf(postCreateReq.category()))
+                .postHashtags(new ArrayList<>())  // 빈 리스트 초기화
+                .postImages(new ArrayList<>())  // 빈 리스트 초기화
+                .likeCount(0L)
+                .commentCount(0L)
+                .build();
+
     }
 
-    //PostUpdateReq -> Post 로 변환
-    public Post convert(PostUpdateReq postUpdateReq, User user){
-        return new Post(user,
-                postUpdateReq.title(),
-                postUpdateReq.content(),
-                postUpdateReq.isNotice(),
-                postUpdateReq.isTemporarySave(),
-                PostType.valueOf(postUpdateReq.postType()),
-                Category.valueOf(postUpdateReq.category()),
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
-    }
+
 
     public PostDetailsGetRes postDetailsGetResFrom(
             Post post, List<String> hashtags, List<String> postImages, Integer numOfLike, Integer numOfComment

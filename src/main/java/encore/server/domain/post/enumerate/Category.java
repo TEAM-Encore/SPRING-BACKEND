@@ -15,7 +15,9 @@ public enum Category {
     // 후기 게시판
     VIEW_REVIEW("시야 후기"),
     GOODS_REVIEW("굿즈 후기"),
-    PERFORMANCE_REVIEW("공연 감상 후기");
+    PERFORMANCE_REVIEW("공연 감상 후기"),
+
+    NO_SELECT("카테고리 미선택");
 
     private final String category;
 }
