@@ -3,6 +3,7 @@ package encore.server.domain.post.controller;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostLikeReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
+import encore.server.domain.post.dto.response.PostCreateRes;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
@@ -45,7 +46,7 @@ public class PostController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "게시글 작성 API", description = "게시글을 작성합니다.")
-    public ApplicationResponse<Long> createPost(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
+    public ApplicationResponse<PostCreateRes> createPost(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
 
         log.info("[POST]-[PostController]-[post] post API call");
 
@@ -68,13 +69,13 @@ public class PostController {
         log.info("[POST]-[PostController]-[post] post API terminated successfully");
 
         //Response Create
-        return new ApplicationResponse(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post created successfully", postId);
+        return new ApplicationResponse(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post created successfully", new PostCreateRes(postId));
     }
 
     @PutMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "게시글 수정 API", description = "게시글을 수정합니다.")
-    public ApplicationResponse<Long> updatePost(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
+    public ApplicationResponse<PostCreateRes> updatePost(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
 
         log.info("[POST]-[PostController]-[postUpdate] update API call");
 
@@ -94,7 +95,7 @@ public class PostController {
         //Business logic
         Long postId = postService.updatePost(postIdToUpdate, postUpdateReq);
 
-        return new ApplicationResponse<>(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post updated successfully", postId);
+        return new ApplicationResponse<>(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post updated successfully", new PostCreateRes(postId));
     }
 
 
