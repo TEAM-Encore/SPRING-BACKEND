@@ -75,7 +75,7 @@ public class PostController {
     @PutMapping("/{post_id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "게시글 수정 API", description = "게시글을 수정합니다.")
-    public ApplicationResponse<Long> updatePost(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
+    public ApplicationResponse<PostCreateRes> updatePost(@PathVariable("post_id") Long postIdToUpdate, @RequestBody @Valid PostUpdateReq postUpdateReq, BindingResult bindingResult){
 
         log.info("[POST]-[PostController]-[postUpdate] update API call");
 
@@ -95,7 +95,7 @@ public class PostController {
         //Business logic
         Long postId = postService.updatePost(postIdToUpdate, postUpdateReq);
 
-        return new ApplicationResponse<>(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post updated successfully", postId);
+        return new ApplicationResponse<>(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post updated successfully", new PostCreateRes(postId));
     }
 
 
