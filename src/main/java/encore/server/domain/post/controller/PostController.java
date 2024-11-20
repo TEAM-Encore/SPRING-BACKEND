@@ -3,6 +3,7 @@ package encore.server.domain.post.controller;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostLikeReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
+import encore.server.domain.post.dto.response.PostCreateRes;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
@@ -45,7 +46,7 @@ public class PostController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "게시글 작성 API", description = "게시글을 작성합니다.")
-    public ApplicationResponse<Long> createPost(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
+    public ApplicationResponse<PostCreateRes> createPost(@RequestBody @Valid PostCreateReq postCreateReq, BindingResult bindingResult) {
 
         log.info("[POST]-[PostController]-[post] post API call");
 
@@ -68,7 +69,7 @@ public class PostController {
         log.info("[POST]-[PostController]-[post] post API terminated successfully");
 
         //Response Create
-        return new ApplicationResponse(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post created successfully", postId);
+        return new ApplicationResponse(LocalDateTime.now(), ErrorCode.SUCCESS.getCode(), "Post created successfully", new PostCreateRes(postId));
     }
 
     @PutMapping("/{post_id}")
