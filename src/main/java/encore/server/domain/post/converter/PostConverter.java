@@ -74,6 +74,7 @@ public class PostConverter {
 
     }
 
+    //likeCount인자 추가
     public static final SimplePostRes toSimplePostRes(Post post, User user) {
         return SimplePostRes.builder()
                 .id(post.getId())

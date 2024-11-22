@@ -47,5 +47,11 @@ public class PostLikeService {
         }
 
         postLikeRepository.save(postLike);
+
+        // Post의 likeCount를 쿼리로 갱신
+        Long newLikeCount = postLikeRepository.countByPostAndLikedTrue(post);
+        post.setLikeCount(newLikeCount);
+
+        postRepository.save(post); // likeCount를 갱신한 후 post를 저장
     }
 }

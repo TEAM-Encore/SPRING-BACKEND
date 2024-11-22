@@ -11,6 +11,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
+    // 특정 Post에 대해 liked가 true인 좋아요의 개수를 세는 메서드
+    Long countByPostAndLikedTrue(Post post);
+
     Optional<PostLike> findByUserAndPost(User user, Post post);
     Integer countByPostAndDeletedAtIsNull(Post post);
 
