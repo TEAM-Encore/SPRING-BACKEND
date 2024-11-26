@@ -6,7 +6,8 @@ import encore.server.domain.hashtag.entity.Hashtag;
 import encore.server.domain.hashtag.entity.PostHashtag;
 import encore.server.domain.hashtag.repository.HashtagRepository;
 import encore.server.domain.hashtag.repository.PostHashtagRepository;
-import encore.server.domain.hashtag.service.HashtagService;
+import encore.server.domain.term.entity.Term;
+import encore.server.domain.term.repository.TermRepository;
 import encore.server.domain.post.converter.PostConverter;
 import encore.server.domain.post.converter.PostImageConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
@@ -22,22 +23,17 @@ import encore.server.domain.post.repository.PostLikeRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
-import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +49,7 @@ public class PostService {
     private final PostHashtagRepository postHashtagRepository;
     private final CommentRepository commentRepository;
     private final PostLikeRepository postLikeRepository;
+    private final TermRepository musicalTermRepository;
 
     private final PostConverter postConverter;
     private final PostHashtagConverter postHashtagConverter;
@@ -74,13 +71,13 @@ public class PostService {
 
         //Postlike 에서 Post 의 likeCount를 수정하는 로직이 있나?
         Integer numOfLike = postLikeRepository.countByPostAndDeletedAtIsNull(post);
-        Integer numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
+        Long numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
 
 
         //**userEntity 에 Name 필드 추가 필요
         //PostDetailGetRes 생성하여 return
         return postConverter.postDetailsGetResFrom(post, stringListFromPostHashtag,
-                stringListFromPostImage, numOfLike, numOfComment);
+                stringListFromPostImage, numOfLike, numOfComment, Collections.emptyList());
     }
 
     @Transactional
@@ -171,8 +168,8 @@ public class PostService {
             PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
             phashTagsToSave.add(pHashtagToSave);
         }
-        for(Hashtag hashTag : savedHashTags){
-            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+        for(Hashtag hashTag : savedHashTags) {
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost, hashTag); //id는 왜 있지
             phashTagsToSave.add(pHashtagToSave);
         }
 
@@ -184,7 +181,7 @@ public class PostService {
     }
 
     @Transactional
-    public Long createPost(PostCreateReq postCreateReq, Long userId){
+    public Long createPost(PostCreateReq postCreateReq, Long userId) {
 
         log.info("[POST]-[PostService]-[createPost] method call");
 
@@ -203,7 +200,7 @@ public class PostService {
         // 이미지 url추출 후 따로 PostImage 저장(post pk를 sequence로 하는게 성능상 좋을수도)
         List<PostImage> imagesToSave = new ArrayList<>();
 
-        for(String imgUrl : imgUrls){
+        for (String imgUrl : imgUrls) {
             PostImage imageToSave = new PostImage(null, imgUrl, savedPost); //id는 왜 있지
             imagesToSave.add(imageToSave);
         }
@@ -228,7 +225,7 @@ public class PostService {
 
         List<Hashtag> hashtagsToSave = new ArrayList<>();
 
-        for(String hashTagToSave : nonExistingHashTags){
+        for (String hashTagToSave : nonExistingHashTags) {
             hashtagsToSave.add(new Hashtag(hashTagToSave));
         }
 
@@ -237,17 +234,40 @@ public class PostService {
 
         List<PostHashtag> phashTagsToSave = new ArrayList<>();
 
-        for(Hashtag hashTag : existingHashTags){
-            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+        for (Hashtag hashTag : existingHashTags) {
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost, hashTag); //id는 왜 있지
             phashTagsToSave.add(pHashtagToSave);
         }
-        for(Hashtag hashTag : savedHashTags){
-            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost,hashTag); //id는 왜 있지
+        for (Hashtag hashTag : savedHashTags) {
+            PostHashtag pHashtagToSave = new PostHashtag(null, savedPost, hashTag); //id는 왜 있지
             phashTagsToSave.add(pHashtagToSave);
         }
 
+        // 시작 시간 측정
+        long startTime = System.currentTimeMillis();
+
+// content를 기준으로 MusicalTerm 조회
+        List<Term> matchingTerms = musicalTermRepository.findByTermIn(post.getContent());
+
+// MusicalTerm이 존재하면 content에 태그 추가
+        if (!matchingTerms.isEmpty()) {
+            String updatedContent = musicalTermRepository.highlightTermsInContent(post.getContent());
+            post.updateContent(updatedContent); // 수정된 content를 post에 반영
+        }
+
+// MusicalTerm 저장
+        musicalTermRepository.saveAll(matchingTerms);
+
+// 종료 시간 측정
+        long endTime = System.currentTimeMillis();
+
+// 소요 시간 출력
+        System.out.println("Execution Time: " + (endTime - startTime) + " ms");
+
+// PostHashtags 저장
         postHashtagRepository.saveAll(phashTagsToSave);
 
+// Post ID 반환
         return savedPost.getId();
     }
 

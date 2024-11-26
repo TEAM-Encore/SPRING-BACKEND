@@ -50,6 +50,8 @@ public class CommentService {
             parentComment.getChildComments().add(comment);
         }
 
+        Long numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
+        post.updateCommentCount(numOfComment+1);
         commentRepository.save(comment);
 
         // return: 생성된 댓글 정보 반환
@@ -95,6 +97,9 @@ public class CommentService {
         if(!comment.getUser().equals(user)) {
             throw new ApplicationException(ErrorCode.COMMENT_NOT_OWNER_EXCEPTION);
         }
+
+        Long numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
+        post.updateCommentCount(numOfComment-1);
 
         //business logic: 댓글 논리적 삭제
         commentRepository.delete(comment);

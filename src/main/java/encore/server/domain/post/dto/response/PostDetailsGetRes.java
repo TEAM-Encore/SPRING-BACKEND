@@ -1,11 +1,8 @@
 package encore.server.domain.post.dto.response;
 
-import encore.server.domain.hashtag.entity.PostHashtag;
-import encore.server.domain.post.entity.Post;
-import encore.server.domain.post.entity.PostImage;
+import encore.server.domain.term.dto.MusicalTermRes;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public record PostDetailsGetRes(
@@ -25,10 +22,9 @@ public record PostDetailsGetRes(
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
         Boolean isModified,
+        Boolean isLiked,
         Integer numOfLike,
-        Integer numOfComment
-
+        Long numOfComment,
+        List<MusicalTermRes> terms
 ) {
-
-
 }

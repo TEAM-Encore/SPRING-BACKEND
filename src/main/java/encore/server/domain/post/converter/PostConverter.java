@@ -1,16 +1,16 @@
 package encore.server.domain.post.converter;
 
 
-import encore.server.domain.hashtag.entity.PostHashtag;
+import encore.server.domain.term.converter.MusicalTermConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
-import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
-import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
+import encore.server.domain.term.entity.Term;
 import encore.server.domain.user.entity.User;
+import encore.server.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,6 +20,12 @@ import java.util.Objects;
 
 @Component
 public class PostConverter {
+
+    private final UserRepository userRepository;
+
+    public PostConverter(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     //PostCreateReq -> Post 로 변환
     public Post convert(PostCreateReq postCreateReq, User user){
@@ -43,7 +49,7 @@ public class PostConverter {
 
 
     public PostDetailsGetRes postDetailsGetResFrom(
-            Post post, List<String> hashtags, List<String> postImages, Integer numOfLike, Integer numOfComment
+            Post post, List<String> hashtags, List<String> postImages, Integer numOfLike, Long numOfComment, List<Term> musicalTerms
     ) {
 
         Boolean isModified = true;
@@ -51,6 +57,7 @@ public class PostConverter {
         if (Objects.equals(post.getModifiedAt(), post.getCreatedAt())) {
             isModified = false;
         }
+        User user = userRepository.findByIdAndDeletedAtIsNull(1L).orElseThrow();
 
         return new PostDetailsGetRes(
                 post.getId(),
@@ -68,8 +75,10 @@ public class PostConverter {
                 post.getCreatedAt(),
                 post.getModifiedAt(),
                 isModified,
+                post.getPostLikes().stream().anyMatch(postLike -> postLike.getUser().getId().equals(user.getId())),
                 numOfLike,
-                numOfComment
+                numOfComment,
+                MusicalTermConverter.toMusicalTermResList(musicalTerms)
         );
 
     }
@@ -87,6 +96,7 @@ public class PostConverter {
                 .commentCount(post.getCommentCount())
                 .userId(user.getId())
                 .nickname(user.getNickName())
+                .isLiked(post.getPostLikes().stream().anyMatch(postLike -> postLike.getUser().getId().equals(user.getId())))
                 .createdAt(post.getCreatedAt())
                 .build();
     }
