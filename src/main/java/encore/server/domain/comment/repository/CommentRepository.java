@@ -15,7 +15,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> findByIdAndPostAndDeletedAtIsNull(Long id, Post post);
 
     List<Comment> findAllByPostAndDeletedAtIsNull(Post post);
-    Integer countByPostAndDeletedAtIsNull(Post post);
+    Long countByPostAndDeletedAtIsNull(Post post);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Comment c SET c.deletedAt = CURRENT_TIMESTAMP WHERE c.post.id = :postId")

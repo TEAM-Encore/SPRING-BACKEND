@@ -3,6 +3,7 @@ package encore.server.domain.post.entity;
 import encore.server.domain.hashtag.entity.PostHashtag;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
+import encore.server.domain.term.entity.Term;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -59,8 +60,14 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long likeCount;
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PostLike> postLikes = new ArrayList<>();
+
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long commentCount;
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Term> terms = new ArrayList<>();
 
     @Builder
     public Post(User user, String title, String content,Boolean isNotice, Boolean isTemporarySave, PostType postType,
@@ -75,6 +82,23 @@ public class Post extends BaseTimeEntity {
         this.postHashtags = postHashtags;
         this.postImages = postImages;
         this.likeCount = likeCount;
+        this.commentCount = commentCount;
+    }
+
+    public void addMusicalTerm(Term musicalTerm) {
+        this.terms.add(musicalTerm);
+        musicalTerm.setPost(this);
+    }
+
+    public void addMusicalTerms(List<Term> terms) {
+        terms.forEach(this::addMusicalTerm);
+    }
+
+    public void updateContent(String updatedContent) {
+        this.content = updatedContent;
+    }
+
+    public void updateCommentCount(Long commentCount) {
         this.commentCount = commentCount;
     }
 }
