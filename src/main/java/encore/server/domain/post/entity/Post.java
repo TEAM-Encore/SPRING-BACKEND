@@ -85,6 +85,12 @@ public class Post extends BaseTimeEntity {
         this.commentCount = commentCount;
     }
 
+    // likeCount 값을 갱신할 수 있는 setter 메서드 추가 **얘 추가함!!
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+
     public void addMusicalTerm(Term musicalTerm) {
         this.terms.add(musicalTerm);
         musicalTerm.setPost(this);
