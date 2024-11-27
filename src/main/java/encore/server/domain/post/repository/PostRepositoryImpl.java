@@ -36,6 +36,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .and(addCategoryCondition(category))
                 .and(addTypeCondition(type))
                 .and(addSearchWordCondition(searchWord))
+                .and(post.isTemporarySave.eq(false))
                 .and(post.deletedAt.isNull());
 
         List<Post> posts = queryFactory.selectFrom(post)
@@ -60,6 +61,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         BooleanBuilder predicate = new BooleanBuilder();
         predicate.and(addCursorCondition(cursor))
                 .and(addHashtagCondition(hashtag))
+                .and(post.isTemporarySave.eq(false))
                 .and(post.deletedAt.isNull());
 
         List<Post> posts = queryFactory.selectFrom(post)
