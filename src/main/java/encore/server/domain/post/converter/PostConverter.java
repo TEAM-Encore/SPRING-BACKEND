@@ -43,7 +43,7 @@ public class PostConverter {
 
 
     public PostDetailsGetRes postDetailsGetResFrom(
-            Post post, List<String> hashtags, List<String> postImages, Integer numOfLike, Integer numOfComment
+            Post post, List<String> hashtags, List<String> postImages, Long numOfLike, Long numOfComment, boolean isLiked
     ) {
 
         Boolean isModified = true;
@@ -52,26 +52,26 @@ public class PostConverter {
             isModified = false;
         }
 
-        return new PostDetailsGetRes(
-                post.getId(),
-                post.getUser().getId(),
-                post.getUser().getNickName(),
-                post.getUser().getProfileImageUrl(),
-                post.getTitle(),
-                post.getContent(),
-                post.getIsNotice(),
-                post.getIsTemporarySave(),
-                post.getPostType().name(),
-                post.getCategory().name(),
-                hashtags,
-                postImages,
-                post.getCreatedAt(),
-                post.getModifiedAt(),
-                isModified,
-                numOfLike,
-                numOfComment
-        );
-
+        return PostDetailsGetRes.builder()
+                .postId(post.getId())
+                .userId(post.getUser().getId())
+                .nickName(post.getUser().getNickName())
+                .profileImageUrl(post.getUser().getProfileImageUrl())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .isNotice(post.getIsNotice())
+                .isTemporarySave(post.getIsTemporarySave())
+                .postType(post.getPostType().name())
+                .category(post.getCategory().name())
+                .hashtags(hashtags)
+                .postImages(postImages)
+                .createdAt(post.getCreatedAt())
+                .modifiedAt(post.getModifiedAt())
+                .isModified(isModified)
+                .numOfLike(numOfLike)
+                .numOfComment(numOfComment)
+                .isLiked(isLiked)
+                .build();
     }
 
     //likeCount인자 추가

@@ -1,13 +1,10 @@
 package encore.server.domain.post.dto.response;
 
-import encore.server.domain.hashtag.entity.PostHashtag;
-import encore.server.domain.post.entity.Post;
-import encore.server.domain.post.entity.PostImage;
-
+import lombok.Builder;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 public record PostDetailsGetRes(
 
         Long postId,
@@ -25,8 +22,9 @@ public record PostDetailsGetRes(
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
         Boolean isModified,
-        Integer numOfLike,
-        Integer numOfComment
+        Long numOfLike,
+        Long numOfComment,
+        Boolean isLiked
 
 ) {
 

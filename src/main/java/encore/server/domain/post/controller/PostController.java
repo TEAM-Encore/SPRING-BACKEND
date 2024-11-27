@@ -121,7 +121,7 @@ public class PostController {
 
         log.info("[POST]-[PostController]-[getPostDetails] /post/{post_id} API call");
 
-        PostDetailsGetRes postDetailsGetRes = postService.getPostDetails(postId);
+        PostDetailsGetRes postDetailsGetRes = postService.getPostDetails(postId, mockUserIdProvide());
 
         return ApplicationResponse.ok(postDetailsGetRes);
 
