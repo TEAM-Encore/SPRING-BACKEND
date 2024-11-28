@@ -1,7 +1,7 @@
 package encore.server.domain.post.converter;
 
 
-import encore.server.domain.hashtag.entity.PostHashtag;
+import encore.server.domain.term.converter.MusicalTermConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
 import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
@@ -10,7 +10,9 @@ import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
+import encore.server.domain.term.entity.Term;
 import encore.server.domain.user.entity.User;
+import encore.server.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,6 +22,12 @@ import java.util.Objects;
 
 @Component
 public class PostConverter {
+
+    private final UserRepository userRepository;
+
+    public PostConverter(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     //PostCreateReq -> Post 로 변환
     public Post convert(PostCreateReq postCreateReq, User user){
@@ -43,7 +51,7 @@ public class PostConverter {
 
 
     public PostDetailsGetRes postDetailsGetResFrom(
-            Post post, List<String> hashtags, List<String> postImages, Long numOfLike, Long numOfComment, boolean isLiked
+            Post post, List<String> hashtags, List<String> postImages, Long numOfLike, Long numOfComment,boolean isLiked, List<Term> musicalTerms
     ) {
 
         Boolean isModified = true;
@@ -51,27 +59,30 @@ public class PostConverter {
         if (Objects.equals(post.getModifiedAt(), post.getCreatedAt())) {
             isModified = false;
         }
+        User user = userRepository.findByIdAndDeletedAtIsNull(1L).orElseThrow();
 
-        return PostDetailsGetRes.builder()
-                .postId(post.getId())
-                .userId(post.getUser().getId())
-                .nickName(post.getUser().getNickName())
-                .profileImageUrl(post.getUser().getProfileImageUrl())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .isNotice(post.getIsNotice())
-                .isTemporarySave(post.getIsTemporarySave())
-                .postType(post.getPostType().name())
-                .category(post.getCategory().name())
-                .hashtags(hashtags)
-                .postImages(postImages)
-                .createdAt(post.getCreatedAt())
-                .modifiedAt(post.getModifiedAt())
-                .isModified(isModified)
-                .numOfLike(numOfLike)
-                .numOfComment(numOfComment)
-                .isLiked(isLiked)
-                .build();
+        return new PostDetailsGetRes(
+                post.getId(),
+                post.getUser().getId(),
+                post.getUser().getNickName(),
+                post.getUser().getProfileImageUrl(),
+                post.getTitle(),
+                post.getContent(),
+                post.getIsNotice(),
+                post.getIsTemporarySave(),
+                post.getPostType().name(),
+                post.getCategory().name(),
+                hashtags,
+                postImages,
+                post.getCreatedAt(),
+                post.getModifiedAt(),
+                isModified,
+                numOfLike,
+                numOfComment,
+                isLiked,
+                MusicalTermConverter.toMusicalTermResList(musicalTerms)
+        );
+
     }
 
     //likeCount인자 추가

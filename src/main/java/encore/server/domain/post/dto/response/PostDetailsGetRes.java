@@ -1,7 +1,10 @@
 package encore.server.domain.post.dto.response;
 
+import encore.server.domain.term.dto.MusicalTermRes;
+
 import lombok.Builder;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -24,8 +27,8 @@ public record PostDetailsGetRes(
         Boolean isModified,
         Long numOfLike,
         Long numOfComment,
-        Boolean isLiked
-
+        Boolean isLiked,
+        List<MusicalTermRes> terms
 ) {
 
 
