@@ -75,7 +75,7 @@ public class PostConverter {
     }
 
     //likeCount인자 추가
-    public static final SimplePostRes toSimplePostRes(Post post, User user) {
+    public static final SimplePostRes toSimplePostRes(Post post, User user, Boolean isLiked) {
         return SimplePostRes.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -88,6 +88,7 @@ public class PostConverter {
                 .userId(user.getId())
                 .nickname(user.getNickName())
                 .createdAt(post.getCreatedAt())
+                .isLiked(isLiked)
                 .build();
     }
 

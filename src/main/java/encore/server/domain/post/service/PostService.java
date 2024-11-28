@@ -31,14 +31,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -261,12 +259,58 @@ public class PostService {
     }
 
     public Slice<SimplePostRes> getPostPagination(Long cursor, String category,
-                                                  String type, String searchWord, Pageable pageable) {
+                                                  String type, String searchWord, Pageable pageable, Long userId) {
+        //business logic
+        // 1. Cursor 기반으로 게시물 목록 가져오기
+        List<Post> posts = postRepository.findPostsByCursor(cursor, category, type, searchWord, pageable);
+        // 2 현재 로그인한 사용자 정보 조회
+        User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NotFoundException("Post not found"));
+        // 3. 사용자가 해당 게시물들에 눌렀던 좋아요 기록 가져오기. 좋아요가 눌러진 경우만 가져오기
+        List<PostLike> postLikes = postLikeRepository.findByUserAndPostIn(user, posts)
+                .stream()
+                .filter(PostLike::isLiked)
+                .toList();
+        // 4. 좋아요를 누른 게시물만 HashSet 으로 저장
+        Set<Post> likedPostMap = postLikes.stream()
+                .map(PostLike::getPost)
+                .collect(Collectors.toSet());
 
-        return postRepository.findPostsByCursor(cursor, category, type, searchWord, pageable);
+        boolean hasNext = posts.size() > pageable.getPageSize();
+
+        List<SimplePostRes> postResponses = posts.stream()
+                .limit(pageable.getPageSize())
+                .map(post -> PostConverter.toSimplePostRes(post, post.getUser(), likedPostMap.contains(post)))
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 
-    public Slice<SimplePostRes> getPostPaginationByHashtag(Long cursor, String hashtag, Pageable pageable) {
-        return postRepository.findPostsByHashtag(cursor, hashtag, pageable);
+    public Slice<SimplePostRes> getPostPaginationByHashtag(Long cursor, String hashtag, Pageable pageable, Long userId) {
+
+        //business logic
+        // 1. Cursor 기반으로 게시물 목록 가져오기
+        List<Post> posts = postRepository.findPostsByHashtag(cursor, hashtag, pageable);
+        // 2 현재 로그인한 사용자 정보 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+        // 3. 사용자가 해당 게시물들에 눌렀던 좋아요 기록 가져오기. 좋아요가 눌러진 경우만 가져오기
+        List<PostLike> postLikes = postLikeRepository.findByUserAndPostIn(user, posts)
+                .stream()
+                .filter(PostLike::isLiked)
+                .toList();
+        // 4. 좋아요를 누른 게시물만 HashSet 으로 저장
+        Set<Post> likedPostMap = postLikes.stream()
+                .map(PostLike::getPost)
+                .collect(Collectors.toSet());
+
+        boolean hasNext = posts.size() > pageable.getPageSize();
+
+        List<SimplePostRes> postResponses = posts.stream()
+                .limit(pageable.getPageSize())
+                .map(post -> PostConverter.toSimplePostRes(post, post.getUser(), likedPostMap.contains(post)))
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 }
