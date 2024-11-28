@@ -32,9 +32,6 @@ public record SimplePostRes(
         @Schema(description = "게시글 좋아요 수", example = "1")
         Long likeCount,
 
-        @Schema(description = "내가 좋아요를 눌렀는지 여부", example = "true")
-        Boolean isLiked,
-
         @Schema(description = "게시글 댓글 수", example = "1")
         Long commentCount,
 
