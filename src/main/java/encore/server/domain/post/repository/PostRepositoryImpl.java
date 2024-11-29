@@ -36,13 +36,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<SimplePostRes> findPostsByCursor(Long cursor, String category, String type,
+    public List<Post> findPostsByCursor(Long cursor, String category, String type,
                                                   String searchWord, Pageable pageable) {
         BooleanBuilder predicate = new BooleanBuilder();
         predicate.and(addCursorCondition(cursor))
                 .and(addCategoryCondition(category))
                 .and(addTypeCondition(type))
                 .and(addSearchWordCondition(searchWord))
+                .and(post.isTemporarySave.eq(false))
                 .and(post.deletedAt.isNull());
 
         List<Post> posts = queryFactory.selectFrom(post)
@@ -51,22 +52,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .orderBy(getSortOrder(pageable))
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
+        return posts;
 
-        boolean hasNext = posts.size() > pageable.getPageSize();
-
-        List<SimplePostRes> postResponses = posts.stream()
-                .limit(pageable.getPageSize())
-                .map(post -> PostConverter.toSimplePostRes(post, post.getUser()))
-                .collect(Collectors.toList());
-
-        return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 
     @Override
-    public Slice<SimplePostRes> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable) {
+    public List<Post> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable) {
         BooleanBuilder predicate = new BooleanBuilder();
         predicate.and(addCursorCondition(cursor))
                 .and(addHashtagCondition(hashtag))
+                .and(post.isTemporarySave.eq(false))
                 .and(post.deletedAt.isNull());
 
         List<Post> posts = queryFactory.selectFrom(post)
@@ -76,14 +71,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        boolean hasNext = posts.size() > pageable.getPageSize();
-
-        List<SimplePostRes> postResponses = posts.stream()
-                .limit(pageable.getPageSize())
-                .map(post -> PostConverter.toSimplePostRes(post, post.getUser()))
-                .collect(Collectors.toList());
-
-        return new SliceImpl<>(postResponses, pageable, hasNext);
+        return posts;
     }
 
     public Optional<Post> findFetchJoinPostImageAndUserByIdAndDeletedAtIsNull(Long postId) {

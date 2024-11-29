@@ -121,7 +121,7 @@ public class PostController {
 
         log.info("[POST]-[PostController]-[getPostDetails] /post/{post_id} API call");
 
-        PostDetailsGetRes postDetailsGetRes = postService.getPostDetails(postId);
+        PostDetailsGetRes postDetailsGetRes = postService.getPostDetails(postId, mockUserIdProvide());
 
         return ApplicationResponse.ok(postDetailsGetRes);
 
@@ -134,7 +134,7 @@ public class PostController {
                                                                        @RequestParam(name = "type", required = false) String type,
                                                                        @RequestParam(name = "search_word", required = false) String searchWord,
                                                                        @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
-        return ApplicationResponse.ok(postService.getPostPagination(cursor, category, type, searchWord, pageable));
+        return ApplicationResponse.ok(postService.getPostPagination(cursor, category, type, searchWord, pageable, mockUserIdProvide()));
     }
 
     @GetMapping("/hashtag-list")
@@ -142,7 +142,7 @@ public class PostController {
     public ApplicationResponse<Slice<SimplePostRes>> getPostPaginationByHashtag(@RequestParam(name = "cursor", required = false) Long cursor,
                                                                                 @RequestParam(name = "hashtag", required = false) String hashtag,
                                                                                 @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
-        return ApplicationResponse.ok(postService.getPostPaginationByHashtag(cursor, hashtag, pageable));
+        return ApplicationResponse.ok(postService.getPostPaginationByHashtag(cursor, hashtag, pageable, mockUserIdProvide()));
     }
 
 

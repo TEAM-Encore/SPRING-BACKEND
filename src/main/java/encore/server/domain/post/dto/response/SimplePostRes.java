@@ -32,9 +32,6 @@ public record SimplePostRes(
         @Schema(description = "게시글 좋아요 수", example = "1")
         Long likeCount,
 
-        @Schema(description = "내가 좋아요를 눌렀는지 여부", example = "true")
-        Boolean isLiked,
-
         @Schema(description = "게시글 댓글 수", example = "1")
         Long commentCount,
 
@@ -45,6 +42,9 @@ public record SimplePostRes(
         String nickname,
 
         @Schema(description = "게시글 생성일", example = "2021-07-01 00:00:00")
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+
+        @Schema(description = "로그인한 사용자에 대한 좋아요 누름 여부", example = "true")
+        Boolean isLiked
 ) {
 }
