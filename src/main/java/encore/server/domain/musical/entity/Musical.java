@@ -1,5 +1,6 @@
 package encore.server.domain.musical.entity;
 
+import encore.server.domain.musical.embeded.Actor;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -44,13 +45,8 @@ public class Musical extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String imageUrl;
 
-    @Column(nullable = false, columnDefinition = "varchar(500)")
-    private String actor1;
+    @Embedded
+    private Actor actor;
 
-    @Column(nullable = false, columnDefinition = "varchar(500)")
-    private String actor2;
-
-    @Column(columnDefinition = "varchar(500)")
-    private String actor3;
 
 }
