@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
-@Setter
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
@@ -34,4 +33,10 @@ public class PostLike extends BaseTimeEntity {
         this.user = user;
         this.liked = liked;
     }
+
+    //Setter말고 set함수로 생성
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
 }

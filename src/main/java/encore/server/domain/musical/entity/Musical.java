@@ -31,4 +31,17 @@ public class Musical extends BaseTimeEntity {
 
     @Column(nullable = false, columnDefinition = "varchar(500)")
     private String location;
+
+    @Column(nullable = false, columnDefinition = "bigint")
+    private Long runningTime;
+
+    @Column(nullable = false, columnDefinition = "bigint")
+    private Long age;
+
+    @Column(nullable = false, columnDefinition = "bigint")
+    private Long series;
+
+    @Column(columnDefinition = "text")
+    private String imageUrl;
+
 }
