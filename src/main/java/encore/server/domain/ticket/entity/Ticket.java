@@ -1,5 +1,6 @@
 package encore.server.domain.ticket.entity;
 
+import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -10,8 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Getter
 @Entity
@@ -27,6 +27,10 @@ public class Ticket extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false, columnDefinition = "bigint")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "musical_id", nullable = false, columnDefinition = "bigint")
+    private Musical musical;
+
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String title;
 
@@ -36,15 +40,18 @@ public class Ticket extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime viewedDate;
 
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Companion> companions = new ArrayList<>();
+    @Column(nullable = false, columnDefinition = "varchar(255)")
+    private String seat;
+
 
     @Builder
-    public Ticket(User user, String title, String imageUrl, LocalDateTime viewedDate, List<Companion> companions) {
+    public Ticket(User user, Musical musical, String title, String imageUrl, LocalDateTime viewedDate, String seat) {
         this.user = user;
+        this.musical = musical;
         this.title = title;
         this.imageUrl = imageUrl;
         this.viewedDate = viewedDate;
-        this.companions = companions;
+        this.seat = seat;
+
     }
 }
