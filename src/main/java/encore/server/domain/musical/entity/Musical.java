@@ -44,4 +44,13 @@ public class Musical extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String imageUrl;
 
+    @Column(nullable = false, columnDefinition = "varchar(500)")
+    private String actor1;
+
+    @Column(nullable = false, columnDefinition = "varchar(500)")
+    private String actor2;
+
+    @Column(columnDefinition = "varchar(500)")
+    private String actor3;
+
 }
