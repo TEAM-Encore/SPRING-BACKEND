@@ -1,5 +1,6 @@
 package encore.server.domain.ticket.entity;
 
+import encore.server.domain.review.entity.Review;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -38,6 +39,10 @@ public class Ticket extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Companion> companions = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
 
     @Builder
     public Ticket(User user, String title, String imageUrl, LocalDateTime viewedDate, List<Companion> companions) {
