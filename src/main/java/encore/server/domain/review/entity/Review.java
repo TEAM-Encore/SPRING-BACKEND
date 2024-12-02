@@ -1,6 +1,7 @@
 package encore.server.domain.review.entity;
 
-import encore.server.domain.musical.entity.Musical;
+import encore.server.domain.review.Tag;
+import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -10,36 +11,44 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
+import java.util.List;
+
 @Getter
 @Entity
-@SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE review SET deleted_at = NOW() where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, columnDefinition = "bigint")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, columnDefinition = "bigint")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "musical_id", nullable = false, columnDefinition = "bigint")
-    private Musical musical;
+    @JoinColumn(name = "ticket_id", nullable = false)
+    private Ticket ticket;
 
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String title;
 
-    @Column(nullable = false, columnDefinition = "varchar(1000)")
-    private String content;
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "review_tags", joinColumns = @JoinColumn(name = "review_id"))
+    @Column(name = "tag", nullable = false)
+    private List<Tag> tags;
+
+    @Embedded
+    private ReviewData reviewData;
 
     @Builder
-    public Review(User user, Musical musical, String title, String content) {
+    public Review(User user, Ticket ticket, String title, List<Tag> tags, ReviewData reviewData) {
         this.user = user;
-        this.musical = musical;
+        this.ticket = ticket;
         this.title = title;
-        this.content = content;
+        this.tags = tags;
+        this.reviewData = reviewData;
     }
 }
