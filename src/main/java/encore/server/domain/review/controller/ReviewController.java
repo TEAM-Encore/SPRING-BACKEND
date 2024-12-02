@@ -2,6 +2,7 @@ package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.ReviewRes;
+import encore.server.domain.review.dto.response.ViewImageRes;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +21,11 @@ public class ReviewController {
                                                        @RequestBody ReviewReq req) {
         Long userId = getUserId();
         return ApplicationResponse.created(reviewService.createReview(ticketId, userId, req));
+    }
+
+    @GetMapping("/view-image/{cycle}")
+    public ApplicationResponse<ViewImageRes> viewImage(@PathVariable("cycle") Long cycle) {
+        return ApplicationResponse.ok(reviewService.viewImage(cycle));
     }
 
     private Long getUserId() {

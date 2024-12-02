@@ -1,5 +1,7 @@
 package encore.server.domain.review.converter;
 
+import encore.server.domain.review.dto.response.ViewImageRes;
+import encore.server.domain.review.entity.ViewImage;
 import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.ReviewRes;
@@ -26,7 +28,7 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewRes toResponse(Review review) {
+    public static ReviewRes toReviewRes(Review review) {
         return ReviewRes.builder()
                 .reviewId(review.getId())
                 .ticketId(review.getTicket().getId())
@@ -34,6 +36,18 @@ public class ReviewConverter {
                 .title(review.getTitle())
                 .tags(review.getTags())
                 .reviewData(review.getReviewData())
+                .build();
+    }
+
+    public static ViewImageRes toViewImageRes(List<ViewImage> viewImages) {
+        return ViewImageRes.builder()
+                .viewImages(viewImages.stream()
+                        .map(viewImage -> ViewImageRes.ViewImage.builder()
+                                .id(viewImage.getId())
+                                .url(viewImage.getUrl())
+                                .level(viewImage.getLevel())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
