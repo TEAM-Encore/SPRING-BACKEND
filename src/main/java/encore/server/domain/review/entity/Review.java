@@ -1,6 +1,6 @@
 package encore.server.domain.review.entity;
 
-import encore.server.domain.review.Tag;
+import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
