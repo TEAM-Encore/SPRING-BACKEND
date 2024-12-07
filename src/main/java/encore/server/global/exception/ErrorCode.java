@@ -24,6 +24,7 @@ public enum ErrorCode {
 
     // 3000: User Error
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 사용자입니다."),
+    PASSWORD_MISMATCH_EXCEPTION(HttpStatus.FORBIDDEN, 3001, "비밀번호가 일치하지 않습니다."),
 
     // 4000: Post Error
     POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 4000, "존재하지 않는 게시글입니다."),
