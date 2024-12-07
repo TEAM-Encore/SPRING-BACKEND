@@ -15,7 +15,7 @@ public class UserConverter {
                 .name(userSignupReq.name())
                 .nickName(uniqueNickName)
                 .authProvider(userSignupReq.provider())
-                .role(UserRole.BASIC)
+                .role(userSignupReq.role())
                 .viewingFrequency(null)
                 .point(0L)
                 .profileImageUrl(null)

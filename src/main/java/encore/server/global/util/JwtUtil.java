@@ -1,4 +1,4 @@
-package encore.server.global.auth.util;
+package encore.server.global.util;
 
 import encore.server.domain.user.enumerate.UserRole;
 import io.jsonwebtoken.*;

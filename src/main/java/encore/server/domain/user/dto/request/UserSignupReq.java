@@ -3,6 +3,7 @@ package encore.server.domain.user.dto.request;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import encore.server.domain.user.enumerate.AuthProvider;
+import encore.server.domain.user.enumerate.UserRole;
 import encore.server.global.auth.OAuth2UserInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,12 @@ public record UserSignupReq(
         String name,
         @Schema(description = "로그인 제공자", example = "GOOGLE")
         @NotNull
-        AuthProvider provider
+        AuthProvider provider,
+        @Schema(description = "권한", example = "BASIC")
+        @NotNull
+        UserRole role
+
+
 
 ) {
 
@@ -34,6 +40,7 @@ public record UserSignupReq(
                 .password((String) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.EMAIL_KEY)) // 비밀번호와 이메일이 동일하게 설정되는 경우
                 .name((String) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.NAME_KEY))
                 .provider((AuthProvider) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.PROVIDER_KEY))
+                .role((UserRole) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.ROLE_KEY))
                 .build();
     }
 

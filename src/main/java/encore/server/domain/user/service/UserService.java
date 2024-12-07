@@ -7,7 +7,7 @@ import encore.server.domain.user.entity.User;
 import encore.server.domain.user.enumerate.NickNameAnimal;
 import encore.server.domain.user.enumerate.NickNameColor;
 import encore.server.domain.user.repository.UserRepository;
-import encore.server.global.auth.util.JwtUtil;
+import encore.server.global.util.JwtUtil;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
