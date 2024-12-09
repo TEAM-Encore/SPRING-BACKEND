@@ -27,12 +27,12 @@ public class TicketController {
 
 
 
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "티켓북 생성 API", description = "티켓북을 생성합니다.")
-    public ApplicationResponse<TicketReq> createPost(@RequestBody @Valid TicketReq ticketReq, BindingResult bindingResult) {
-
-        Long ticketId = ticketService.createTicket(ticketReq);
-        ApplicationResponse.ok();
-    }
+//    @PostMapping("")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    @Operation(summary = "티켓북 생성 API", description = "티켓북을 생성합니다.")
+//    public ApplicationResponse<TicketReq> createPost(@RequestBody @Valid TicketReq ticketReq, BindingResult bindingResult) {
+//
+//        Long ticketId = ticketService.createTicket(ticketReq);
+//        ApplicationResponse.ok();
+//    }
 }
