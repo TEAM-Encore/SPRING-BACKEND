@@ -1,5 +1,6 @@
 package encore.server.domain.ticket.entity;
 
+import encore.server.domain.review.entity.Review;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
@@ -43,6 +44,10 @@ public class Ticket extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String seat;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
 
     @Builder
     public Ticket(User user, Musical musical, String title, String imageUrl, LocalDateTime viewedDate, String seat) {
