@@ -40,6 +40,8 @@ public enum ErrorCode {
 
     // 8000: Review Error
     REVIEW_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 8000, "존재하지 않는 리뷰입니다."),
+    REVIEW_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 8001, "이미 리뷰가 존재합니다."),
+    REVIEW_TAG_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, 8002, "존재하지 않는 태그입니다."),
 
     // 9000: Mission Error
     MISSION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 9000, "존재하지 않는 미션입니다."),

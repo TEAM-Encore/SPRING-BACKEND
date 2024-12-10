@@ -90,9 +90,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(postImage.post.eq(fetchedPost))
                 .fetch();
 
-        // MusicalTerms 가져오기
+        // Term 가져오기
         List<Term> musicalTerms = queryFactory.selectFrom(term)
-                .where(term.post.eq(fetchedPost))
+                .join(term.posts, post)
+                .where(post.eq(fetchedPost))
                 .fetch();
         fetchedPost.addMusicalTerms(musicalTerms);
 
