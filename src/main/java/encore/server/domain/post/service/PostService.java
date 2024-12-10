@@ -243,31 +243,25 @@ public class PostService {
             phashTagsToSave.add(pHashtagToSave);
         }
 
-        // 시작 시간 측정
-        long startTime = System.currentTimeMillis();
 
-// content를 기준으로 MusicalTerm 조회
+        // content를 기준으로 MusicalTerm 조회
         List<Term> matchingTerms = musicalTermRepository.findByTermIn(post.getContent());
 
-// MusicalTerm이 존재하면 content에 태그 추가
+        // MusicalTerm이 존재하면 content에 태그 추가
         if (!matchingTerms.isEmpty()) {
             String updatedContent = musicalTermRepository.highlightTermsInContent(post.getContent());
             post.updateContent(updatedContent); // 수정된 content를 post에 반영
         }
 
-// MusicalTerm 저장
+        matchingTerms.forEach(post::addMusicalTerm);
+
+        // MusicalTerm 저장
         musicalTermRepository.saveAll(matchingTerms);
 
-// 종료 시간 측정
-        long endTime = System.currentTimeMillis();
-
-// 소요 시간 출력
-        System.out.println("Execution Time: " + (endTime - startTime) + " ms");
-
-// PostHashtags 저장
+        // PostHashtags 저장
         postHashtagRepository.saveAll(phashTagsToSave);
 
-// Post ID 반환
+        // Post ID 반환
         return savedPost.getId();
     }
 
