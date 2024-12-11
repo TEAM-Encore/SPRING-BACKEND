@@ -1,9 +1,9 @@
 package encore.server.domain.ticket.controller;
 
-import encore.server.domain.post.dto.request.PostCreateReq;
-import encore.server.domain.post.dto.response.PostCreateRes;
-import encore.server.domain.post.service.PostService;
-import encore.server.domain.ticket.dto.request.TicketReq;
+
+
+import encore.server.domain.ticket.dto.request.TicketCreateReq;
+import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.ErrorCode;
@@ -24,6 +24,11 @@ import java.time.LocalDateTime;
 public class TicketController {
     private final TicketService ticketService;
 
+
+    @PostMapping
+    public TicketCreateRes createTicket(@RequestBody TicketCreateReq request) {
+        return ticketService.createTicket(request);
+    }
 
 
 
