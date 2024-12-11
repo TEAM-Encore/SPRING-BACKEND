@@ -1,5 +1,6 @@
 package encore.server.domain.musical.service;
 
+import encore.server.domain.musical.converter.MusicalConverter;
 import encore.server.domain.musical.dto.response.MusicalRes;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.repository.MusicalRepository;
@@ -18,11 +19,7 @@ public class MusicalService {
     public List<MusicalRes> searchMusicalsByTitle(String keyword) {
         List<Musical> musicals = musicalRepository.findByTitleContaining(keyword);
         return musicals.stream()
-                .map(musical -> MusicalRes.builder()
-                        .musicalId(musical.getId())
-                        .title(musical.getTitle())
-                        .series(musical.getSeries())
-                        .build())
+                .map(MusicalConverter::toResponse) // Converter를 이용해 변환으로 수정!
                 .toList();
     }
 }
