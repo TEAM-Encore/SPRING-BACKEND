@@ -1,14 +1,11 @@
 package encore.server.domain.review.converter;
 
-import encore.server.domain.review.dto.response.ReviewDataRes;
-import encore.server.domain.review.dto.response.ReviewDetailRes;
-import encore.server.domain.review.dto.response.ViewImageRes;
+import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.entity.ReviewData;
 import encore.server.domain.review.entity.ReviewTags;
 import encore.server.domain.review.entity.ViewImage;
 import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.review.dto.request.ReviewReq;
-import encore.server.domain.review.dto.response.ReviewRes;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.ticket.entity.Companion;
 import encore.server.domain.ticket.entity.Ticket;
@@ -125,6 +122,19 @@ public class ReviewConverter {
                         .totalRating(reviewData.getRating().getTotalRating())
                         .ratingReview(reviewData.getRating().getRatingReview())
                         .build())
+                .build();
+    }
+
+    public static ReviewSimpleRes toReviewSimpleRes(Review review, String elapsedTime) {
+        return ReviewSimpleRes.builder()
+                .reviewId(review.getId())
+                .userId(review.getUser().getId())
+                .title(review.getTitle())
+                .nickname(review.getUser().getNickName())
+                .elapsedTime(elapsedTime)
+                .totalRating(review.getReviewData().getRating().getTotalRating())
+                .viewCount(review.getViewCount())
+                .likeCount(review.getLikeCount())
                 .build();
     }
 }

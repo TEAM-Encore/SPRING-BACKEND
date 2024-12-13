@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import encore.server.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
 import static encore.server.domain.review.entity.QReview.review;
@@ -27,5 +26,4 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
         return Optional.ofNullable(fetchedReview);
     }
-
 }
