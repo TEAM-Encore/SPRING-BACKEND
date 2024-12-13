@@ -1,6 +1,6 @@
 package encore.server.domain.musical.entity;
 
-import encore.server.domain.musical.embeded.Actor;
+
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,10 +9,12 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
-@SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE musical SET deleted_at = NOW() where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Musical extends BaseTimeEntity {
 
@@ -45,8 +47,9 @@ public class Musical extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String imageUrl;
 
-    @Embedded
-    private Actor actor;
-
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "musical_show_times", joinColumns = @JoinColumn(name = "musical_id"))
+    @Column(name = "show_time")
+    private List<String> showTimes = new ArrayList<>();
 
 }
