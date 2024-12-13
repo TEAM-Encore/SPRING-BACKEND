@@ -1,19 +1,18 @@
-package encore.server.domain.musical.dto.response;
-
+package encore.server.domain.ticket.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record MusicalRes(
+public record TicketCreateReq(
         Long musicalId,
-        String title,
-        Long series,
-        String location,
-        List<String> showTimes
+        Long userId,
+        LocalDate viewedDate,
+        String showTime,
+        String seat
 ) {
 }

@@ -1,6 +1,7 @@
 package encore.server.domain.ticket.entity;
 
 import encore.server.domain.review.entity.Review;
+import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -10,9 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+
 
 @Getter
 @Entity
@@ -28,28 +30,46 @@ public class Ticket extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false, columnDefinition = "bigint")
     private User user;
 
-    @Column(nullable = false, columnDefinition = "varchar(255)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "musical_id", nullable = false, columnDefinition = "bigint")
+    private Musical musical;
+
+    @Column(nullable = true, columnDefinition = "varchar(255)")
     private String title;
 
-    @Column(nullable = false, columnDefinition = "text")
+    @Column(nullable = true, columnDefinition = "text")
     private String imageUrl;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime viewedDate;
+    private LocalDate viewedDate;
 
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Companion> companions = new ArrayList<>();
+    @Column(nullable = false, columnDefinition = "varchar(255)")
+    private String seat;
+
+    //관람 회차 시간, 배우 필드 추가
+    @Column(nullable = false, columnDefinition = "varchar(50)")
+    private String showTime;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "ticket_actors", joinColumns = @JoinColumn(name = "ticket_id"))
+    @Column(name = "actor_name")
+    private List<String> actors;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     private Review review;
 
     @Builder
-    public Ticket(User user, String title, String imageUrl, LocalDateTime viewedDate, List<Companion> companions) {
+    public Ticket(User user, Musical musical, String title, String imageUrl, LocalDate viewedDate, String seat, String showTime, List<String> actors) {
         this.user = user;
+        this.musical = musical;
         this.title = title;
         this.imageUrl = imageUrl;
         this.viewedDate = viewedDate;
-        this.companions = companions;
+        this.seat = seat;
+        this.showTime = showTime;
+        this.actors = actors;
+
     }
 }

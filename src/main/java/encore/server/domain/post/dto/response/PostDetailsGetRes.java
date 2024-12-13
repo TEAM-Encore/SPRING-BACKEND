@@ -2,9 +2,12 @@ package encore.server.domain.post.dto.response;
 
 import encore.server.domain.term.dto.MusicalTermRes;
 
+import lombok.Builder;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 public record PostDetailsGetRes(
 
         Long postId,
@@ -22,9 +25,11 @@ public record PostDetailsGetRes(
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
         Boolean isModified,
-        Boolean isLiked,
-        Integer numOfLike,
+        Long numOfLike,
         Long numOfComment,
+        Boolean isLiked,
         List<MusicalTermRes> terms
 ) {
+
+
 }

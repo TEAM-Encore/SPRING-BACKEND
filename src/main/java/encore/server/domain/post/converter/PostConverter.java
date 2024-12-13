@@ -3,9 +3,11 @@ package encore.server.domain.post.converter;
 
 import encore.server.domain.term.converter.MusicalTermConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
+import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
+import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.term.entity.Term;
@@ -49,7 +51,7 @@ public class PostConverter {
 
 
     public PostDetailsGetRes postDetailsGetResFrom(
-            Post post, List<String> hashtags, List<String> postImages, Integer numOfLike, Long numOfComment, List<Term> musicalTerms
+            Post post, List<String> hashtags, List<String> postImages, Long numOfLike, Long numOfComment,boolean isLiked, List<Term> musicalTerms
     ) {
 
         Boolean isModified = true;
@@ -75,16 +77,16 @@ public class PostConverter {
                 post.getCreatedAt(),
                 post.getModifiedAt(),
                 isModified,
-                post.getPostLikes().stream().anyMatch(postLike -> postLike.getUser().getId().equals(user.getId())),
                 numOfLike,
                 numOfComment,
+                isLiked,
                 MusicalTermConverter.toMusicalTermResList(musicalTerms)
         );
 
     }
 
     //likeCount인자 추가
-    public static final SimplePostRes toSimplePostRes(Post post, User user) {
+    public static final SimplePostRes toSimplePostRes(Post post, User user, Boolean isLiked) {
         return SimplePostRes.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -96,8 +98,8 @@ public class PostConverter {
                 .commentCount(post.getCommentCount())
                 .userId(user.getId())
                 .nickname(user.getNickName())
-                .isLiked(post.getPostLikes().stream().anyMatch(postLike -> postLike.getUser().getId().equals(user.getId())))
                 .createdAt(post.getCreatedAt())
+                .isLiked(isLiked)
                 .build();
     }
 

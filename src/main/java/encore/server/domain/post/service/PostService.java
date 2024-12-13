@@ -16,6 +16,7 @@ import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
+import encore.server.domain.post.entity.PostLike;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.post.repository.PostImageRepository;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -56,28 +58,36 @@ public class PostService {
     private final PostImageConverter postImageConverter;
 
 
-    public PostDetailsGetRes getPostDetails(Long postId) {
+    public PostDetailsGetRes getPostDetails(Long postId, Long userId) {
 
-        //Post Image와 User 를 Fetch Join 하여 Post 객체를 가져옴
+        // validation: post, user 존재성 확인
+        // Post Image, User 를 Fetch Join 하여 Post 객체를 가져옴
         Post post = postRepository.findFetchJoinPostImageAndUserByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new NotFoundException("Post not found"));
-
-        //Post와 연관된 PostHashtag를 Fetch Join 하여 가져옴
+        User userViewing = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        //Post 와 연관된 PostHashtag 를 Fetch Join 하여 가져옴
         List<PostHashtag> allByPost = postHashtagRepository.findFetchHashtagAllByPostAndDeletedAtIsNull(post);
 
+        // business logic:
         //Post Image와 PostHashtag를 List<String> 으로 변환
         List<String> stringListFromPostHashtag = postHashtagConverter.stringListFrom(allByPost);
         List<String> stringListFromPostImage = postImageConverter.stringListFrom(post.getPostImages());
 
-        //Postlike 에서 Post 의 likeCount를 수정하는 로직이 있나?
-        Integer numOfLike = postLikeRepository.countByPostAndDeletedAtIsNull(post);
-        Long numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
+        //post 엔티티 필드에 있는 count 로 대체
+        //Integer numOfLike = postLikeRepository.countByPostAndDeletedAtIsNull(post);
+        //Integer numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
 
+        //Post 에 좋아요를 눌렀는지 확인
+        boolean isLiked = false;
+        Optional<PostLike> optionalPostLike = postLikeRepository.findByUserAndPost(userViewing, post);
+        if (optionalPostLike.isPresent()) {
+            isLiked = optionalPostLike.get().isLiked();
+        }
 
-        //**userEntity 에 Name 필드 추가 필요
-        //PostDetailGetRes 생성하여 return
+        // return: 게시글 상세정보 반환
         return postConverter.postDetailsGetResFrom(post, stringListFromPostHashtag,
-                stringListFromPostImage, numOfLike, numOfComment, Collections.emptyList());
+                stringListFromPostImage, post.getLikeCount(), post.getCommentCount(), isLiked, Collections.emptyList());
     }
 
     @Transactional
@@ -266,12 +276,58 @@ public class PostService {
     }
 
     public Slice<SimplePostRes> getPostPagination(Long cursor, String category,
-                                                  String type, String searchWord, Pageable pageable) {
+                                                  String type, String searchWord, Pageable pageable, Long userId) {
+        //business logic
+        // 1. Cursor 기반으로 게시물 목록 가져오기
+        List<Post> posts = postRepository.findPostsByCursor(cursor, category, type, searchWord, pageable);
+        // 2 현재 로그인한 사용자 정보 조회
+        User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NotFoundException("Post not found"));
+        // 3. 사용자가 해당 게시물들에 눌렀던 좋아요 기록 가져오기. 좋아요가 눌러진 경우만 가져오기
+        List<PostLike> postLikes = postLikeRepository.findByUserAndPostIn(user, posts)
+                .stream()
+                .filter(PostLike::isLiked)
+                .toList();
+        // 4. 좋아요를 누른 게시물만 HashSet 으로 저장
+        Set<Post> likedPostMap = postLikes.stream()
+                .map(PostLike::getPost)
+                .collect(Collectors.toSet());
 
-        return postRepository.findPostsByCursor(cursor, category, type, searchWord, pageable);
+        boolean hasNext = posts.size() > pageable.getPageSize();
+
+        List<SimplePostRes> postResponses = posts.stream()
+                .limit(pageable.getPageSize())
+                .map(post -> PostConverter.toSimplePostRes(post, post.getUser(), likedPostMap.contains(post)))
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 
-    public Slice<SimplePostRes> getPostPaginationByHashtag(Long cursor, String hashtag, Pageable pageable) {
-        return postRepository.findPostsByHashtag(cursor, hashtag, pageable);
+    public Slice<SimplePostRes> getPostPaginationByHashtag(Long cursor, String hashtag, Pageable pageable, Long userId) {
+
+        //business logic
+        // 1. Cursor 기반으로 게시물 목록 가져오기
+        List<Post> posts = postRepository.findPostsByHashtag(cursor, hashtag, pageable);
+        // 2 현재 로그인한 사용자 정보 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+        // 3. 사용자가 해당 게시물들에 눌렀던 좋아요 기록 가져오기. 좋아요가 눌러진 경우만 가져오기
+        List<PostLike> postLikes = postLikeRepository.findByUserAndPostIn(user, posts)
+                .stream()
+                .filter(PostLike::isLiked)
+                .toList();
+        // 4. 좋아요를 누른 게시물만 HashSet 으로 저장
+        Set<Post> likedPostMap = postLikes.stream()
+                .map(PostLike::getPost)
+                .collect(Collectors.toSet());
+
+        boolean hasNext = posts.size() > pageable.getPageSize();
+
+        List<SimplePostRes> postResponses = posts.stream()
+                .limit(pageable.getPageSize())
+                .map(post -> PostConverter.toSimplePostRes(post, post.getUser(), likedPostMap.contains(post)))
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 }

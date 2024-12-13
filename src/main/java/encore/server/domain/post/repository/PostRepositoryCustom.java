@@ -7,11 +7,12 @@ import org.springframework.data.domain.Slice;
 
 import java.util.Optional;
 
+import java.util.List;
+
 public interface PostRepositoryCustom {
-    Slice<SimplePostRes> findPostsByCursor(Long cursor, String category,
-                                           String type, String searchWord, Pageable pageable);
-
-    Slice<SimplePostRes> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable);
-
+    List<Post> findPostsByCursor(Long cursor, String category,
+                                 String type, String searchWord, Pageable pageable);
+    List<Post> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable);
     Optional<Post> findFetchJoinPostImageAndUserByIdAndDeletedAtIsNull(Long postId);
+
 }
