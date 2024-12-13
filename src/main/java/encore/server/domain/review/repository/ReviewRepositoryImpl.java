@@ -26,4 +26,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
         return Optional.ofNullable(fetchedReview);
     }
+
+    public void updateViewCount(Long reviewId, Long increment) {
+        queryFactory
+                .update(review)
+                .where(review.id.eq(reviewId))
+                .set(review.viewCount, review.viewCount.add(increment))
+                .execute();
+    }
 }

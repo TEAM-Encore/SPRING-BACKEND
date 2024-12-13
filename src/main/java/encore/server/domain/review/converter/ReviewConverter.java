@@ -63,6 +63,8 @@ public class ReviewConverter {
                 .reviewDataRes(toReviewDataRes(review.getReviewData()))
                 .isUnlocked(isUnlocked)
                 .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
+                .viewCount(review.getViewCount())
+                .likeCount(review.getLikeCount())
                 .build();
     }
 

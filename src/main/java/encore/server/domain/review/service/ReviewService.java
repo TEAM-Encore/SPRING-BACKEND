@@ -19,6 +19,7 @@ import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ViewImageRepository viewImageRepository;
     private final UserReviewRepository userReviewRepository;
+    private final ReviewViewService reviewViewService;
 
     @Transactional
     public ReviewRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -85,6 +87,9 @@ public class ReviewService {
         if (!isUnlocked) {
             throw new ApplicationException(ErrorCode.REVIEW_LOCKED_EXCEPTION);
         }
+
+        // 조회수 증가
+        reviewViewService.addVisitedRedis(user, review);
 
         // return: review detail response
         return ReviewConverter.toReviewDetailRes(review, isUnlocked);
