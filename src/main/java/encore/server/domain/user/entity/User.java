@@ -33,4 +33,9 @@ public class User extends BaseTimeEntity {
         this.nickName = nickName;
         this.point = point;
     }
+
+    public Long usePoint(Long point) {
+        this.point -= point;
+        return this.point;
+    }
 }

@@ -1,6 +1,7 @@
 package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
+import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.domain.review.dto.response.ReviewRes;
 import encore.server.domain.review.dto.response.ViewImageRes;
 import encore.server.domain.review.service.ReviewService;
@@ -26,6 +27,19 @@ public class ReviewController {
     @GetMapping("/view-image/{cycle}")
     public ApplicationResponse<ViewImageRes> viewImage(@PathVariable("cycle") Long cycle) {
         return ApplicationResponse.ok(reviewService.viewImage(cycle));
+    }
+
+    @PostMapping("/{review_id}/unlock")
+    public ApplicationResponse<?> unlockReview(@PathVariable("review_id") Long reviewId) {
+        Long userId = getUserId();
+        reviewService.unlockReview(userId, reviewId);
+        return ApplicationResponse.ok();
+    }
+
+    @GetMapping("/{review_id}")
+    public ApplicationResponse<ReviewDetailRes> getReview(@PathVariable("review_id") Long reviewId) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewService.getReview(userId, reviewId));
     }
 
     private Long getUserId() {

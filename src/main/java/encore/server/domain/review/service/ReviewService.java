@@ -2,11 +2,14 @@ package encore.server.domain.review.service;
 
 import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewReq;
+import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.domain.review.dto.response.ReviewRes;
 import encore.server.domain.review.dto.response.ViewImageRes;
 import encore.server.domain.review.entity.Review;
+import encore.server.domain.review.entity.UserReview;
 import encore.server.domain.review.entity.ViewImage;
 import encore.server.domain.review.repository.ReviewRepository;
+import encore.server.domain.review.repository.UserReviewRepository;
 import encore.server.domain.review.repository.ViewImageRepository;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.TicketRepository;
@@ -31,6 +34,7 @@ public class ReviewService {
     private final TicketRepository ticketRepository;
     private final ReviewRepository reviewRepository;
     private final ViewImageRepository viewImageRepository;
+    private final UserReviewRepository userReviewRepository;
 
     @Transactional
     public ReviewRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -61,5 +65,50 @@ public class ReviewService {
 
         //return: view image response
         return ReviewConverter.toViewImageRes(viewImages);
+    }
+
+    public ReviewDetailRes getReview(Long userId, Long reviewId) {
+        // validation: user, review, isUnlocked
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findReviewDetail(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        boolean isUnlocked = Objects.equals(user.getId(), review.getUser().getId()) ||
+                userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId);
+
+        if (!isUnlocked) {
+            throw new ApplicationException(ErrorCode.REVIEW_LOCKED_EXCEPTION);
+        }
+
+        // return: review detail response
+        return ReviewConverter.toReviewDetailRes(review, isUnlocked);
+    }
+
+    @Transactional
+    public void unlockReview(Long userId, Long reviewId) {
+        //validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId)) {
+            throw new ApplicationException(ErrorCode.REVIEW_ALREADY_UNLOCKED_EXCEPTION);
+        }
+
+        //business logic & return: unlock review
+        if(user.getPoint() < 40){
+            throw new ApplicationException(ErrorCode.POINT_NOT_ENOUGH_EXCEPTION);
+        }
+
+        user.usePoint(40L);
+        UserReview userReview = UserReview.builder()
+                .user(user)
+                .review(review)
+                .build();
+        userReviewRepository.save(userReview);
     }
 }

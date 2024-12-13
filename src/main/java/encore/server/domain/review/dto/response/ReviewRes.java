@@ -1,18 +1,20 @@
 package encore.server.domain.review.dto.response;
 
-import encore.server.domain.review.enumerate.Tag;
-import encore.server.domain.review.entity.ReviewData;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 
 import java.util.List;
 
+
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record ReviewRes(
         Long reviewId,
         Long ticketId,
         Long userId,
         String title,
-        List<Tag> tags,
-        ReviewData reviewData
+        List<String> tags,
+        ReviewDataRes reviewDataRes
 ) {
 }

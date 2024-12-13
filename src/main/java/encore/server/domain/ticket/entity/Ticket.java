@@ -55,6 +55,8 @@ public class Ticket extends BaseTimeEntity {
     @Column(name = "actor_name")
     private List<String> actors;
 
+    @OneToMany(mappedBy = "ticket")
+    private List<Companion> companions;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
