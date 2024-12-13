@@ -42,6 +42,9 @@ public class Review extends BaseTimeEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewTags> tags;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes;
+
     @Embedded
     private ReviewData reviewData;
 
@@ -52,9 +55,15 @@ public class Review extends BaseTimeEntity {
         this.title = title;
         this.tags = tags;
         this.reviewData = reviewData;
+        this.viewCount = 0L;
+        this.likeCount = 0L;
     }
 
     public void addTags(List<ReviewTags> reviewTags) {
         this.tags = reviewTags;
+    }
+
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
     }
 }

@@ -1,13 +1,11 @@
-package encore.server.domain.review.dto.response;
+package encore.server.domain.review.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
-@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record ReviewDataRes(
+public record ReviewDataReq(
         @Schema(description = "시야 데이터")
         View view,
 
@@ -20,7 +18,6 @@ public record ReviewDataRes(
         @Schema(description = "평점 데이터")
         Rating rating
 ) {
-    @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record View(
             @Schema(description = "시야 점수", example = "3")
@@ -31,7 +28,6 @@ public record ReviewDataRes(
     ) {
     }
 
-    @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record Sound(
             @Schema(description = "음향 점수", example = "3")
@@ -42,7 +38,6 @@ public record ReviewDataRes(
     ) {
     }
 
-    @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record Facility(
             @Schema(description = "시설 점수", example = "3")
@@ -53,7 +48,6 @@ public record ReviewDataRes(
     ) {
     }
 
-    @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record Rating(
             @Schema(description = "넘버 별점", example = "5")

@@ -29,7 +29,7 @@ public record ReviewSimpleRes(
         @Schema(description = "리뷰 조회수", example = "100")
         Long viewCount,
 
-        @Schema(description = "리뷰 좋아요 수", example = "100")
-        Long likeCount
+        @Schema(description = "리뷰 좋아요 데이터")
+        ReviewLikeRes likeData
 ) {
 }
