@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -13,6 +14,8 @@ public record TicketCreateReq(
         Long userId,
         LocalDate viewedDate,
         String showTime,
-        String seat
+        String seat,
+        List<ActorDTO> actors, // Actor 리스트
+        String ticketImageUrl
 ) {
 }
