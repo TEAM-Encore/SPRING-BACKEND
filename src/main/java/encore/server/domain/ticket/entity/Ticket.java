@@ -1,6 +1,7 @@
 package encore.server.domain.ticket.entity;
 
 import encore.server.domain.musical.entity.Musical;
+import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -37,7 +38,7 @@ public class Ticket extends BaseTimeEntity {
     private String title;
 
     @Column(nullable = true, columnDefinition = "text")
-    private String imageUrl;
+    private String ticketImageUrl;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDate viewedDate;
@@ -45,26 +46,27 @@ public class Ticket extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String seat;
 
-    //관람 회차 시간, 배우 필드 추가
+    //관람 회차 시간
     @Column(nullable = false, columnDefinition = "varchar(50)")
     private String showTime;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "ticket_actors", joinColumns = @JoinColumn(name = "ticket_id"))
-    @Column(name = "actor_name")
-    private List<String> actors;
-
+    @ManyToMany
+    @JoinTable(
+            name = "ticket_actors",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "actor_id")
+    )
+    private List<Actor> actors;
 
     @Builder
-    public Ticket(User user, Musical musical, String title, String imageUrl, LocalDate viewedDate, String seat, String showTime, List<String> actors) {
+    public Ticket(User user, Musical musical, String title, String ticketImageUrl, LocalDate viewedDate, String seat, String showTime, List<Actor> actors) {
         this.user = user;
         this.musical = musical;
         this.title = title;
-        this.imageUrl = imageUrl;
+        this.ticketImageUrl = ticketImageUrl;
         this.viewedDate = viewedDate;
         this.seat = seat;
         this.showTime = showTime;
         this.actors = actors;
-
     }
 }
