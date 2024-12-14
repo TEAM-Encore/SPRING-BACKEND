@@ -35,17 +35,25 @@ public class TicketService {
 
     @Transactional
     public TicketCreateRes createTicket(TicketCreateReq request) {
-        // Validation
+
+        //validation
         Musical musical = musicalRepository.findById(request.musicalId())
                 .orElseThrow(() -> new RuntimeException("Musical not found"));
 
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // DTO -> Entity 변환
-        List<Actor> actors = TicketConverter.toActorList(request.actors());
+        //actordto->actor
+        List<Actor> actors = request.actors().stream()
+                .map(actorDTO -> Actor.builder()
+                        .id(actorDTO.id())
+                        .name(actorDTO.name())
+                        .actorImageUrl(actorDTO.actorImageUrl())
+                        .build())
+                .collect(Collectors.toList());
 
-        // Ticket 생성
+        //business logic
+        //create ticket
         Ticket ticket = Ticket.builder()
                 .user(user)
                 .musical(musical)
@@ -56,20 +64,22 @@ public class TicketService {
                 .ticketImageUrl(request.ticketImageUrl())
                 .build();
 
-        // 저장
         ticketRepository.save(ticket);
 
-        // Entity -> DTO 변환
-        return TicketConverter.toCreateResponse(ticket);
+
+        return new TicketCreateRes(ticket);
+
     }
 
+    //배우 검색
     public List<ActorDTO> searchActorsByName(String keyword) {
         List<Actor> actors = actorRepository.findByNameContaining(keyword);
         return actors.stream()
-                .map(actor -> new ActorDTO(actor.getId(), actor.getName(), actor.getActorImageUrl()))
+                .map(TicketConverter::toActorDTO) // Converter를 활용한 변환
                 .toList();
     }
 
+    //티켓북 조회
     public List<TicketRes> getTicketList(String dateRange) {
         LocalDate startDate = switch (dateRange) {
             case "WEEK" -> LocalDate.now().minusWeeks(1);
@@ -78,14 +88,17 @@ public class TicketService {
             default -> null; // ALL: 전체 조회
         };
 
-        List<Ticket> tickets = (startDate != null) ?
-                ticketRepository.findByViewedDateAfter(startDate) :
-                ticketRepository.findAll();
+        List<Ticket> tickets;
 
-        // Entity -> DTO 변환
+        if (startDate != null) {
+            tickets = ticketRepository.findByViewedDateAfter(startDate);
+        } else {
+            tickets = ticketRepository.findAll();
+        }
+
         return tickets.stream()
-                .map(TicketConverter::toResponse)
-                .toList();
+                .map(TicketRes::new)
+                .collect(Collectors.toList());
     }
 
 }
