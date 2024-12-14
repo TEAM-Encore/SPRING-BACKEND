@@ -19,4 +19,22 @@ public class TicketConverter {
                 .build();
     }
 
+    public static TicketCreateRes toTicketCreateRes(Ticket ticket) {
+        return TicketCreateRes.builder()
+                .id(ticket.getId())
+                .userId(ticket.getUser().getId())
+                .musicalId(ticket.getMusical().getId())
+                .viewedDate(ticket.getViewedDate())
+                .showTime(ticket.getShowTime())
+                .seat(ticket.getSeat())
+                .actors(ticket.getActors().stream()
+                        .map(actor -> ActorDTO.builder()
+                                .id(actor.getId())
+                                .name(actor.getName())
+                                .actorImageUrl(actor.getActorImageUrl())
+                                .build())
+                        .collect(Collectors.toList()))
+                .ticketImageUrl(ticket.getTicketImageUrl())
+                .build();
+    }
 }
