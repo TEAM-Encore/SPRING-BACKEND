@@ -2,8 +2,10 @@ package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
+import encore.server.domain.review.service.ReviewSearchService;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
+import encore.server.global.util.redis.SearchLogRedis;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ import java.util.List;
 @Tag(name = "Review", description = "리뷰 API")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final ReviewSearchService reviewSearchService;
 
     @PostMapping("/{ticket_id}")
     @Operation(summary = "리뷰 작성", description = "티켓에 대한 리뷰를 작성합니다.")
@@ -78,7 +82,30 @@ public class ReviewController {
             @RequestParam(name = "cursor", required = false) Long cursor,
             @RequestParam(name = "tag", required = false) String tag,
             @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
-        return ApplicationResponse.ok(reviewService.getReviewList(keyword, cursor, tag, pageable));
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewService.getReviewList(userId, keyword, cursor, tag, pageable));
+    }
+
+    @GetMapping("/recent-search-logs")
+    @Operation(summary = "최근 검색 키워드 조회", description = "사용자의 최근 검색 키워드를 조회합니다.")
+    public ApplicationResponse<Set<SearchLogRedis>> getRecentSearchLogs() {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewSearchService.getRecentSearchLogs(userId));
+    }
+
+    @DeleteMapping("/recent-search-logs")
+    @Operation(summary = "최근 검색 키워드 삭제", description = "사용자의 최근 검색 키워드를 삭제합니다.")
+    public ApplicationResponse<Set<SearchLogRedis>> deleteRecentSearchLog(@RequestParam("name") String name) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewSearchService.deleteRecentSearchLog(name, userId));
+    }
+
+    @DeleteMapping("/recent-search-logs/all")
+    @Operation(summary = "최근 검색 키워드 전체 삭제", description = "사용자의 최근 검색 키워드를 전체 삭제합니다.")
+    public ApplicationResponse<?> deleteAllRecentSearchLogs() {
+        Long userId = getUserId();
+        reviewSearchService.deleteAllRecentSearchLogs(userId);
+        return ApplicationResponse.ok();
     }
 
     private Long getUserId() {

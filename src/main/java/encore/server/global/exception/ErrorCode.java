@@ -22,6 +22,7 @@ public enum ErrorCode {
     ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 2006, "이미 존재하는 리소스입니다."),
     INVALID_SORT_EXCEPTION(HttpStatus.BAD_REQUEST, 2007, "올바르지 않은 정렬 값입니다."),
     POINT_NOT_ENOUGH_EXCEPTION(HttpStatus.BAD_REQUEST, 2008, "포인트가 부족합니다."),
+    SEARCH_LOG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 2009, "존재하지 않는 검색 로그입니다."),
 
     // 3000: User Error
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 사용자입니다."),

@@ -43,6 +43,7 @@ public class ReviewService {
     private final UserReviewRepository userReviewRepository;
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewSearchService reviewSearchService;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -205,8 +206,15 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public Slice<ReviewSimpleRes> getReviewList(String searchKeyword, Long cursor, String tag, Pageable pageable) {
-        //business logic
+    public Slice<ReviewSimpleRes> getReviewList(Long userId, String searchKeyword, Long cursor, String tag, Pageable pageable) {
+        // validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        // business logic: get review list
+        //0. 검색어 로그에 저장
+        reviewSearchService.saveRecentSearchLog(searchKeyword, userId);
+
         //1. cursor 기반으로 리뷰 리스트 조회
         List<Review> reviews = reviewRepository.findReviewListByCursor(searchKeyword, cursor, tag, pageable);
 
