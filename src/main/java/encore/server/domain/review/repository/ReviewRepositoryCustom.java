@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ReviewRepositoryCustom {
     Optional<Review> findReviewDetail(Long reviewId);
     void updateViewCount(Long reviewId, Long increment);
-
+    List<Review> findUserReviews(Long userId, Long reviewId);
     List<Review> findPopularReviews();
 
     List<Review> findReviewListByCursor(Long cursor, String tag, Pageable pageable);

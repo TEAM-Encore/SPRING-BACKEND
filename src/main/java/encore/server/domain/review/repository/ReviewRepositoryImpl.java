@@ -6,6 +6,8 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import encore.server.domain.review.converter.ReviewConverter;
+import encore.server.domain.review.dto.response.ReviewSimpleRes;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.review.enumerate.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static encore.server.domain.review.entity.QReview.review;
 import static encore.server.domain.review.entity.QReviewTags.reviewTags;
@@ -41,6 +44,23 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .where(review.id.eq(reviewId))
                 .set(review.viewCount, review.viewCount.add(increment))
                 .execute();
+    }
+
+    public List<Review> findUserReviews(Long userId, Long reviewId) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(review.user.id.eq(userId));
+        builder.and(review.deletedAt.isNull());
+        builder.and(review.id.isNotNull());
+
+        if (reviewId != null) {
+            builder.and(review.id.ne(reviewId));
+        }
+
+        return queryFactory.selectFrom(review)
+                .where(builder)
+                .orderBy(review.createdAt.desc())
+                .limit(3)
+                .fetch();
     }
 
     public List<Review> findPopularReviews() {
