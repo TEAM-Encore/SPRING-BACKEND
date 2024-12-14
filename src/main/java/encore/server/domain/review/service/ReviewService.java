@@ -138,9 +138,7 @@ public class ReviewService {
         }
 
         // 필터링: 현재 보고 있는 리뷰를 제외한 다른 리뷰들만 필터링
-        List<Review> otherReviews = reviews.stream()
-                .filter(review -> !review.getId().equals(reviewId))
-                .toList();
+        List<Review> otherReviews = reviewRepository.findUserReviews(userId, reviewId);
 
         if (otherReviews.isEmpty()) {
             throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
@@ -207,7 +205,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public Slice<ReviewSimpleRes> getReviewList(Long cursor, String tag, Pageable pageable) {
+    public Slice<ReviewSimpleRes> getReviewList(String searchKeyword, Long cursor, String tag, Pageable pageable) {
         //business logic
         //1. cursor 기반으로 리뷰 리스트 조회
         List<Review> reviews = reviewRepository.findReviewListByCursor(cursor, tag, pageable);
