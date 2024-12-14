@@ -4,6 +4,7 @@ package encore.server.domain.ticket.controller;
 
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
+import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.service.TicketService;
@@ -47,5 +48,14 @@ public class TicketController {
         return ApplicationResponse.ok(ticketList);
     }
 
+    @Operation(summary = "티켓북 수정", description = "티켓북을 수정합니다.")
+    @PatchMapping("/{ticketId}")
+    public ApplicationResponse<TicketRes> updateTicket(
+            @PathVariable Long ticketId,
+            @RequestBody TicketUpdateReq request
+    ) {
+        TicketRes updatedTicket = ticketService.updateTicket(ticketId, request);
+        return ApplicationResponse.ok(updatedTicket);
+    }
 
 }
