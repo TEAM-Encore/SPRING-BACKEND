@@ -63,8 +63,14 @@ public class ReviewService {
         Review review = ReviewConverter.toEntity(ticket, user, req);
         reviewRepository.save(review);
 
+        // 작성자에게 포인트 제공
+        user.addPoint(50L);
+
+        // 업로드 시점
+        String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
+
         // return: review response
-        return ReviewConverter.toReviewDetailRes(review, true, false);
+        return ReviewConverter.toReviewDetailRes(review, true, false, elapsedTime);
     }
 
     public ViewImageRes viewImage(Long cycle) {
@@ -97,8 +103,11 @@ public class ReviewService {
         // 좋아요 여부
         boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
 
+        // 업로드 시점
+        String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
+
         // return: review detail response
-        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike);
+        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike, elapsedTime);
     }
 
     @Transactional

@@ -43,17 +43,19 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewDetailRes toReviewDetailRes(Review review, Boolean isUnlocked, Boolean isLike) {
+    public static ReviewDetailRes toReviewDetailRes(Review review, Boolean isUnlocked, Boolean isLike, String elapsedTime) {
         return ReviewDetailRes.builder()
                 .reviewId(review.getId())
                 .ticket(toTicketRes(review.getTicket()))
                 .userId(review.getUser().getId())
+                .profileImageUrl(review.getUser().getProfileImageUrl())
                 .title(review.getTitle())
                 .tags(tagToString(review.getTags()))
                 .reviewDataRes(toReviewDataRes(review.getReviewData()))
                 .isUnlocked(isUnlocked)
                 .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
                 .viewCount(review.getViewCount())
+                .elapsedTime(elapsedTime)
                 .likeRes(toReviewLikeRes(isLike, review.getLikeCount()))
                 .build();
     }
