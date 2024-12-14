@@ -6,6 +6,7 @@ import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.domain.ticket.converter.TicketConverter;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
+import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.entity.Actor;
@@ -99,6 +100,43 @@ public class TicketService {
         return tickets.stream()
                 .map(TicketRes::new)
                 .collect(Collectors.toList());
+    }
+
+    //티켓북 수정
+    @Transactional
+    public TicketRes updateTicket(Long ticketId, TicketUpdateReq request) {
+        //Validation
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        if (request.title() != null) {
+            ticket.setTitle(request.title());
+        }
+        if (request.viewedDate() != null) {
+            ticket.setViewedDate(request.viewedDate());
+        }
+        if (request.showTime() != null) {
+            ticket.setShowTime(request.showTime());
+        }
+        if (request.seat() != null) {
+            ticket.setSeat(request.seat());
+        }
+        if (request.actors() != null) {
+            List<Actor> actors = request.actors().stream()
+                    .map(actorDTO -> Actor.builder()
+                            .id(actorDTO.id())
+                            .name(actorDTO.name())
+                            .actorImageUrl(actorDTO.actorImageUrl())
+                            .build())
+                    .collect(Collectors.toList());
+            ticket.setActors(actors);
+        }
+        if (request.ticketImageUrl() != null) {
+            ticket.setTicketImageUrl(request.ticketImageUrl());
+        }
+
+        ticketRepository.save(ticket);
+        return new TicketRes(ticket);
     }
 
 }

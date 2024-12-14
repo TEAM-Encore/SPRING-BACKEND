@@ -69,4 +69,29 @@ public class Ticket extends BaseTimeEntity {
         this.showTime = showTime;
         this.actors = actors;
     }
+
+    // Setter 메서드 추가
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setTicketImageUrl(String ticketImageUrl) {
+        this.ticketImageUrl = ticketImageUrl;
+    }
+
+    public void setViewedDate(LocalDate viewedDate) {
+        this.viewedDate = viewedDate;
+    }
+
+    public void setSeat(String seat) {
+        this.seat = seat;
+    }
+
+    public void setShowTime(String showTime) {
+        this.showTime = showTime;
+    }
+
+    public void setActors(List<Actor> actors) {
+        this.actors = actors;
+    }
 }

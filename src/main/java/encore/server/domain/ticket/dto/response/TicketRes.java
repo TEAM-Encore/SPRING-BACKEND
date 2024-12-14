@@ -1,5 +1,7 @@
 package encore.server.domain.ticket.dto.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import encore.server.domain.ticket.entity.Ticket;
 import lombok.Builder;
 
@@ -8,12 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record TicketRes(
         Long id,
         String musicalTitle,
         Long series,
         LocalDate viewedDate,
-        String venue,
+        String location,
         String seat,
         List<String> actors
 ) {
