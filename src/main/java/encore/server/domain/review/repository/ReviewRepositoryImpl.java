@@ -6,17 +6,17 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import encore.server.domain.review.converter.ReviewConverter;
-import encore.server.domain.review.dto.response.ReviewSimpleRes;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.review.enumerate.Tag;
+import encore.server.global.exception.ApplicationException;
+import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static encore.server.domain.review.entity.QReview.review;
 import static encore.server.domain.review.entity.QReviewTags.reviewTags;
@@ -47,17 +47,17 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
     }
 
     public List<Review> findUserReviews(Long userId, Long reviewId) {
-        BooleanBuilder builder = new BooleanBuilder();
-        builder.and(review.user.id.eq(userId));
-        builder.and(review.deletedAt.isNull());
-        builder.and(review.id.isNotNull());
+        BooleanBuilder predicate = new BooleanBuilder();
+        predicate.and(review.user.id.eq(userId))
+                .and(review.deletedAt.isNull())
+                .and(review.id.isNotNull());
 
         if (reviewId != null) {
-            builder.and(review.id.ne(reviewId));
+            predicate.and(review.id.ne(reviewId));
         }
 
         return queryFactory.selectFrom(review)
-                .where(builder)
+                .where(predicate)
                 .orderBy(review.createdAt.desc())
                 .limit(3)
                 .fetch();
@@ -72,11 +72,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .fetch();
     }
 
-    public List<Review> findReviewListByCursor(Long cursor, String tag, Pageable pageable) {
+    public List<Review> findReviewListByCursor(String searchKeyword, Long cursor, String tag, Pageable pageable) {
         BooleanBuilder predicate = new BooleanBuilder();
         predicate.and(review.deletedAt.isNull())
-                .and(addCursorCondition(cursor))
-                .and(addTagCondition(tag));
+                .and(addKeywordCondition(searchKeyword))
+                .and(addTagCondition(tag))
+                .and(addCursorCondition(cursor));
 
         return queryFactory
                 .selectFrom(review)
@@ -89,17 +90,29 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
     // 정렬 조건 추가
     private OrderSpecifier<?>[] getSortOrder(Pageable pageable) {
         return pageable.getSort().stream()
-                .map(order -> {
+                .flatMap(order -> {
                     switch (order.getProperty().toLowerCase()) {
                         case "createdat":
-                            return new OrderSpecifier<>(Order.DESC, review.id);
+                            return Stream.of(new OrderSpecifier<>(Order.DESC, review.id));
                         case "likecount":
-                            return new OrderSpecifier<>(Order.DESC, review.likeCount);
+                            return Stream.of(
+                                    new OrderSpecifier<>(Order.DESC, review.likeCount),
+                                    new OrderSpecifier<>(Order.DESC, review.createdAt)
+                            );
                         default:
-                            return new OrderSpecifier<>(Order.DESC, review.id);
+                            return Stream.of(new OrderSpecifier<>(Order.DESC, review.id));
                     }
                 })
                 .toArray(OrderSpecifier[]::new);
+    }
+
+    // keyword 조건 추가
+    private BooleanExpression addKeywordCondition(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return null;
+        }
+        return review.title.containsIgnoreCase(keyword)
+                .or(review.reviewData.rating.ratingReview.containsIgnoreCase(keyword));
     }
 
     // cursor 뒤인지 확인(id 기준)
@@ -112,9 +125,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     // tag 조건 추가
     private BooleanExpression addTagCondition(String tag) {
-        if (tag != null && !tag.isEmpty()) {
-            return review.tags.any().tag.eq(Tag.valueOf(tag));
+        if (tag == null || tag.trim().isEmpty()) {
+            return null;
         }
-        return null;
+        try {
+            return review.tags.any().tag.eq(Tag.valueOf(tag));
+        } catch (IllegalArgumentException e) {
+            throw new ApplicationException(ErrorCode.REVIEW_TAG_NOT_FOUND_EXCEPTION);
+        }
     }
 }

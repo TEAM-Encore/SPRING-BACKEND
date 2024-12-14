@@ -12,5 +12,5 @@ public interface ReviewRepositoryCustom {
     List<Review> findUserReviews(Long userId, Long reviewId);
     List<Review> findPopularReviews();
 
-    List<Review> findReviewListByCursor(Long cursor, String tag, Pageable pageable);
+    List<Review> findReviewListByCursor(String searchKeyword, Long cursor, String tag, Pageable pageable);
 }
