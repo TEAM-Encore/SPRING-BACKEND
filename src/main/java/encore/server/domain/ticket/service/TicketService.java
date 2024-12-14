@@ -66,8 +66,8 @@ public class TicketService {
 
         ticketRepository.save(ticket);
 
-
-        return new TicketCreateRes(ticket);
+        // TicketConverter 이용
+        return TicketConverter.toTicketCreateRes(ticket);
 
     }
 
@@ -75,7 +75,7 @@ public class TicketService {
     public List<ActorDTO> searchActorsByName(String keyword) {
         List<Actor> actors = actorRepository.findByNameContaining(keyword);
         return actors.stream()
-                .map(TicketConverter::toActorDTO) // Converter를 활용한 변환
+                .map(TicketConverter::toActorDTO) // Converter를 이용해 변환
                 .toList();
     }
 
