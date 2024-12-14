@@ -7,6 +7,9 @@ import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,6 +65,20 @@ public class ReviewController {
         return ApplicationResponse.ok(reviewService.likeReview(userId, reviewId));
     }
 
+    @GetMapping("/popular-list")
+    @Operation(summary = "인기 리뷰 리스트 조회", description = "인기 리뷰 리스트를 조회합니다.")
+    public ApplicationResponse<List<ReviewSimpleRes>> getPopularReviewList() {
+        return ApplicationResponse.ok(reviewService.getPopularReviewList());
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "리뷰 리스트 페이징 조회", description = "리뷰 리스트를 조회합니다.")
+    public ApplicationResponse<Slice<ReviewSimpleRes>> getReviewList(
+            @RequestParam(name = "cursor", required = false) Long cursor,
+            @RequestParam(name = "tag", required = false) String tag,
+            @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
+        return ApplicationResponse.ok(reviewService.getReviewList(cursor, tag, pageable));
+    }
 
     private Long getUserId() {
         return 1L;

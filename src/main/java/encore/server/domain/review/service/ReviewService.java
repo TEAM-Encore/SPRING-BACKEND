@@ -18,6 +18,9 @@ import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,12 +148,7 @@ public class ReviewService {
 
         // return: review simple response for other reviews
         return otherReviews.stream()
-                .map(review -> {
-                    long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
-                    String elapsedTime = getElapsedTime(minutesAgo);
-                    Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
-                    return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
-                })
+                .map(this::convertToReviewSimpleRes)
                 .collect(Collectors.toList());
     }
 
@@ -194,5 +192,46 @@ public class ReviewService {
         } else {
             return minutesAgo / 1440 + "일 전";
         }
+    }
+
+    public List<ReviewSimpleRes> getPopularReviewList() {
+        // business logic: get popular review list
+        List<Review> reviews = reviewRepository.findPopularReviews();
+        if (reviews.isEmpty()) {
+            throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
+        }
+
+        // return: popular review list
+       return reviews.stream()
+                .map(this::convertToReviewSimpleRes)
+                .collect(Collectors.toList());
+    }
+
+    public Slice<ReviewSimpleRes> getReviewList(Long cursor, String tag, Pageable pageable) {
+        //business logic
+        //1. cursor 기반으로 리뷰 리스트 조회
+        List<Review> reviews = reviewRepository.findReviewListByCursor(cursor, tag, pageable);
+
+        //2. 리뷰 리스트가 없는 경우
+        if (reviews.isEmpty()) {
+            throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
+        }
+
+        //3. 리뷰 리스트 조회 성공
+        boolean hasNext = reviews.size() > pageable.getPageSize();
+        List<ReviewSimpleRes> reviewSimpleResList = reviews.stream()
+                .limit(pageable.getPageSize())
+                .map(this::convertToReviewSimpleRes)
+                .toList();
+
+        //return: slice 객체 생성 후 반환
+        return new SliceImpl<>(reviewSimpleResList, pageable, hasNext);
+    }
+
+    private ReviewSimpleRes convertToReviewSimpleRes(Review review) {
+        long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
+        String elapsedTime = getElapsedTime(minutesAgo);
+        Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, review.getUser());
+        return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
     }
 }
