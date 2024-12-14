@@ -208,7 +208,7 @@ public class ReviewService {
     public Slice<ReviewSimpleRes> getReviewList(String searchKeyword, Long cursor, String tag, Pageable pageable) {
         //business logic
         //1. cursor 기반으로 리뷰 리스트 조회
-        List<Review> reviews = reviewRepository.findReviewListByCursor(cursor, tag, pageable);
+        List<Review> reviews = reviewRepository.findReviewListByCursor(searchKeyword, cursor, tag, pageable);
 
         //2. 리뷰 리스트가 없는 경우
         if (reviews.isEmpty()) {
@@ -220,9 +220,8 @@ public class ReviewService {
         List<ReviewSimpleRes> reviewSimpleResList = reviews.stream()
                 .limit(pageable.getPageSize())
                 .map(this::convertToReviewSimpleRes)
-                .toList();
+                .collect(Collectors.toList());
 
-        //return: slice 객체 생성 후 반환
         return new SliceImpl<>(reviewSimpleResList, pageable, hasNext);
     }
 

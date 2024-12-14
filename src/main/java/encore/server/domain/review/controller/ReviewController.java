@@ -74,10 +74,11 @@ public class ReviewController {
     @GetMapping("/list")
     @Operation(summary = "리뷰 리스트 페이징 조회", description = "리뷰 리스트를 조회합니다.")
     public ApplicationResponse<Slice<ReviewSimpleRes>> getReviewList(
+            @RequestParam(name= "search_keyword", required = false) String keyword,
             @RequestParam(name = "cursor", required = false) Long cursor,
             @RequestParam(name = "tag", required = false) String tag,
             @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
-        return ApplicationResponse.ok(reviewService.getReviewList(cursor, tag, pageable));
+        return ApplicationResponse.ok(reviewService.getReviewList(keyword, cursor, tag, pageable));
     }
 
     private Long getUserId() {
