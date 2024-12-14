@@ -2,6 +2,7 @@ package encore.server.domain.ticket.controller;
 
 
 
+import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.service.TicketService;
@@ -17,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +32,13 @@ public class TicketController {
     public ResponseEntity<TicketCreateRes> createTicket(@RequestBody TicketCreateReq request) {
         TicketCreateRes response = ticketService.createTicket(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "배우 검색", description = "배우 이름을 키워드로 검색합니다.")
+    @GetMapping("/actors/search")
+    public ApplicationResponse<List<ActorDTO>> searchActors(@RequestParam String keyword) {
+        List<ActorDTO> responses = ticketService.searchActorsByName(keyword);
+        return ApplicationResponse.ok(responses);
     }
 
 

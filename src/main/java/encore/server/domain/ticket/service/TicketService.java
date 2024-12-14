@@ -68,4 +68,11 @@ public class TicketService {
 
     }
 
+    public List<ActorDTO> searchActorsByName(String keyword) {
+        List<Actor> actors = actorRepository.findByNameContaining(keyword);
+        return actors.stream()
+                .map(actor -> new ActorDTO(actor.getId(), actor.getName(), actor.getActorImageUrl()))
+                .collect(Collectors.toList());
+    }
+
 }
