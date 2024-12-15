@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +57,16 @@ public class TicketController {
     ) {
         TicketRes updatedTicket = ticketService.updateTicket(ticketId, request);
         return ApplicationResponse.ok(updatedTicket);
+    }
+
+    @DeleteMapping("/{ticket_id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "티켓북 삭제 API", description = "티켓북을 삭제합니다.")
+    public ApplicationResponse deletePost(@PathVariable("ticket_id") Long ticketIdToDelete){
+
+        ticketService.deleteTicket(ticketIdToDelete);
+
+        return ApplicationResponse.ok();
     }
 
 }
