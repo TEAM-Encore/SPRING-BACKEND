@@ -3,10 +3,11 @@ package encore.server.domain.ticket.entity;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
+@Builder
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,4 +23,11 @@ public class Actor extends BaseTimeEntity {
 
     @Column(columnDefinition = "TEXT")
     private String actorImageUrl;
+
+
+    public Actor(Long id, String name, String actorImageUrl) {
+        this.id = id;
+        this.name = name;
+        this.actorImageUrl = actorImageUrl;
+    }
 }

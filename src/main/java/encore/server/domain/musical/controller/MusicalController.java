@@ -23,6 +23,7 @@ import java.util.List;
 public class MusicalController {
     private final MusicalService musicalService;
 
+    @Operation(summary = "뮤지컬 검색", description = "뮤지컬을 키워드로 검색합니다.")
     @GetMapping("/search")
     public ApplicationResponse<List<MusicalRes>> searchMusicals(@RequestParam String keyword) {
         List<MusicalRes> responses = musicalService.searchMusicalsByTitle(keyword);
