@@ -15,6 +15,7 @@ import encore.server.domain.ticket.repository.ActorRepository;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,9 +93,9 @@ public class TicketService {
         List<Ticket> tickets;
 
         if (startDate != null) {
-            tickets = ticketRepository.findByViewedDateAfter(startDate);
+            tickets = ticketRepository.findByViewedDateAfterAndDeletedAtIsNull(startDate);
         } else {
-            tickets = ticketRepository.findAll();
+            tickets = ticketRepository.findByDeletedAtIsNull();
         }
 
         return tickets.stream()
@@ -139,4 +140,13 @@ public class TicketService {
         return new TicketRes(ticket);
     }
 
+    //티켓북 삭제
+    @Transactional
+    public void deleteTicket(Long ticketId) {
+
+        if(!ticketRepository.existsById(ticketId)){
+            throw new BadRequestException("Ticket does not exist");
+        }
+        ticketRepository.softDeleteByTicketId(ticketId);
+    }
 }

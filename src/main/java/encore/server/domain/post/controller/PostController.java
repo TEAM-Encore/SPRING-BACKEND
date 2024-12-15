@@ -38,6 +38,7 @@ public class PostController {
     private final PostLikeService postLikeService;
 
     @PostMapping("/likes")
+    @Operation(summary = "게시글 좋아요 API", description = "게시글 좋아요를 누릅니다.")
     public ApplicationResponse<Void> toggleLike(@RequestBody @Valid PostLikeReq postLikeReq) throws Exception {
         postLikeService.toggleLike(postLikeReq);
         return  ApplicationResponse.ok();
