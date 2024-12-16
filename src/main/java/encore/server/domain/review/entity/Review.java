@@ -1,6 +1,5 @@
 package encore.server.domain.review.entity;
 
-import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
@@ -33,6 +32,12 @@ public class Review extends BaseTimeEntity {
 
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String title;
+
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long viewCount;
+
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long likeCount;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewTags> tags;

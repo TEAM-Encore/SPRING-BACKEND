@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface ReviewRepositoryCustom {
     Optional<Review> findReviewDetail(Long reviewId);
+    void updateViewCount(Long reviewId, Long increment);
 }
