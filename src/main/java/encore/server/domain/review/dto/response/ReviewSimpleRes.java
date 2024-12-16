@@ -23,13 +23,13 @@ public record ReviewSimpleRes(
         @Schema(description = "업로드 시점", example = "11분 전")
         String elapsedTime,
 
-        @Schema(description = "총평", example = "5.0")
-        Float totalRating,
-
         @Schema(description = "리뷰 조회수", example = "100")
         Long viewCount,
 
         @Schema(description = "리뷰 좋아요 데이터")
-        ReviewLikeRes likeData
+        ReviewLikeRes likeData,
+
+        @Schema(description = "리뷰 총평점과 내용")
+        ReviewDataRes.Rating rating
 ) {
 }

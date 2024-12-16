@@ -20,6 +20,9 @@ public record ReviewDetailRes(
         @Schema(description = "유저 ID", example = "1")
         Long userId,
 
+        @Schema(description = "유저 프로필 이미지", example = "https://www.image.com")
+        String profileImageUrl,
+
         @Schema(description = "리뷰 제목", example = "위키드 리뷰")
         String title,
 
@@ -36,6 +39,9 @@ public record ReviewDetailRes(
 
         @Schema(description = "나의 리뷰인지 여부", example = "true")
         Boolean isMyReview,
+
+        @Schema(description = "업로드 시점", example = "11분 전")
+        String elapsedTime,
 
         @Schema(description = "조회수", example = "100")
         Long viewCount,

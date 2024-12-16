@@ -18,6 +18,9 @@ import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,7 @@ public class ReviewService {
     private final UserReviewRepository userReviewRepository;
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewSearchService reviewSearchService;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -59,8 +63,14 @@ public class ReviewService {
         Review review = ReviewConverter.toEntity(ticket, user, req);
         reviewRepository.save(review);
 
+        // 작성자에게 포인트 제공
+        user.addPoint(50L);
+
+        // 업로드 시점
+        String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
+
         // return: review response
-        return ReviewConverter.toReviewDetailRes(review, true, false);
+        return ReviewConverter.toReviewDetailRes(review, true, false, elapsedTime);
     }
 
     public ViewImageRes viewImage(Long cycle) {
@@ -93,8 +103,11 @@ public class ReviewService {
         // 좋아요 여부
         boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
 
+        // 업로드 시점
+        String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
+
         // return: review detail response
-        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike);
+        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike, elapsedTime);
     }
 
     @Transactional
@@ -135,9 +148,7 @@ public class ReviewService {
         }
 
         // 필터링: 현재 보고 있는 리뷰를 제외한 다른 리뷰들만 필터링
-        List<Review> otherReviews = reviews.stream()
-                .filter(review -> !review.getId().equals(reviewId))
-                .toList();
+        List<Review> otherReviews = reviewRepository.findUserReviews(userId, reviewId);
 
         if (otherReviews.isEmpty()) {
             throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
@@ -145,12 +156,7 @@ public class ReviewService {
 
         // return: review simple response for other reviews
         return otherReviews.stream()
-                .map(review -> {
-                    long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
-                    String elapsedTime = getElapsedTime(minutesAgo);
-                    Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
-                    return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
-                })
+                .map(this::convertToReviewSimpleRes)
                 .collect(Collectors.toList());
     }
 
@@ -194,5 +200,52 @@ public class ReviewService {
         } else {
             return minutesAgo / 1440 + "일 전";
         }
+    }
+
+    public List<ReviewSimpleRes> getPopularReviewList() {
+        // business logic: get popular review list
+        List<Review> reviews = reviewRepository.findPopularReviews();
+        if (reviews.isEmpty()) {
+            throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
+        }
+
+        // return: popular review list
+       return reviews.stream()
+                .map(this::convertToReviewSimpleRes)
+                .collect(Collectors.toList());
+    }
+
+    public Slice<ReviewSimpleRes> getReviewList(Long userId, String searchKeyword, Long cursor, String tag, Pageable pageable) {
+        // validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        // business logic: get review list
+        //0. 검색어 로그에 저장
+        reviewSearchService.saveRecentSearchLog(searchKeyword, userId);
+
+        //1. cursor 기반으로 리뷰 리스트 조회
+        List<Review> reviews = reviewRepository.findReviewListByCursor(searchKeyword, cursor, tag, pageable);
+
+        //2. 리뷰 리스트가 없는 경우
+        if (reviews.isEmpty()) {
+            throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
+        }
+
+        //3. 리뷰 리스트 조회 성공
+        boolean hasNext = reviews.size() > pageable.getPageSize();
+        List<ReviewSimpleRes> reviewSimpleResList = reviews.stream()
+                .limit(pageable.getPageSize())
+                .map(this::convertToReviewSimpleRes)
+                .collect(Collectors.toList());
+
+        return new SliceImpl<>(reviewSimpleResList, pageable, hasNext);
+    }
+
+    private ReviewSimpleRes convertToReviewSimpleRes(Review review) {
+        long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
+        String elapsedTime = getElapsedTime(minutesAgo);
+        Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, review.getUser());
+        return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
     }
 }
