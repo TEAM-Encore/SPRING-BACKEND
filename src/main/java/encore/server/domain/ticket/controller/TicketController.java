@@ -2,8 +2,11 @@ package encore.server.domain.ticket.controller;
 
 
 
+import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
+import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
+import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.ErrorCode;
@@ -16,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,20 +28,45 @@ import java.time.LocalDateTime;
 public class TicketController {
     private final TicketService ticketService;
 
-
+    @Operation(summary = "티켓북 생성", description = "티켓북을 생성합니다.")
     @PostMapping
-    public TicketCreateRes createTicket(@RequestBody TicketCreateReq request) {
-        return ticketService.createTicket(request);
+    public ApplicationResponse<TicketCreateRes> createTicket(@RequestBody TicketCreateReq request) {
+        TicketCreateRes response = ticketService.createTicket(request);
+        return ApplicationResponse.created(response);
     }
 
+    @Operation(summary = "배우 검색", description = "배우 이름을 키워드로 검색합니다.")
+    @GetMapping("/actors/search")
+    public ApplicationResponse<List<ActorDTO>> searchActors(@RequestParam String keyword) {
+        List<ActorDTO> responses = ticketService.searchActorsByName(keyword);
+        return ApplicationResponse.ok(responses);
+    }
 
+    @Operation(summary = "티켓북 리스트 조회", description = "기간별 티켓북 리스트를 조회합니다.")
+    @GetMapping("/list")
+    public ApplicationResponse<List<TicketRes>> getTicketList(@RequestParam String dateRange) {
+        List<TicketRes> ticketList = ticketService.getTicketList(dateRange);
+        return ApplicationResponse.ok(ticketList);
+    }
 
-//    @PostMapping("")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    @Operation(summary = "티켓북 생성 API", description = "티켓북을 생성합니다.")
-//    public ApplicationResponse<TicketReq> createPost(@RequestBody @Valid TicketReq ticketReq, BindingResult bindingResult) {
-//
-//        Long ticketId = ticketService.createTicket(ticketReq);
-//        ApplicationResponse.ok();
-//    }
+    @Operation(summary = "티켓북 수정", description = "티켓북을 수정합니다.")
+    @PatchMapping("/{ticketId}")
+    public ApplicationResponse<TicketRes> updateTicket(
+            @PathVariable Long ticketId,
+            @RequestBody TicketUpdateReq request
+    ) {
+        TicketRes updatedTicket = ticketService.updateTicket(ticketId, request);
+        return ApplicationResponse.ok(updatedTicket);
+    }
+
+    @DeleteMapping("/{ticket_id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "티켓북 삭제 API", description = "티켓북을 삭제합니다.")
+    public ApplicationResponse deletePost(@PathVariable("ticket_id") Long ticketIdToDelete){
+
+        ticketService.deleteTicket(ticketIdToDelete);
+
+        return ApplicationResponse.ok();
+    }
+
 }

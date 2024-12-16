@@ -61,8 +61,8 @@ public record ReviewDetailRes(
             @Schema(description = "공연 포스터", example = "https://www.image.com")
             String imageUrl,
 
-            @Schema(description = "동행인", example = "[\"김뮤뮤\", \"이뮤뮤\"]")
-            List<String> companions
+            @Schema(description = "배우 리스트", example = "[\"김뮤뮤\", \"이뮤뮤\"]")
+            List<String> actors
     ) {
     }
 }
