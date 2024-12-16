@@ -38,7 +38,7 @@ public record ReviewDetailRes(
             String seat,
             LocalDate viewedDate,
             String imageUrl,
-            List<String> companions
+            List<String> actors
     ) {
     }
 }
