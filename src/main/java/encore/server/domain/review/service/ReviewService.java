@@ -2,13 +2,12 @@ package encore.server.domain.review.service;
 
 import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewReq;
-import encore.server.domain.review.dto.response.ReviewDetailRes;
-import encore.server.domain.review.dto.response.ReviewRes;
-import encore.server.domain.review.dto.response.ReviewSimpleRes;
-import encore.server.domain.review.dto.response.ViewImageRes;
+import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.entity.Review;
+import encore.server.domain.review.entity.ReviewLike;
 import encore.server.domain.review.entity.UserReview;
 import encore.server.domain.review.entity.ViewImage;
+import encore.server.domain.review.repository.ReviewLikeRepository;
 import encore.server.domain.review.repository.ReviewRepository;
 import encore.server.domain.review.repository.UserReviewRepository;
 import encore.server.domain.review.repository.ViewImageRepository;
@@ -19,7 +18,6 @@ import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +39,10 @@ public class ReviewService {
     private final ViewImageRepository viewImageRepository;
     private final UserReviewRepository userReviewRepository;
     private final ReviewViewService reviewViewService;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     @Transactional
-    public ReviewRes createReview(Long ticketId, Long userId, ReviewReq req) {
+    public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
         // validation: user, ticket, review
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -61,7 +60,7 @@ public class ReviewService {
         reviewRepository.save(review);
 
         // return: review response
-        return ReviewConverter.toReviewRes(review);
+        return ReviewConverter.toReviewDetailRes(review, true, false);
     }
 
     public ViewImageRes viewImage(Long cycle) {
@@ -91,8 +90,11 @@ public class ReviewService {
         // 조회수 증가
         reviewViewService.addVisitedRedis(user, review);
 
+        // 좋아요 여부
+        boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
+
         // return: review detail response
-        return ReviewConverter.toReviewDetailRes(review, isUnlocked);
+        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike);
     }
 
     @Transactional
@@ -146,9 +148,40 @@ public class ReviewService {
                 .map(review -> {
                     long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
                     String elapsedTime = getElapsedTime(minutesAgo);
-                    return ReviewConverter.toReviewSimpleRes(review, elapsedTime);
+                    Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
+                    return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ReviewLikeRes likeReview(Long userId, Long reviewId) {
+        // validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        // business logic: like review
+        ReviewLike reviewLike = reviewLikeRepository.findByReviewAndUser(review, user)
+                .orElse(null);
+
+        if (reviewLike == null) {
+            reviewLike = ReviewLike.builder()
+                    .review(review)
+                    .user(user)
+                    .build();
+            reviewLikeRepository.save(reviewLike);
+        } else {
+            reviewLike.toggleLike(reviewLike.getIsLike());
+        }
+
+        long likeCount = reviewLikeRepository.countByReviewAndIsLikeTrue(review);
+        review.setLikeCount(likeCount);
+        reviewRepository.save(review);
+
+        // return: like count
+        return ReviewConverter.toReviewLikeRes(reviewLike.getIsLike(), likeCount);
     }
 
     private String getElapsedTime(long minutesAgo) {

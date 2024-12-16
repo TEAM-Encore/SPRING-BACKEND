@@ -40,8 +40,8 @@ public record ReviewDetailRes(
         @Schema(description = "조회수", example = "100")
         Long viewCount,
 
-        @Schema(description = "좋아요 수", example = "100")
-        Long likeCount
+        @Schema(description = "좋아요 관련 데이터")
+        ReviewLikeRes likeRes
 ) {
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

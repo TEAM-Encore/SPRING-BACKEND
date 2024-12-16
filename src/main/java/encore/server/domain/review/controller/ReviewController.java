@@ -1,10 +1,7 @@
 package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
-import encore.server.domain.review.dto.response.ReviewDetailRes;
-import encore.server.domain.review.dto.response.ReviewRes;
-import encore.server.domain.review.dto.response.ReviewSimpleRes;
-import encore.server.domain.review.dto.response.ViewImageRes;
+import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +20,7 @@ public class ReviewController {
 
     @PostMapping("/{ticket_id}")
     @Operation(summary = "리뷰 작성", description = "티켓에 대한 리뷰를 작성합니다.")
-    public ApplicationResponse<ReviewRes> createReview(@PathVariable("ticket_id") Long ticketId,
+    public ApplicationResponse<ReviewDetailRes> createReview(@PathVariable("ticket_id") Long ticketId,
                                                        @RequestBody ReviewReq req) {
         Long userId = getUserId();
         return ApplicationResponse.created(reviewService.createReview(ticketId, userId, req));
@@ -57,6 +54,14 @@ public class ReviewController {
             @RequestParam(value = "review_id", required = false) Long reviewId) {
         return ApplicationResponse.ok(reviewService.getUserReviews(userId, reviewId));
     }
+
+    @PatchMapping("/{review_id}/like")
+    @Operation(summary = "리뷰 좋아요", description = "리뷰에 좋아요를 누릅니다.(좋아요 생성+취소)")
+    public ApplicationResponse<ReviewLikeRes> likeReview(@PathVariable("review_id") Long reviewId) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewService.likeReview(userId, reviewId));
+    }
+
 
     private Long getUserId() {
         return 1L;
