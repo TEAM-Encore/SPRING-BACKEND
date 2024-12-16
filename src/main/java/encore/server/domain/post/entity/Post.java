@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -66,8 +68,14 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long commentCount;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Term> terms = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "post_term",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "term_id")
+    )
+    private Set<Term> terms = new HashSet<>();
 
     @Builder
     public Post(User user, String title, String content,Boolean isNotice, Boolean isTemporarySave, PostType postType,
@@ -93,7 +101,7 @@ public class Post extends BaseTimeEntity {
 
     public void addMusicalTerm(Term musicalTerm) {
         this.terms.add(musicalTerm);
-        musicalTerm.setPost(this);
+        musicalTerm.addPost(this);
     }
 
     public void addMusicalTerms(List<Term> terms) {

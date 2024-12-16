@@ -1,4 +1,4 @@
-package encore.server.domain.review;
+package encore.server.domain.review.enumerate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

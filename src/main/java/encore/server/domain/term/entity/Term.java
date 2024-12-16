@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,11 +23,10 @@ public class Term {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @ManyToMany(mappedBy = "terms")
+    private Set<Post> posts = new HashSet<>();
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void addPost(Post post) {
+        this.posts.add(post);
     }
 }

@@ -1,6 +1,6 @@
 package encore.server.domain.review.entity;
 
-import encore.server.domain.review.Tag;
+import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
@@ -34,21 +34,22 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String title;
 
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "review_tags", joinColumns = @JoinColumn(name = "review_id"))
-    @Column(name = "tag", nullable = false)
-    private List<Tag> tags;
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewTags> tags;
 
     @Embedded
     private ReviewData reviewData;
 
     @Builder
-    public Review(User user, Ticket ticket, String title, List<Tag> tags, ReviewData reviewData) {
+    public Review(User user, Ticket ticket, String title, List<ReviewTags> tags, ReviewData reviewData) {
         this.user = user;
         this.ticket = ticket;
         this.title = title;
         this.tags = tags;
         this.reviewData = reviewData;
+    }
+
+    public void addTags(List<ReviewTags> reviewTags) {
+        this.tags = reviewTags;
     }
 }

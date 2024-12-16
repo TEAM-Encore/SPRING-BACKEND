@@ -6,15 +6,17 @@ import lombok.Builder;
 
 import java.util.List;
 
-
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record ReviewRes(
-        Long reviewId,
-        Long ticketId,
-        Long userId,
-        String title,
-        List<String> tags,
-        ReviewDataRes reviewDataRes
+public record ViewImageRes(
+        List<ViewImage> viewImages
 ) {
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static record ViewImage(
+            Long id,
+            String url,
+            Long level
+    ) {
+    }
 }

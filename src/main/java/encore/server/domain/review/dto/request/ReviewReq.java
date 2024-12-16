@@ -1,4 +1,12 @@
 package encore.server.domain.review.dto.request;
 
-public record ReviewReq() {
+import encore.server.domain.review.entity.ReviewData;
+
+import java.util.List;
+
+public record ReviewReq(
+        String title,
+        List<String> tags,
+        ReviewData reviewData
+) {
 }
