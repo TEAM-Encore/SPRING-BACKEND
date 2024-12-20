@@ -7,6 +7,7 @@ import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
+import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.ErrorCode;
@@ -52,11 +53,11 @@ public class TicketController {
 
     @Operation(summary = "티켓북 수정", description = "티켓북을 수정합니다.")
     @PatchMapping("/{ticketId}")
-    public ApplicationResponse<TicketRes> updateTicket(
+    public ApplicationResponse<TicketUpdateRes> updateTicket(
             @PathVariable Long ticketId,
             @RequestBody TicketUpdateReq request
     ) {
-        TicketRes updatedTicket = ticketService.updateTicket(ticketId, request);
+        TicketUpdateRes updatedTicket = ticketService.updateTicket(ticketId, request);
         return ApplicationResponse.ok(updatedTicket);
     }
 

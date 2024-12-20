@@ -3,12 +3,15 @@ package encore.server.domain.ticket.service;
 import encore.server.domain.image.service.ImageService;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.repository.MusicalRepository;
+import encore.server.domain.review.entity.Review;
+import encore.server.domain.review.repository.ReviewRepository;
 import encore.server.domain.ticket.converter.TicketConverter;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
+import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.ActorRepository;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +39,7 @@ public class TicketService {
     private final UserRepository userRepository;
     private final ActorRepository actorRepository;
     private final ImageService imageService;
+    private final ReviewRepository reviewRepository;
 
 
     @Transactional
@@ -107,14 +112,17 @@ public class TicketService {
         }
 
         return tickets.stream()
-                .map(TicketConverter::toTicketRes)
+                .map(ticket -> {
+                    Optional<Review> review = reviewRepository.findByTicketIdAndDeletedAtIsNull(ticket.getId());
+                    return TicketConverter.toTicketRes(ticket, review);
+                })
                 .collect(Collectors.toList());
     }
 
 
     //티켓북 수정
     @Transactional
-    public TicketRes updateTicket(Long ticketId, TicketUpdateReq request) {
+    public TicketUpdateRes updateTicket(Long ticketId, TicketUpdateReq request) {
         //Validation
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
@@ -146,7 +154,7 @@ public class TicketService {
         }
 
         ticketRepository.save(ticket);
-        return TicketConverter.toTicketRes(ticket);
+        return TicketConverter.toTicketUpdateRes(ticket);
     }
 
     //티켓북 삭제
