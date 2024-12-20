@@ -3,25 +3,31 @@ package encore.server.domain.ticket.service;
 import encore.server.domain.image.service.ImageService;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.repository.MusicalRepository;
+import encore.server.domain.review.entity.Review;
+import encore.server.domain.review.repository.ReviewRepository;
 import encore.server.domain.ticket.converter.TicketConverter;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
+import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.ActorRepository;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.BadRequestException;
+import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +39,7 @@ public class TicketService {
     private final UserRepository userRepository;
     private final ActorRepository actorRepository;
     private final ImageService imageService;
+    private final ReviewRepository reviewRepository;
 
 
     @Transactional
@@ -82,7 +89,13 @@ public class TicketService {
     }
 
     //티켓북 조회
-    public List<TicketRes> getTicketList(String dateRange) {
+    public List<TicketRes> getTicketList(Long userId, String dateRange) {
+
+        // validation: user
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+
         LocalDate startDate = switch (dateRange) {
             case "WEEK" -> LocalDate.now().minusWeeks(1);
             case "MONTH" -> LocalDate.now().minusMonths(1);
@@ -93,19 +106,23 @@ public class TicketService {
         List<Ticket> tickets;
 
         if (startDate != null) {
-            tickets = ticketRepository.findByViewedDateAfterAndDeletedAtIsNull(startDate);
+            tickets = ticketRepository.findByUserIdAndViewedDateAfterAndDeletedAtIsNull(userId, startDate);
         } else {
-            tickets = ticketRepository.findByDeletedAtIsNull();
+            tickets = ticketRepository.findByUserIdAndDeletedAtIsNull(userId);
         }
 
         return tickets.stream()
-                .map(TicketRes::new)
+                .map(ticket -> {
+                    Optional<Review> review = reviewRepository.findByTicketIdAndDeletedAtIsNull(ticket.getId());
+                    return TicketConverter.toTicketRes(ticket, review);
+                })
                 .collect(Collectors.toList());
     }
 
+
     //티켓북 수정
     @Transactional
-    public TicketRes updateTicket(Long ticketId, TicketUpdateReq request) {
+    public TicketUpdateRes updateTicket(Long ticketId, TicketUpdateReq request) {
         //Validation
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
@@ -137,7 +154,7 @@ public class TicketService {
         }
 
         ticketRepository.save(ticket);
-        return new TicketRes(ticket);
+        return TicketConverter.toTicketUpdateRes(ticket);
     }
 
     //티켓북 삭제

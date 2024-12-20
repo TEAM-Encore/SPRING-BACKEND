@@ -64,7 +64,7 @@ public class Ticket extends BaseTimeEntity {
     private Review review;
 
     @Builder
-    public Ticket(User user, Musical musical, String title, String ticketImageUrl, LocalDate viewedDate, String seat, String showTime, List<Actor> actors) {
+    public Ticket(User user, Musical musical, String title, String ticketImageUrl, LocalDate viewedDate, String seat, String showTime, Review review, List<Actor> actors) {
         this.user = user;
         this.musical = musical;
         this.title = title;
@@ -72,6 +72,7 @@ public class Ticket extends BaseTimeEntity {
         this.viewedDate = viewedDate;
         this.seat = seat;
         this.showTime = showTime;
+        this.review = review;
         this.actors = actors;
     }
 

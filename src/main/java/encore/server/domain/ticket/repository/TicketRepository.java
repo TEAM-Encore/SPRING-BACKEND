@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    List<Ticket> findByViewedDateAfterAndDeletedAtIsNull(LocalDate date);
-
-    List<Ticket> findByDeletedAtIsNull();
+    List<Ticket> findByUserIdAndViewedDateAfterAndDeletedAtIsNull(Long userId, LocalDate date);
+    List<Ticket> findByUserIdAndDeletedAtIsNull(Long userId);
 
     @Modifying
     @Query("UPDATE Ticket t SET t.deletedAt = CURRENT_TIMESTAMP WHERE t.id = :ticketId")

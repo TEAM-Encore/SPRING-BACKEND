@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record TicketRes(
+public record TicketUpdateRes(
         Long id,
         Long userId,
         String musicalTitle,
@@ -19,8 +19,6 @@ public record TicketRes(
         LocalDate viewedDate,
         String location,
         String seat,
-        List<String> actors,
-        Boolean hasReview,
-        Float totalRating
+        List<String> actors
 ) {
 }
