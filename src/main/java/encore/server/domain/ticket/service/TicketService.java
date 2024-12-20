@@ -15,7 +15,9 @@ import encore.server.domain.ticket.repository.ActorRepository;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.BadRequestException;
+import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +84,13 @@ public class TicketService {
     }
 
     //티켓북 조회
-    public List<TicketRes> getTicketList(String dateRange) {
+    public List<TicketRes> getTicketList(Long userId, String dateRange) {
+
+        // validation: user
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+
         LocalDate startDate = switch (dateRange) {
             case "WEEK" -> LocalDate.now().minusWeeks(1);
             case "MONTH" -> LocalDate.now().minusMonths(1);
@@ -93,15 +101,16 @@ public class TicketService {
         List<Ticket> tickets;
 
         if (startDate != null) {
-            tickets = ticketRepository.findByViewedDateAfterAndDeletedAtIsNull(startDate);
+            tickets = ticketRepository.findByUserIdAndViewedDateAfterAndDeletedAtIsNull(userId, startDate);
         } else {
-            tickets = ticketRepository.findByDeletedAtIsNull();
+            tickets = ticketRepository.findByUserIdAndDeletedAtIsNull(userId);
         }
 
         return tickets.stream()
-                .map(TicketRes::new)
+                .map(TicketConverter::toTicketRes)
                 .collect(Collectors.toList());
     }
+
 
     //티켓북 수정
     @Transactional
@@ -137,7 +146,7 @@ public class TicketService {
         }
 
         ticketRepository.save(ticket);
-        return new TicketRes(ticket);
+        return TicketConverter.toTicketRes(ticket);
     }
 
     //티켓북 삭제

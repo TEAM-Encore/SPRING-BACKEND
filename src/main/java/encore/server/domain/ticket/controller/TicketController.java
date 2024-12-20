@@ -45,7 +45,8 @@ public class TicketController {
     @Operation(summary = "티켓북 리스트 조회", description = "기간별 티켓북 리스트를 조회합니다.")
     @GetMapping("/list")
     public ApplicationResponse<List<TicketRes>> getTicketList(@RequestParam String dateRange) {
-        List<TicketRes> ticketList = ticketService.getTicketList(dateRange);
+        Long userId = getUserId();
+        List<TicketRes> ticketList = ticketService.getTicketList(userId, dateRange);
         return ApplicationResponse.ok(ticketList);
     }
 
@@ -67,6 +68,10 @@ public class TicketController {
         ticketService.deleteTicket(ticketIdToDelete);
 
         return ApplicationResponse.ok();
+    }
+
+    private Long getUserId() {
+        return 1L; // Mock user ID
     }
 
 }

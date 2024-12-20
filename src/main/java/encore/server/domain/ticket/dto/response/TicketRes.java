@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record TicketRes(
         Long id,
+        Long userId,
         String musicalTitle,
         Long series,
         LocalDate viewedDate,
@@ -20,18 +21,4 @@ public record TicketRes(
         String seat,
         List<String> actors
 ) {
-    //이 부분도 없애고 builder패턴 사용하도록 변경해야함...
-    public TicketRes(Ticket ticket) {
-        this(
-                ticket.getId(),
-                ticket.getMusical().getTitle(),
-                ticket.getMusical().getSeries(),
-                ticket.getViewedDate(),
-                ticket.getMusical().getLocation(),
-                ticket.getSeat(),
-                ticket.getActors().stream()
-                        .map(actor -> actor.getName())
-                        .collect(Collectors.toList())
-        );
-    }
 }

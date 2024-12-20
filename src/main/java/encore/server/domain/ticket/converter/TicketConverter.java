@@ -37,4 +37,19 @@ public class TicketConverter {
                 .ticketImageUrl(ticket.getTicketImageUrl())
                 .build();
     }
+
+    public static TicketRes toTicketRes(Ticket ticket) {
+        return TicketRes.builder()
+                .id(ticket.getId())
+                .userId(ticket.getUser().getId())
+                .musicalTitle(ticket.getMusical().getTitle())
+                .series(ticket.getMusical().getSeries())
+                .viewedDate(ticket.getViewedDate())
+                .location(ticket.getMusical().getLocation())
+                .seat(ticket.getSeat())
+                .actors(ticket.getActors().stream()
+                        .map(Actor::getName)
+                        .collect(Collectors.toList()))
+                .build();
+    }
 }
