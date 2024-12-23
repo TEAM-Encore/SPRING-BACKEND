@@ -29,7 +29,7 @@ public class OAuth2UserInfo implements OAuth2User {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return Map.of(EMAIL_KEY, email, NAME_KEY, name, ROLE_KEY, role);
+        return Map.of(EMAIL_KEY, email, NAME_KEY, name, ROLE_KEY, role, PROVIDER_KEY, provider);
     }
 
     @Override

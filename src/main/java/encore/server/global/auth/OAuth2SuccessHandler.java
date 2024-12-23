@@ -1,7 +1,9 @@
 package encore.server.global.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
+import encore.server.domain.user.dto.response.UserLoginRes;
 import encore.server.domain.user.service.UserService;
 import encore.server.global.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,14 +40,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         }
 
         //이후 login 시도 및 결과 반환
-        String accessToken = userService.login(UserLoginReq.fromOauthAttributes(oauthLoginUserInfoAttributes));
+        UserLoginRes loginRes = userService.login(UserLoginReq.fromOauthAttributes(oauthLoginUserInfoAttributes));
 
         //HttpResponse Header Mapping
         response.setStatus(HttpStatus.OK.value());
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
 
-        //Write HttpResponse Body
-        response.getWriter().write(accessToken);
+        //write response
+        ObjectMapper objectMapper = new ObjectMapper();
+        response.getWriter().write(objectMapper.writeValueAsString(loginRes));
     }
 
 
