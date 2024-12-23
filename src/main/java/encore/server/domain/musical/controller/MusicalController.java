@@ -4,6 +4,7 @@ import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.service.MusicalService;
+import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,9 +30,9 @@ public class MusicalController {
     }
 
     @Operation(summary = "뮤지컬 상세조회", description = "뮤지컬을 상세조회합니다.")
-    @GetMapping("/{id}")
-    public MusicalDetailRes getMusicalDetail(@PathVariable Long id) {
-        return musicalService.getMusicalDetail(id);
+    @GetMapping("/{musical_id}")
+    public ApplicationResponse<MusicalDetailRes> getMusicalDetail(@PathVariable("musical_id") Long musicalId) {
+        return ApplicationResponse.ok(musicalService.getMusicalDetail(musicalId));
     }
 
 }

@@ -168,4 +168,54 @@ public class ReviewConverter {
                         .build())
                 .build();
     }
+
+    public static ReviewRes toReviewRes(Review review) {
+        return ReviewRes.builder()
+                .title(review.getTitle())
+                .nickName(review.getUser().getNickName())
+                .totalRating(review.getReviewData().getRating().getTotalRating())
+                .viewCount(review.getViewCount())
+                .likeCount(review.getLikeCount())
+                .build();
+    }
+
+    public static ReviewSummaryRes toReviewSummaryRes(List<Review> reviews) {
+        List<ReviewRes> reviewResList = reviews.stream()
+                .map(ReviewConverter::toReviewRes)
+                .toList();
+
+        double averageTotalRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getTotalRating())
+                .average().orElse(0.0);
+
+        double averageNumberRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getNumberRating())
+                .average().orElse(0.0);
+
+        double averageStoryRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getStoryRating())
+                .average().orElse(0.0);
+
+        double averageRevisitRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getRevisitRating())
+                .average().orElse(0.0);
+
+        double averageActorRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getActorRating())
+                .average().orElse(0.0);
+
+        double averagePerformanceRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getPerformanceRating())
+                .average().orElse(0.0);
+
+        return ReviewSummaryRes.builder()
+                .reviews(reviewResList)
+                .averageTotalRating((float) averageTotalRating)
+                .averageNumberRating((float) averageNumberRating)
+                .averageStoryRating((float) averageStoryRating)
+                .averageRevisitRating((float) averageRevisitRating)
+                .averageActorRating((float) averageActorRating)
+                .averagePerformanceRating((float) averagePerformanceRating)
+                .build();
+    }
 }

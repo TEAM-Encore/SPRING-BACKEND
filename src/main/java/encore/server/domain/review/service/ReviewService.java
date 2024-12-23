@@ -248,4 +248,9 @@ public class ReviewService {
         Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, review.getUser());
         return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
     }
+
+    public ReviewSummaryRes getReviewsByMusical(Long musicalId) {
+        List<Review> reviews = reviewRepository.findReviewsByMusicalId(musicalId);
+        return ReviewConverter.toReviewSummaryRes(reviews);
+    }
 }
