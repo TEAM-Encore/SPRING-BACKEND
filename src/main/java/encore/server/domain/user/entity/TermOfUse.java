@@ -25,5 +25,8 @@ public class TermOfUse extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "tinyint(1)")
     private Boolean isOptional;
 
+    @Column(nullable = false, columnDefinition = "bigint")
+    private Long version;
+
 
 }
