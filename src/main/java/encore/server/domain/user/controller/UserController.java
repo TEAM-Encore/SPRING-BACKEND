@@ -5,6 +5,7 @@ import encore.server.domain.user.dto.request.UserSignupReq;
 import encore.server.domain.user.service.UserService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.ApplicationException;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,14 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
+    @Operation(summary = "회원가입", description = "주어진 정보로 회원가입을 진행합니다.")
     public ApplicationResponse<String> signup(@RequestBody @Valid UserSignupReq userSignupReq) {
         return ApplicationResponse.ok(userService.signup(userSignupReq));
     }
 
     // 로그인
     @PostMapping("/login")
+    @Operation(summary = "로그인", description = "주어진 정보로 로그인을 진행합니다.")
     public ApplicationResponse<String> login(@RequestBody @Valid UserLoginReq userLoginReq) {
         return ApplicationResponse.ok(userService.login(userLoginReq));
     }

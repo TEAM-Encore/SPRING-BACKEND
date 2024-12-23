@@ -30,8 +30,6 @@ public record UserSignupReq(
         @NotNull
         UserRole role
 
-
-
 ) {
 
     public static UserSignupReq fromOauthAttributes(Map<String,Object> oauthLoginUserInfoAttributes) {

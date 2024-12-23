@@ -4,8 +4,6 @@ import encore.server.domain.user.converter.UserConverter;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
 import encore.server.domain.user.entity.User;
-import encore.server.domain.user.enumerate.NickNameAnimal;
-import encore.server.domain.user.enumerate.NickNameColor;
 import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.util.JwtUtil;
 import encore.server.global.exception.ApplicationException;
@@ -33,7 +31,7 @@ public class UserService {
         
         // validation: 회원가입된 유저인지 확인
         if(userRepository.existsByEmail(userSignupReq.email())) {
-            throw new ApplicationException(ErrorCode.ALREADY_EXIST_EXCEPTION);
+            throw new ApplicationException(ErrorCode.USER_ALREADY_EXIST_EXCEPTION);
         }
 
         // business logic: 비밀번호 인코딩 후 유저 저장
@@ -44,7 +42,7 @@ public class UserService {
         return userRepository.save(userConverter.toEntity(userSignupReq, encodedPassword, getUniqueNickName())).getEmail();
     }
     
-    public String login(UserLoginReq userLoginReq){
+    public String login(UserLoginReq userLoginReq) {
 
         // validation: 회원가입된 유저인지 확인
         User findUser = userRepository.findByEmail(userLoginReq.email())
@@ -59,22 +57,23 @@ public class UserService {
         return jwtUtil.createToken(findUser.getEmail(), findUser.getRole());
     }
 
-    public String getUniqueNickName(){
+    public String getUniqueNickName() {
 
         StringBuilder uniqueNickNameStringBuilder = new StringBuilder();
         String uniqueNickName;
 
-        while(true){
-
-            NickNameAnimal animal = NickNameAnimal.values()[random.nextInt(NickNameAnimal.values().length)];
-            NickNameColor color = NickNameColor.values()[random.nextInt(NickNameColor.values().length)];
+        while(true) {
             uniqueNickNameStringBuilder
-                    .append(color.name())
-                    .append(animal.name())
-                    .append(random.nextInt(100));
+                .append("뮤사랑")
+                .append(random.nextInt(10))
+                .append(random.nextInt(10))
+                .append(random.nextInt(10))
+                .append(random.nextInt(10))
+                .append(random.nextInt(10));
+
             uniqueNickName = uniqueNickNameStringBuilder.toString();
 
-            if(!userRepository.existsByNickName(uniqueNickName)){
+            if(!userRepository.existsByNickName(uniqueNickName)) {
                 break;
             }
 
