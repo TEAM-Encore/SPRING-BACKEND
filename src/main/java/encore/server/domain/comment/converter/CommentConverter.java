@@ -9,6 +9,8 @@ import encore.server.domain.post.entity.Post;
 import encore.server.domain.user.entity.User;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CommentConverter {
     public static Comment toEntity(Post post, User user, Comment parentComment, CommentReq req) {
@@ -20,7 +22,7 @@ public class CommentConverter {
                 .build();
     }
 
-    public static CommentRes toResponse(Comment comment, User user) {
+    public static CommentRes toResponse(Comment comment, User user, Boolean isLiked) {
 
         return CommentRes.builder()
                 .id(comment.getId())
@@ -35,15 +37,15 @@ public class CommentConverter {
                 .nickname(comment.getUser().getNickName())
                 .profileImageUrl(comment.getUser().getProfileImageUrl())
                 .likeCount((long) comment.getLikes().size())
-                .isLiked(comment.getLikes().stream().anyMatch(like -> like.getUser().getId().equals(user.getId())))
+                .isLiked(isLiked)
                 .childCommentCount((long) comment.getChildComments().size())
                 .build();
     }
 
-    public static List<CommentRes> toListResponse(List<Comment> comments, User user) {
-        return comments.stream()
-                .map(comment -> toResponse(comment, user))
-                .toList();
+    public static List<CommentRes> toListResponse(Map<Comment, Boolean> comments, User user) {
+        return comments.entrySet().stream()
+                .map(entry -> toResponse(entry.getKey(), user, entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     public static CommentLikeRes toLikeResponse(CommentLike commentlike, Long count) {

@@ -61,7 +61,19 @@ public class User extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String profileImageUrl;
 
+    @Builder
+    public User(String nickName, Long point) {
+        this.nickName = nickName;
+        this.point = point;
+    }
 
+    public Long usePoint(Long point) {
+        this.point -= point;
+        return this.point;
+    }
+
+    public Long addPoint(Long point) {
+        this.point += point;
+        return this.point;
+    }
 }
-
-

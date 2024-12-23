@@ -21,6 +21,8 @@ public enum ErrorCode {
     FORBIDDEN_EXCEPTION(HttpStatus.FORBIDDEN, 2005, "인가되지 않는 요청입니다."),
     ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 2006, "이미 존재하는 리소스입니다."),
     INVALID_SORT_EXCEPTION(HttpStatus.BAD_REQUEST, 2007, "올바르지 않은 정렬 값입니다."),
+    POINT_NOT_ENOUGH_EXCEPTION(HttpStatus.BAD_REQUEST, 2008, "포인트가 부족합니다."),
+    SEARCH_LOG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 2009, "존재하지 않는 검색 로그입니다."),
 
     // 3000: User Error
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 사용자입니다."),
@@ -41,6 +43,10 @@ public enum ErrorCode {
 
     // 8000: Review Error
     REVIEW_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 8000, "존재하지 않는 리뷰입니다."),
+    REVIEW_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 8001, "이미 리뷰가 존재합니다."),
+    REVIEW_TAG_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, 8002, "존재하지 않는 태그입니다."),
+    REVIEW_LOCKED_EXCEPTION(HttpStatus.FORBIDDEN, 8003, "리뷰가 잠겨있습니다."),
+    REVIEW_ALREADY_UNLOCKED_EXCEPTION(HttpStatus.BAD_REQUEST, 8004, "이미 리뷰 잠금이 해제되었습니다."),
 
     // 9000: Mission Error
     MISSION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 9000, "존재하지 않는 미션입니다."),

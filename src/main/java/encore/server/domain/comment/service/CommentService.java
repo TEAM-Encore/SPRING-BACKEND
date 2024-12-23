@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -55,7 +57,7 @@ public class CommentService {
         commentRepository.save(comment);
 
         // return: 생성된 댓글 정보 반환
-        return CommentConverter.toResponse(comment, user);
+        return CommentConverter.toResponse(comment, user, false);
     }
 
     @Transactional
@@ -81,7 +83,7 @@ public class CommentService {
         comment.update(commentReq.content());
 
         // return: 수정된 댓글 정보 반환
-        return CommentConverter.toResponse(comment, user);
+        return CommentConverter.toResponse(comment, user, isLiked(comment, user));
     }
 
     @Transactional
@@ -114,9 +116,11 @@ public class CommentService {
 
         //business logic: 게시글의 댓글 목록 반환
         List<Comment> comments = commentRepository.findAllByPostAndDeletedAtIsNull(post);
+        Map<Comment, Boolean> commentMap = comments.stream()
+                .collect(Collectors.toMap(comment -> comment, comment -> isLiked(comment, user)));
 
-        //return: 댓글 목록 반환
-        return CommentConverter.toListResponse(comments, user);
+        // return: 댓글 목록 반환
+        return CommentConverter.toListResponse(commentMap, user);
     }
 
     @Transactional
@@ -148,5 +152,9 @@ public class CommentService {
 
         //return: 좋아요 정보 반환
         return CommentConverter.toLikeResponse(commentLike, count);
+    }
+
+    private Boolean isLiked(Comment comment, User user) {
+        return commentLikeRepository.existsByCommentAndUserAndLikedTrue(comment, user);
     }
 }

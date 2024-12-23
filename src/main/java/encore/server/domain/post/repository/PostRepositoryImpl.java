@@ -6,8 +6,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import encore.server.domain.hashtag.entity.PostHashtag;
-import encore.server.domain.post.converter.PostConverter;
-import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
@@ -15,13 +13,10 @@ import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.term.entity.Term;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static encore.server.domain.hashtag.entity.QPostHashtag.postHashtag;
 import static encore.server.domain.term.entity.QTerm.term;
@@ -35,7 +30,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    @Override
     public List<Post> findPostsByCursor(Long cursor, String category, String type,
                                                   String searchWord, Pageable pageable) {
         BooleanBuilder predicate = new BooleanBuilder();
@@ -56,7 +50,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     }
 
-    @Override
     public List<Post> findPostsByHashtag(Long cursor, String hashtag, Pageable pageable) {
         BooleanBuilder predicate = new BooleanBuilder();
         predicate.and(addCursorCondition(cursor))
@@ -90,9 +83,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(postImage.post.eq(fetchedPost))
                 .fetch();
 
-        // MusicalTerms 가져오기
+        // Term 가져오기
         List<Term> musicalTerms = queryFactory.selectFrom(term)
-                .where(term.post.eq(fetchedPost))
+                .join(term.posts, post)
+                .where(post.eq(fetchedPost))
                 .fetch();
         fetchedPost.addMusicalTerms(musicalTerms);
 
