@@ -15,6 +15,9 @@ public record ReviewRes(
         @Schema(description = "유저 닉네임", example = "뮤사랑")
         String nickName,
 
+        @Schema(description = "업로드 시점", example = "11분 전")
+        String elapsedTime,
+
         @Schema(description = "총점", example = "4.5")
         Float totalRating,
 

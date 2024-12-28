@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -111,9 +110,9 @@ public class ReviewController {
 
     @GetMapping("/musical/{musical_id}/reviews")
     @Operation(summary = "뮤지컬의 전체리뷰조회", description = "해당 뮤지컬의 프리미엄리뷰 전체정보를 조회합니다.")
-    public ResponseEntity<ReviewSummaryRes> getReviews(@PathVariable("musical_id") Long musicalId) {
+    public ApplicationResponse<ReviewSummaryRes> getReviews(@PathVariable("musical_id") Long musicalId) {
         ReviewSummaryRes response = reviewService.getReviewsByMusical(musicalId);
-        return ResponseEntity.ok(response);
+        return ApplicationResponse.ok(response);
     }
 
     private Long getUserId() {

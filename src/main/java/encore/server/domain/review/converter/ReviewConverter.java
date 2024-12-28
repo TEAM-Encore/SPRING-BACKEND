@@ -169,20 +169,18 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewRes toReviewRes(Review review) {
+    public static ReviewRes toReviewRes(Review review, String elapsedTime) {
         return ReviewRes.builder()
                 .title(review.getTitle())
                 .nickName(review.getUser().getNickName())
+                .elapsedTime(elapsedTime)
                 .totalRating(review.getReviewData().getRating().getTotalRating())
                 .viewCount(review.getViewCount())
                 .likeCount(review.getLikeCount())
                 .build();
     }
 
-    public static ReviewSummaryRes toReviewSummaryRes(List<Review> reviews) {
-        List<ReviewRes> reviewResList = reviews.stream()
-                .map(ReviewConverter::toReviewRes)
-                .toList();
+    public static ReviewSummaryRes toReviewSummaryRes(List<ReviewRes> reviewResList, List<Review> reviews) {
 
         double averageTotalRating = reviews.stream()
                 .mapToDouble(r -> r.getReviewData().getRating().getTotalRating())

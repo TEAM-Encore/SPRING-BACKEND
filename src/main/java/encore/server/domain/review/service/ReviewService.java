@@ -251,6 +251,18 @@ public class ReviewService {
 
     public ReviewSummaryRes getReviewsByMusical(Long musicalId) {
         List<Review> reviews = reviewRepository.findReviewsByMusicalId(musicalId);
-        return ReviewConverter.toReviewSummaryRes(reviews);
+
+        //각 리뷰의 elapsedTime을 계산해서 ReviewRes 리스트로 변환
+        List<ReviewRes> reviewResList = reviews.stream()
+                .map(review -> {
+                    long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
+                    String elapsedTime = getElapsedTime(minutesAgo);
+                    return ReviewConverter.toReviewRes(review, elapsedTime);  // elapsedTime을 전달
+                })
+                .toList();
+
+        //reviewResList를 전달하여 SummaryRes 생성
+        return ReviewConverter.toReviewSummaryRes(reviewResList, reviews);
+
     }
 }
