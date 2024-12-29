@@ -10,8 +10,10 @@ import java.util.Optional;
 public interface MusicalRepository extends JpaRepository<Musical, Long> {
     List<Musical> findByTitleContaining(String keyword);
     Optional<Musical> findByIdAndDeletedAtIsNull(Long id);
+    List<Musical> findTop8ByIsFeaturedTrueOrderByStartDateAsc();
 
     @Query("SELECT m FROM Musical m WHERE m.title = :title AND m.deletedAt IS NULL")
     List<Musical> findByTitle(String title);
+
 
 }

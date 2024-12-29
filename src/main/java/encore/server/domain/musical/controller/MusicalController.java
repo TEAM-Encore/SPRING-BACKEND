@@ -3,6 +3,7 @@ package encore.server.domain.musical.controller;
 import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
 import encore.server.domain.musical.dto.response.MusicalSeriesRes;
+import encore.server.domain.musical.dto.response.MusicalSimpleRes;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.service.MusicalService;
 import encore.server.domain.review.dto.response.ReviewDetailRes;
@@ -41,6 +42,13 @@ public class MusicalController {
     public ApplicationResponse<List<MusicalSeriesRes>> getAllSeries(@PathVariable("musical_id") Long musicalId) {
         List<MusicalSeriesRes> responses = musicalService.getAllSeriesByMusicalId(musicalId);
         return ApplicationResponse.ok(responses);
+    }
+
+    @Operation(summary = "이달의 인기 뮤지컬 조회", description = "이달의 인기 뮤지컬 8개를 조회합니다.")
+    @GetMapping("/featured")
+    public ApplicationResponse<List<MusicalSimpleRes>> getFeaturedMusicals() {
+        List<MusicalSimpleRes> musicals = musicalService.getFeaturedMusicals();
+        return ApplicationResponse.ok(musicals);
     }
 
 
