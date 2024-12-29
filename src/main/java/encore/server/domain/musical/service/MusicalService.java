@@ -3,6 +3,7 @@ package encore.server.domain.musical.service;
 import encore.server.domain.musical.converter.MusicalConverter;
 import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
+import encore.server.domain.musical.dto.response.MusicalSeriesRes;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.domain.review.entity.Review;
@@ -34,4 +35,20 @@ public class MusicalService {
 
         return MusicalConverter.toMusicalDetailRes(musical);
     }
+
+    public List<MusicalSeriesRes> getAllSeriesByMusicalId(Long musicalId) {
+        Musical currentMusical = musicalRepository.findByIdAndDeletedAtIsNull(musicalId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
+
+        List<Musical> musicals = musicalRepository.findByTitle(currentMusical.getTitle());
+
+        return musicals.stream()
+                .map(musical -> MusicalSeriesRes.builder()
+                        .id(musical.getId())
+                        .series(musical.getSeries())
+                        .isCurrent(musical.getId().equals(musicalId)) // 현재 선택된 시리즈 표시
+                        .build())
+                .toList();
+    }
+
 }

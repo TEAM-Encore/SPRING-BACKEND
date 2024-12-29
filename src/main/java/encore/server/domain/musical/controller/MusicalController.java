@@ -2,6 +2,7 @@ package encore.server.domain.musical.controller;
 
 import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
+import encore.server.domain.musical.dto.response.MusicalSeriesRes;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.service.MusicalService;
 import encore.server.domain.review.dto.response.ReviewDetailRes;
@@ -34,6 +35,15 @@ public class MusicalController {
     public ApplicationResponse<MusicalDetailRes> getMusicalDetail(@PathVariable("musical_id") Long musicalId) {
         return ApplicationResponse.ok(musicalService.getMusicalDetail(musicalId));
     }
+
+    @Operation(summary = "같은 제목의 모든 Series 조회", description = "뮤지컬 ID로 같은 제목의 모든 Series를 조회합니다.")
+    @GetMapping("/{musical_id}/all-series")
+    public ApplicationResponse<List<MusicalSeriesRes>> getAllSeries(@PathVariable("musical_id") Long musicalId) {
+        List<MusicalSeriesRes> responses = musicalService.getAllSeriesByMusicalId(musicalId);
+        return ApplicationResponse.ok(responses);
+    }
+
+
 
 }
 
