@@ -51,6 +51,12 @@ public class MusicalController {
         return ApplicationResponse.ok(musicals);
     }
 
+    @Operation(summary = "개봉 예정 뮤지컬 조회", description = "개봉이 임박한 뮤지컬을 최대 8개 조회합니다.")
+    @GetMapping("/upcoming")
+    public ApplicationResponse<List<MusicalSimpleRes>> getUpcomingMusicals() {
+        List<MusicalSimpleRes> responses = musicalService.getUpcomingMusicals();
+        return ApplicationResponse.ok(responses);
+    }
 
 
 }

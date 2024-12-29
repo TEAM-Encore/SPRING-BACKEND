@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,6 +56,23 @@ public class MusicalService {
     public List<MusicalSimpleRes> getFeaturedMusicals() {
         List<Musical> musicals = musicalRepository.findTop8ByIsFeaturedTrueOrderByStartDateAsc();
         return musicals.stream()
+                .map(musical -> MusicalSimpleRes.builder()
+                        .id(musical.getId())
+                        .title(musical.getTitle())
+                        .startDate(musical.getStartDate())
+                        .endDate(musical.getEndDate())
+                        .location(musical.getLocation())
+                        .imageUrl(musical.getImageUrl())
+                        .build())
+                .toList();
+    }
+
+    public List<MusicalSimpleRes> getUpcomingMusicals() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Musical> musicals = musicalRepository.findUpcomingMusicals(now);
+
+        return musicals.stream()
+                .limit(8)
                 .map(musical -> MusicalSimpleRes.builder()
                         .id(musical.getId())
                         .title(musical.getTitle())
