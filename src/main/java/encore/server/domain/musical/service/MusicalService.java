@@ -40,7 +40,7 @@ public class MusicalService {
         Musical currentMusical = musicalRepository.findByIdAndDeletedAtIsNull(musicalId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
 
-        List<Musical> musicals = musicalRepository.findByTitle(currentMusical.getTitle());
+        List<Musical> musicals = musicalRepository.findByTitleAndDeletedAtIsNull(currentMusical.getTitle());
 
         return musicals.stream()
                 .map(musical -> MusicalSeriesRes.builder()
