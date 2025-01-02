@@ -3,10 +3,7 @@ package encore.server.domain.review.service;
 import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
-import encore.server.domain.review.entity.Review;
-import encore.server.domain.review.entity.ReviewLike;
-import encore.server.domain.review.entity.UserReview;
-import encore.server.domain.review.entity.ViewImage;
+import encore.server.domain.review.entity.*;
 import encore.server.domain.review.repository.ReviewLikeRepository;
 import encore.server.domain.review.repository.ReviewRepository;
 import encore.server.domain.review.repository.UserReviewRepository;
@@ -248,4 +245,32 @@ public class ReviewService {
         Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, review.getUser());
         return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
     }
+
+    @Transactional
+    public ReviewDetailRes updateReview(Long userId, Long reviewId, ReviewReq req) {
+        //validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (!Objects.equals(review.getUser().getId(), user.getId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+        }
+
+        //business logic: update review
+        ReviewData reviewData = ReviewConverter.toReviewData(req.reviewDataReq());
+        review.updateReview(req, reviewData);
+
+        //좋아요 여부
+        boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
+
+        // 업로드 시점
+        String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
+
+        // return: review response
+        return ReviewConverter.toReviewDetailRes(review, true, isLike, elapsedTime);
+    }
+
 }

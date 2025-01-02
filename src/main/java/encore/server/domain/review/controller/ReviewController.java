@@ -33,6 +33,14 @@ public class ReviewController {
         return ApplicationResponse.created(reviewService.createReview(ticketId, userId, req));
     }
 
+    @PutMapping("/{review_id}")
+    @Operation(summary = "리뷰 수정", description = "리뷰를 수정합니다.")
+    public ApplicationResponse<ReviewDetailRes> updateReview(@PathVariable("review_id") Long reviewId,
+                                                       @RequestBody ReviewReq req) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewService.updateReview(userId, reviewId, req));
+    }
+
     @GetMapping("/view-image/{cycle}")
     @Operation(summary = "시야 이미지 조회", description = "cycle 별로 시야 이미지를 조회합니다.")
     public ApplicationResponse<ViewImageRes> viewImage(@PathVariable("cycle") Long cycle) {
