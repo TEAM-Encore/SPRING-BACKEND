@@ -41,6 +41,14 @@ public class ReviewController {
         return ApplicationResponse.ok(reviewService.updateReview(userId, reviewId, req));
     }
 
+    @DeleteMapping("/{review_id}")
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제합니다.")
+    public ApplicationResponse<?> deleteReview(@PathVariable("review_id") Long reviewId) {
+        Long userId = getUserId();
+        reviewService.deleteReview(userId, reviewId);
+        return ApplicationResponse.ok();
+    }
+
     @GetMapping("/view-image/{cycle}")
     @Operation(summary = "시야 이미지 조회", description = "cycle 별로 시야 이미지를 조회합니다.")
     public ApplicationResponse<ViewImageRes> viewImage(@PathVariable("cycle") Long cycle) {

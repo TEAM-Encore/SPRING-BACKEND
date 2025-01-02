@@ -273,4 +273,21 @@ public class ReviewService {
         return ReviewConverter.toReviewDetailRes(review, true, isLike, elapsedTime);
     }
 
+    @Transactional
+    public void deleteReview(Long userId, Long reviewId) {
+        //validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (!Objects.equals(review.getUser().getId(), user.getId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+        }
+
+        //business logic: delete review
+        reviewRepository.delete(review);
+    }
+
 }
