@@ -1,17 +1,18 @@
 package encore.server.domain.musical.controller;
 
+import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
+import encore.server.domain.musical.dto.response.MusicalSeriesRes;
+import encore.server.domain.musical.dto.response.MusicalSimpleRes;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.service.MusicalService;
+import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +30,34 @@ public class MusicalController {
         List<MusicalRes> responses = musicalService.searchMusicalsByTitle(keyword);
         return ApplicationResponse.ok(responses);
     }
+
+    @Operation(summary = "뮤지컬 상세조회", description = "뮤지컬을 상세조회합니다.")
+    @GetMapping("/{musical_id}")
+    public ApplicationResponse<MusicalDetailRes> getMusicalDetail(@PathVariable("musical_id") Long musicalId) {
+        return ApplicationResponse.ok(musicalService.getMusicalDetail(musicalId));
+    }
+
+    @Operation(summary = "같은 제목의 모든 Series 조회", description = "뮤지컬 ID로 같은 제목의 모든 Series를 조회합니다.")
+    @GetMapping("/{musical_id}/all-series")
+    public ApplicationResponse<List<MusicalSeriesRes>> getAllSeries(@PathVariable("musical_id") Long musicalId) {
+        List<MusicalSeriesRes> responses = musicalService.getAllSeriesByMusicalId(musicalId);
+        return ApplicationResponse.ok(responses);
+    }
+
+    @Operation(summary = "이달의 인기 뮤지컬 조회", description = "이달의 인기 뮤지컬 8개를 조회합니다.")
+    @GetMapping("/featured")
+    public ApplicationResponse<List<MusicalSimpleRes>> getFeaturedMusicals() {
+        List<MusicalSimpleRes> musicals = musicalService.getFeaturedMusicals();
+        return ApplicationResponse.ok(musicals);
+    }
+
+    @Operation(summary = "개봉 예정 뮤지컬 조회", description = "개봉이 임박한 뮤지컬을 최대 8개 조회합니다.")
+    @GetMapping("/upcoming")
+    public ApplicationResponse<List<MusicalSimpleRes>> getUpcomingMusicals() {
+        List<MusicalSimpleRes> responses = musicalService.getUpcomingMusicals();
+        return ApplicationResponse.ok(responses);
+    }
+
 
 }
 
