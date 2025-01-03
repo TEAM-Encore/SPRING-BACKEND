@@ -1,5 +1,6 @@
 package encore.server.domain.review.entity;
 
+import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
@@ -65,5 +66,10 @@ public class Review extends BaseTimeEntity {
 
     public void setLikeCount(Long likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public void updateReview(ReviewReq req, ReviewData reviewData) {
+        this.title = req.title();
+        this.reviewData = reviewData;
     }
 }
