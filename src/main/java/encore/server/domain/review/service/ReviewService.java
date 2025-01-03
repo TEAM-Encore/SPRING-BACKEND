@@ -73,7 +73,7 @@ public class ReviewService {
 
 
         // return: review response
-        return ReviewConverter.toReviewDetailRes(review, true, likeType, elapsedTime);
+        return ReviewDetailRes.of(review, true, likeType, elapsedTime);
     }
 
     public ViewImageRes viewImage(Long cycle) {
@@ -82,7 +82,7 @@ public class ReviewService {
         List<ViewImage> viewImages = viewImageRepository.findByIdBetween(start, start + 3);
 
         //return: view image response
-        return ReviewConverter.toViewImageRes(viewImages);
+        return ViewImageRes.of(viewImages);
     }
 
     public ReviewDetailRes getReview(Long userId, Long reviewId) {
@@ -111,7 +111,7 @@ public class ReviewService {
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
         // return: review detail response
-        return ReviewConverter.toReviewDetailRes(review, isUnlocked, likeType, elapsedTime);
+        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
     }
 
     @Transactional

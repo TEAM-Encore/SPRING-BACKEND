@@ -6,8 +6,6 @@ import encore.server.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-import static encore.server.domain.review.converter.ReviewConverter.toReviewDataRes;
-
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record ReviewSimpleRes(
@@ -36,7 +34,7 @@ public record ReviewSimpleRes(
         ReviewDataRes.Rating rating
 ) {
         public static ReviewSimpleRes of(Review review, String elapsedTime) {
-                ReviewDataRes.Rating rating = review.getReviewData() != null ? toReviewDataRes(review.getReviewData()).rating() : null;
+                ReviewDataRes.Rating rating = review.getReviewData() != null ? ReviewDataRes.of(review.getReviewData()).rating() : null;
                 return ReviewSimpleRes.builder()
                         .reviewId(review.getId())
                         .userId(review.getUser().getId())
