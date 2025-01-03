@@ -2,12 +2,14 @@ package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
+import encore.server.domain.review.enumerate.ReportReason;
 import encore.server.domain.review.service.ReviewSearchService;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.util.redis.SearchLogRedis;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -47,6 +49,13 @@ public class ReviewController {
         Long userId = getUserId();
         reviewService.deleteReview(userId, reviewId);
         return ApplicationResponse.ok();
+    }
+
+    @PostMapping("/{review_id}/report")
+    @Operation(summary = "리뷰 신고", description = "리뷰를 신고합니다.")
+    public ApplicationResponse<ReviewReportRes> reportReview(@PathVariable("review_id") Long reviewId, @Valid @RequestParam("reason") ReportReason reason) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok( reviewService.reportReview(userId, reviewId, reason));
     }
 
     @GetMapping("/view-image/{cycle}")

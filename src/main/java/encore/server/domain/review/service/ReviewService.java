@@ -4,10 +4,8 @@ import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.entity.*;
-import encore.server.domain.review.repository.ReviewLikeRepository;
-import encore.server.domain.review.repository.ReviewRepository;
-import encore.server.domain.review.repository.UserReviewRepository;
-import encore.server.domain.review.repository.ViewImageRepository;
+import encore.server.domain.review.enumerate.ReportReason;
+import encore.server.domain.review.repository.*;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
@@ -41,6 +39,7 @@ public class ReviewService {
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewSearchService reviewSearchService;
+    private final ReviewReportRepository reviewReportRepository;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -290,4 +289,33 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
+    @Transactional
+    public ReviewReportRes reportReview(Long userId, Long reviewId, ReportReason reason) {
+        //validation: user, review, self report, duplicated report
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (Objects.equals(review.getUser().getId(), user.getId())) {
+            throw new ApplicationException(ErrorCode.REVIEW_SELF_REPORT_EXCEPTION);
+        }
+
+        if(reviewReportRepository.existsByReporterAndReview(user, review)){
+            throw new ApplicationException(ErrorCode.REVIEW_REPORT_ALREADY_EXIST_EXCEPTION);
+        }
+
+        //business logic: report review
+        ReviewReport reviewReport = ReviewReport.builder()
+                .reporter(user)
+                .review(review)
+                .reason(reason)
+                .build();
+
+        reviewReportRepository.save(reviewReport);
+
+        //return
+        return ReviewReportRes.of(reviewReport);
+    }
 }
