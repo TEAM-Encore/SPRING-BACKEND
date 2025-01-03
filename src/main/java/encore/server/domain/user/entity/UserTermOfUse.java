@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@SQLDelete(sql = "UPDATE user_term SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE user_term_of_use SET deleted_at = NOW() where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserTermOfUse extends BaseTimeEntity {
 
