@@ -2,8 +2,11 @@ package encore.server.domain.review.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import encore.server.domain.review.entity.Review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+
+import static encore.server.domain.review.converter.ReviewConverter.toReviewDataRes;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -26,10 +29,23 @@ public record ReviewSimpleRes(
         @Schema(description = "리뷰 조회수", example = "100")
         Long viewCount,
 
-        @Schema(description = "리뷰 좋아요 데이터")
-        ReviewLikeRes likeData,
+        @Schema(description = "리뷰 좋아요 개수", example = "100")
+        Long likeCount,
 
         @Schema(description = "리뷰 총평점과 내용")
         ReviewDataRes.Rating rating
 ) {
+        public static ReviewSimpleRes of(Review review, String elapsedTime) {
+                ReviewDataRes.Rating rating = review.getReviewData() != null ? toReviewDataRes(review.getReviewData()).rating() : null;
+                return ReviewSimpleRes.builder()
+                        .reviewId(review.getId())
+                        .userId(review.getUser().getId())
+                        .title(review.getTitle())
+                        .nickname(review.getUser().getNickName())
+                        .elapsedTime(elapsedTime)
+                        .viewCount(review.getViewCount())
+                        .likeCount(review.getLikeCount())
+                        .rating(rating)
+                        .build();
+        }
 }

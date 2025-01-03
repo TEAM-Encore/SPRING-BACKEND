@@ -7,10 +7,9 @@ import encore.server.domain.review.entity.Review;
 import encore.server.domain.review.entity.ReviewLike;
 import encore.server.domain.review.entity.UserReview;
 import encore.server.domain.review.entity.ViewImage;
-import encore.server.domain.review.repository.ReviewLikeRepository;
-import encore.server.domain.review.repository.ReviewRepository;
-import encore.server.domain.review.repository.UserReviewRepository;
-import encore.server.domain.review.repository.ViewImageRepository;
+import encore.server.domain.review.enumerate.LikeType;
+import encore.server.domain.review.mapping.LikeTypeMapping;
+import encore.server.domain.review.repository.*;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
@@ -26,8 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -69,8 +67,13 @@ public class ReviewService {
         // 업로드 시점
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
+        // likeType
+        Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(review, user);
+        LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
+
+
         // return: review response
-        return ReviewConverter.toReviewDetailRes(review, true, false, elapsedTime);
+        return ReviewConverter.toReviewDetailRes(review, true, likeType, elapsedTime);
     }
 
     public ViewImageRes viewImage(Long cycle) {
@@ -100,14 +103,15 @@ public class ReviewService {
         // 조회수 증가
         reviewViewService.addVisitedRedis(user, review);
 
-        // 좋아요 여부
-        boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
+        // likeType
+        Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(review, user);
+        LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
 
         // 업로드 시점
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
         // return: review detail response
-        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike, elapsedTime);
+        return ReviewConverter.toReviewDetailRes(review, isUnlocked, likeType, elapsedTime);
     }
 
     @Transactional
@@ -161,7 +165,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewLikeRes likeReview(Long userId, Long reviewId) {
+    public ReviewLikeRes likeReview(Long userId, Long reviewId, LikeType likeType) {
         // validation: user, review
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -176,18 +180,29 @@ public class ReviewService {
             reviewLike = ReviewLike.builder()
                     .review(review)
                     .user(user)
+                    .likeType(likeType)
                     .build();
             reviewLikeRepository.save(reviewLike);
         } else {
-            reviewLike.toggleLike(reviewLike.getIsLike());
+            reviewLike.toggleLike(likeType);
         }
 
-        long likeCount = reviewLikeRepository.countByReviewAndIsLikeTrue(review);
-        review.setLikeCount(likeCount);
+        Map<LikeType, Long> likeCounts = Arrays.stream(LikeType.values())
+                .collect(Collectors.toMap(
+                        lt -> lt,
+                        lt -> reviewLikeRepository.countByReviewAndLikeType(review, lt)
+                ));
+
+        likeCounts.forEach(review::setLikeCount);
+
+        long totalLikeCount = reviewLikeRepository.countByReview(review);
+        review.setTotalLikeCount(totalLikeCount);
+
+        // 리뷰 업데이트
         reviewRepository.save(review);
 
-        // return: like count
-        return ReviewConverter.toReviewLikeRes(reviewLike.getIsLike(), likeCount);
+        // return: like
+        return ReviewLikeRes.of(likeType, review);
     }
 
     private String getElapsedTime(long minutesAgo) {
@@ -245,7 +260,7 @@ public class ReviewService {
     private ReviewSimpleRes convertToReviewSimpleRes(Review review) {
         long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
         String elapsedTime = getElapsedTime(minutesAgo);
-        Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, review.getUser());
-        return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
+
+        return ReviewSimpleRes.of(review, elapsedTime);
     }
 }

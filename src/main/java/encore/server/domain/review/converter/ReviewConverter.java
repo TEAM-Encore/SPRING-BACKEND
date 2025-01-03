@@ -5,11 +5,11 @@ import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.entity.ReviewData;
 import encore.server.domain.review.entity.ReviewTags;
 import encore.server.domain.review.entity.ViewImage;
+import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.ticket.entity.Actor;
-import encore.server.domain.ticket.entity.Companion;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.exception.ApplicationException;
@@ -44,7 +44,7 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewDetailRes toReviewDetailRes(Review review, Boolean isUnlocked, Boolean isLike, String elapsedTime) {
+    public static ReviewDetailRes toReviewDetailRes(Review review, Boolean isUnlocked, LikeType likeType, String elapsedTime) {
         return ReviewDetailRes.builder()
                 .reviewId(review.getId())
                 .ticket(toTicketRes(review.getTicket()))
@@ -57,31 +57,9 @@ public class ReviewConverter {
                 .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
                 .viewCount(review.getViewCount())
                 .elapsedTime(elapsedTime)
-                .likeRes(toReviewLikeRes(isLike, review.getLikeCount()))
+                .likeRes(ReviewLikeRes.of(likeType, review))
                 .build();
     }
-
-    public static ReviewSimpleRes toReviewSimpleRes(Review review, String elapsedTime, Boolean isLike) {
-        ReviewDataRes.Rating rating = review.getReviewData() != null ? toReviewDataRes(review.getReviewData()).rating() : null;
-        return ReviewSimpleRes.builder()
-                .reviewId(review.getId())
-                .userId(review.getUser().getId())
-                .title(review.getTitle())
-                .nickname(review.getUser().getNickName())
-                .elapsedTime(elapsedTime)
-                .viewCount(review.getViewCount())
-                .likeData(toReviewLikeRes(isLike, review.getLikeCount()))
-                .rating(rating)
-                .build();
-    }
-
-    public static ReviewLikeRes toReviewLikeRes(Boolean isLike, Long likeCount) {
-        return ReviewLikeRes.builder()
-                .isLike(isLike)
-                .likeCount(likeCount)
-                .build();
-    }
-
 
     private static List<ReviewTags> toReviewTags(List<String> tags, Review review) {
         try {
@@ -143,7 +121,7 @@ public class ReviewConverter {
                 .build();
     }
 
-    private static ReviewDataRes toReviewDataRes(ReviewData reviewData) {
+    public static ReviewDataRes toReviewDataRes(ReviewData reviewData) {
         return ReviewDataRes.builder()
                 .view(ReviewDataRes.View.builder()
                         .viewLevel(reviewData.getView().getViewLevel())

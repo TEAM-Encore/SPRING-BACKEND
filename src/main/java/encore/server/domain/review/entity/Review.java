@@ -1,5 +1,6 @@
 package encore.server.domain.review.entity;
 
+import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
@@ -39,6 +40,15 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long likeCount;
 
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long followUpLikeCount;
+
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long fullOfTipsLikeCount;
+
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long thoroughAnalysisLikeCount;
+
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewTags> tags;
 
@@ -56,6 +66,9 @@ public class Review extends BaseTimeEntity {
         this.tags = tags;
         this.reviewData = reviewData;
         this.viewCount = 0L;
+        this.followUpLikeCount = 0L;
+        this.fullOfTipsLikeCount = 0L;
+        this.thoroughAnalysisLikeCount = 0L;
         this.likeCount = 0L;
     }
 
@@ -63,7 +76,21 @@ public class Review extends BaseTimeEntity {
         this.tags = reviewTags;
     }
 
-    public void setLikeCount(Long likeCount) {
+    public void setLikeCount(LikeType likeType, Long likeCount) {
+       switch (likeType) {
+           case FOLLOW_UP_RECOMMENDATION:
+               this.followUpLikeCount = likeCount;
+               break;
+           case FULL_OF_TIPS:
+               this.fullOfTipsLikeCount = likeCount;
+               break;
+           case THOROUGH_ANALYSIS:
+               this.thoroughAnalysisLikeCount = likeCount;
+               break;
+       }
+    }
+
+    public void setTotalLikeCount(Long likeCount) {
         this.likeCount = likeCount;
     }
 }
