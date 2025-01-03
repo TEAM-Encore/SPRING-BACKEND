@@ -24,7 +24,7 @@ import java.util.Random;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UserService {
+public class UserAuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
