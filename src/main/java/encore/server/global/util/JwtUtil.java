@@ -22,15 +22,21 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtUtil {
-    // Header KEY 값
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    // 사용자 권한 값의 KEY
-    public static final String AUTHORIZATION_KEY = "auth";
-    public static final String EMAIL_KEY = "email";
-    // Token 식별자
-    public static final String BEARER_PREFIX = "Bearer ";
-    // 토큰 만료시간
-    private final long TOKEN_TIME = 60 * 60 * 1000L; // 60분
+
+    @Value("${jwt.header}")
+    private String AUTHORIZATION_HEADER;
+
+    @Value("${jwt.key}")
+    private String AUTHORIZATION_KEY;
+
+    @Value("${jwt.email-key}")
+    private String EMAIL_KEY;
+
+    @Value("${jwt.bearer-prefix}")
+    private String BEARER_PREFIX;
+
+    @Value("${jwt.token-time}")
+    private long TOKEN_TIME;
 
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
