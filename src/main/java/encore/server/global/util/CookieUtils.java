@@ -3,6 +3,7 @@ package encore.server.global.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
@@ -37,17 +38,17 @@ public class CookieUtils {
     }
 
     public void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(name)) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                }
-            }
-        }
+        Optional<Cookie> targetCookie = Arrays.stream(request.getCookies())
+            .filter(cookie -> cookie.getName().equals(name))
+            .findFirst();
+
+        targetCookie.ifPresent(cookie -> {
+            cookie.setValue("");
+            cookie.setPath("/");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        });
+
     }
 
     public String serialize(Object object) {
