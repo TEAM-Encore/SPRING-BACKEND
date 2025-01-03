@@ -48,6 +48,7 @@ public enum ErrorCode {
     REVIEW_TAG_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, 8002, "존재하지 않는 태그입니다."),
     REVIEW_LOCKED_EXCEPTION(HttpStatus.FORBIDDEN, 8003, "리뷰가 잠겨있습니다."),
     REVIEW_ALREADY_UNLOCKED_EXCEPTION(HttpStatus.BAD_REQUEST, 8004, "이미 리뷰 잠금이 해제되었습니다."),
+    REVIEW_LIKE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 8007, "존재하지 않는 리뷰 좋아요입니다."),
 
     // 9000: Mission Error
     MISSION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 9000, "존재하지 않는 미션입니다."),

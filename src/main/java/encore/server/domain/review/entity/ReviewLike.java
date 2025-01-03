@@ -1,5 +1,6 @@
 package encore.server.domain.review.entity;
 
+import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,18 +24,17 @@ public class ReviewLike {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private Boolean isLike;
+    @Enumerated(EnumType.STRING)
+    private LikeType likeType;
 
     @Builder
-    public ReviewLike(Review review, User user) {
+    public ReviewLike(Review review, User user, LikeType likeType) {
         this.review = review;
         this.user = user;
-        this.isLike = true;
+        this.likeType = likeType;
     }
 
-    public Boolean toggleLike(Boolean isLike) {
-        this.isLike = !isLike;
-        return isLike;
+    public void toggleLike(LikeType likeType) {
+        this.likeType = this.likeType == likeType ? null : likeType;
     }
 }
