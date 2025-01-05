@@ -52,4 +52,7 @@ public class Musical extends BaseTimeEntity {
     @Column(name = "show_time")
     private List<String> showTimes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "musical", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MusicalActor> musicalActors = new ArrayList<>();
+
 }
