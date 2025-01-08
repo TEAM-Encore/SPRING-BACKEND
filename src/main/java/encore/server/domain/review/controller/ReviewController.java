@@ -73,7 +73,7 @@ public class ReviewController {
 
     @GetMapping("/popular-list")
     @Operation(summary = "인기 리뷰 리스트 조회", description = "인기 리뷰 리스트를 조회합니다.")
-    public ApplicationResponse<List<ReviewSimpleRes>> getPopularReviewList() {
+    public ApplicationResponse<List<ReviewPreviewRes>> getPopularReviewList() {
         return ApplicationResponse.ok(reviewService.getPopularReviewList());
     }
 

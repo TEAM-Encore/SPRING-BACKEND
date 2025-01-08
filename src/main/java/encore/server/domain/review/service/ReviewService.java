@@ -217,7 +217,7 @@ public class ReviewService {
         }
     }
 
-    public List<ReviewSimpleRes> getPopularReviewList() {
+    public List<ReviewPreviewRes> getPopularReviewList() {
         // business logic: get popular review list
         List<Review> reviews = reviewRepository.findPopularReviews();
         if (reviews.isEmpty()) {
@@ -225,8 +225,13 @@ public class ReviewService {
         }
 
         // return: popular review list
-       return reviews.stream()
-                .map(this::convertToReviewSimpleRes)
+        return reviews.stream()
+                .map(r -> {
+                    String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(r.getCreatedAt(), LocalDateTime.now()));
+                    Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(r, r.getUser());
+                    LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
+                    return ReviewPreviewRes.of(r, elapsedTime, likeType);
+                })
                 .collect(Collectors.toList());
     }
 
