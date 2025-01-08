@@ -110,6 +110,13 @@ public class ReviewController {
         return ApplicationResponse.ok();
     }
 
+    @GetMapping("/musical/{musical_id}/reviews")
+    @Operation(summary = "뮤지컬의 전체리뷰조회", description = "해당 뮤지컬의 프리미엄리뷰 전체정보를 조회합니다.")
+    public ApplicationResponse<ReviewSummaryRes> getReviews(@PathVariable("musical_id") Long musicalId) {
+        ReviewSummaryRes response = reviewService.getReviewsByMusical(musicalId);
+        return ApplicationResponse.ok(response);
+    }
+
     private Long getUserId() {
         return 1L;
     }
