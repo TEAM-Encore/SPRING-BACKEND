@@ -2,11 +2,17 @@ package encore.server.domain.review.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import encore.server.domain.review.entity.Review;
+import encore.server.domain.review.entity.ReviewTags;
+import encore.server.domain.review.enumerate.LikeType;
+import encore.server.domain.ticket.entity.Actor;
+import encore.server.domain.ticket.entity.Ticket;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -70,5 +76,41 @@ public record ReviewDetailRes(
             @Schema(description = "배우 리스트", example = "[\"김뮤뮤\", \"이뮤뮤\"]")
             List<String> actors
     ) {
+        private static ReviewDetailRes.TicketRes of(Ticket ticket) {
+            return ReviewDetailRes.TicketRes.builder()
+                    .ticketId(ticket.getId())
+                    .ticketTitle(ticket.getTitle())
+                    .seat(ticket.getSeat())
+                    .viewedDate(ticket.getViewedDate())
+                    .imageUrl(ticket.getTicketImageUrl())
+                    .actors(ticket.getActors()
+                            .stream()
+                            .map(Actor::getName)
+                            .collect(Collectors.toList()))
+                    .build();
+        }
+    }
+
+    private static List<String> tagToString(List<ReviewTags> tags) {
+        return tags.stream()
+                .map(reviewTag -> reviewTag.getTag().name())
+                .collect(Collectors.toList());
+    }
+
+    public static ReviewDetailRes of(Review review, Boolean isUnlocked, LikeType likeType, String elapsedTime) {
+        return ReviewDetailRes.builder()
+                .reviewId(review.getId())
+                .ticket(TicketRes.of(review.getTicket()))
+                .userId(review.getUser().getId())
+                .profileImageUrl(review.getUser().getProfileImageUrl())
+                .title(review.getTitle())
+                .tags(tagToString(review.getTags()))
+                .reviewDataRes(ReviewDataRes.of(review.getReviewData()))
+                .isUnlocked(isUnlocked)
+                .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
+                .viewCount(review.getViewCount())
+                .elapsedTime(elapsedTime)
+                .likeRes(ReviewLikeRes.of(likeType, review))
+                .build();
     }
 }

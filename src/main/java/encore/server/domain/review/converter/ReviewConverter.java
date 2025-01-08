@@ -32,56 +32,6 @@ public class ReviewConverter {
         return review;
     }
 
-    public static ViewImageRes toViewImageRes(List<ViewImage> viewImages) {
-        return ViewImageRes.builder()
-                .viewImages(viewImages.stream()
-                        .map(viewImage -> ViewImageRes.ViewImage.builder()
-                                .id(viewImage.getId())
-                                .url(viewImage.getUrl())
-                                .level(viewImage.getLevel())
-                                .build())
-                        .collect(Collectors.toList()))
-                .build();
-    }
-
-    public static ReviewDetailRes toReviewDetailRes(Review review, Boolean isUnlocked, Boolean isLike, String elapsedTime) {
-        return ReviewDetailRes.builder()
-                .reviewId(review.getId())
-                .ticket(toTicketRes(review.getTicket()))
-                .userId(review.getUser().getId())
-                .profileImageUrl(review.getUser().getProfileImageUrl())
-                .title(review.getTitle())
-                .tags(tagToString(review.getTags()))
-                .reviewDataRes(toReviewDataRes(review.getReviewData()))
-                .isUnlocked(isUnlocked)
-                .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
-                .viewCount(review.getViewCount())
-                .elapsedTime(elapsedTime)
-                .likeRes(toReviewLikeRes(isLike, review.getLikeCount()))
-                .build();
-    }
-
-    public static ReviewSimpleRes toReviewSimpleRes(Review review, String elapsedTime, Boolean isLike) {
-        ReviewDataRes.Rating rating = review.getReviewData() != null ? toReviewDataRes(review.getReviewData()).rating() : null;
-        return ReviewSimpleRes.builder()
-                .reviewId(review.getId())
-                .userId(review.getUser().getId())
-                .title(review.getTitle())
-                .nickname(review.getUser().getNickName())
-                .elapsedTime(elapsedTime)
-                .viewCount(review.getViewCount())
-                .likeData(toReviewLikeRes(isLike, review.getLikeCount()))
-                .rating(rating)
-                .build();
-    }
-
-    public static ReviewLikeRes toReviewLikeRes(Boolean isLike, Long likeCount) {
-        return ReviewLikeRes.builder()
-                .isLike(isLike)
-                .likeCount(likeCount)
-                .build();
-    }
-
 
     private static List<ReviewTags> toReviewTags(List<String> tags, Review review) {
         try {

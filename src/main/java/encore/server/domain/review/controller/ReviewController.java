@@ -2,12 +2,14 @@ package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
+import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.review.service.ReviewSearchService;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.util.redis.SearchLogRedis;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -64,14 +66,14 @@ public class ReviewController {
 
     @PatchMapping("/{review_id}/like")
     @Operation(summary = "리뷰 좋아요", description = "리뷰에 좋아요를 누릅니다.(좋아요 생성+취소)")
-    public ApplicationResponse<ReviewLikeRes> likeReview(@PathVariable("review_id") Long reviewId) {
+    public ApplicationResponse<ReviewLikeRes> likeReview(@PathVariable("review_id") Long reviewId, @Valid @RequestParam("like_type") LikeType likeType) {
         Long userId = getUserId();
-        return ApplicationResponse.ok(reviewService.likeReview(userId, reviewId));
+        return ApplicationResponse.ok(reviewService.likeReview(userId, reviewId, likeType));
     }
 
     @GetMapping("/popular-list")
     @Operation(summary = "인기 리뷰 리스트 조회", description = "인기 리뷰 리스트를 조회합니다.")
-    public ApplicationResponse<List<ReviewSimpleRes>> getPopularReviewList() {
+    public ApplicationResponse<List<ReviewPreviewRes>> getPopularReviewList() {
         return ApplicationResponse.ok(reviewService.getPopularReviewList());
     }
 
