@@ -209,11 +209,11 @@ public class ReviewService {
         if (minutesAgo < 1) {
             return "방금 전";
         } else if (minutesAgo < 60) {
-            return minutesAgo + "분 전";
+            return String.format("%d분 전", minutesAgo);
         } else if (minutesAgo < 1440) {
-            return minutesAgo / 60 + "시간 전";
+            return String.format("%d시간 전", minutesAgo / 60);
         } else {
-            return minutesAgo / 1440 + "일 전";
+            return String.format("%d일 전", minutesAgo / 1440);
         }
     }
 
