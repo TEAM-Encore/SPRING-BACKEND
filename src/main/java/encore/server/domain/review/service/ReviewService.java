@@ -41,7 +41,7 @@ public class ReviewService {
     private final UserReviewRepository userReviewRepository;
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
-    private final ReviewSearchService reviewSearchService;
+    private final ReviewRecentSearchService reviewRecentSearchService;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -242,7 +242,7 @@ public class ReviewService {
 
         // business logic: get review list
         //0. 검색어 로그에 저장
-        reviewSearchService.saveRecentSearchLog(searchKeyword, userId);
+        reviewRecentSearchService.saveRecentSearchLog(searchKeyword, userId);
 
         //1. cursor 기반으로 리뷰 리스트 조회
         List<Review> reviews = reviewRepository.findReviewListByCursor(searchKeyword, cursor, tag, pageable);
@@ -283,6 +283,20 @@ public class ReviewService {
 
         //reviewResList를 전달하여 SummaryRes 생성
         return ReviewConverter.toReviewSummaryRes(reviewResList, reviews);
-
     }
+
+    /*
+    public List<String> getAutoCompleteSuggestions(Long userId, String keyword) {
+        // validation: user
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        // business logic: get auto complete suggestions
+        List<String> suggestions = reviewRepository.findAutoCompleteSuggestions(user, keyword);
+
+        // return: auto complete suggestions
+        return suggestions;
+    }
+
+     */
 }

@@ -1,10 +1,13 @@
 package encore.server.domain.review.dto.request;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import encore.server.domain.review.entity.ReviewData;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record ReviewReq(
         @Schema(description = "리뷰 제목", example = "위키드 리뷰")
         String title,

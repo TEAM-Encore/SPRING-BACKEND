@@ -3,7 +3,8 @@ package encore.server.domain.review.controller;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.enumerate.LikeType;
-import encore.server.domain.review.service.ReviewSearchService;
+import encore.server.domain.review.service.ReviewRecentSearchService;
+import encore.server.domain.review.service.ReviewRelatedSearchService;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.util.redis.SearchLogRedis;
@@ -25,7 +26,8 @@ import java.util.Set;
 @Tag(name = "Review", description = "리뷰 API")
 public class ReviewController {
     private final ReviewService reviewService;
-    private final ReviewSearchService reviewSearchService;
+    private final ReviewRecentSearchService reviewRecentSearchService;
+    private final ReviewRelatedSearchService reviewSearchService;
 
     @PostMapping("/{ticket_id}")
     @Operation(summary = "리뷰 작성", description = "티켓에 대한 리뷰를 작성합니다.")
@@ -66,7 +68,7 @@ public class ReviewController {
 
     @PatchMapping("/{review_id}/like")
     @Operation(summary = "리뷰 좋아요", description = "리뷰에 좋아요를 누릅니다.(좋아요 생성+취소)")
-    public ApplicationResponse<ReviewLikeRes> likeReview(@PathVariable("review_id") Long reviewId, @Valid @RequestParam("like_type") LikeType likeType) {
+    public ApplicationResponse<ReviewLikeRes> likeReview(@PathVariable("review_id") Long reviewId, @RequestParam @Valid LikeType likeType) {
         Long userId = getUserId();
         return ApplicationResponse.ok(reviewService.likeReview(userId, reviewId, likeType));
     }
@@ -88,25 +90,32 @@ public class ReviewController {
         return ApplicationResponse.ok(reviewService.getReviewList(userId, keyword, cursor, tag, pageable));
     }
 
+    @GetMapping("/search-suggestions")
+    @Operation(summary = "검색어 자동완성", description = "검색어 자동완성을 제공합니다.")
+    public ApplicationResponse<List<String>> getSearchSuggestions(@RequestParam("keyword") String keyword) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewSearchService.getAutoCompleteSuggestions(userId, keyword));
+    }
+
     @GetMapping("/recent-search-logs")
     @Operation(summary = "최근 검색 키워드 조회", description = "사용자의 최근 검색 키워드를 조회합니다.")
     public ApplicationResponse<Set<SearchLogRedis>> getRecentSearchLogs() {
         Long userId = getUserId();
-        return ApplicationResponse.ok(reviewSearchService.getRecentSearchLogs(userId));
+        return ApplicationResponse.ok(reviewRecentSearchService.getRecentSearchLogs(userId));
     }
 
     @DeleteMapping("/recent-search-logs")
     @Operation(summary = "최근 검색 키워드 삭제", description = "사용자의 최근 검색 키워드를 삭제합니다.")
     public ApplicationResponse<Set<SearchLogRedis>> deleteRecentSearchLog(@RequestParam("name") String name) {
         Long userId = getUserId();
-        return ApplicationResponse.ok(reviewSearchService.deleteRecentSearchLog(name, userId));
+        return ApplicationResponse.ok(reviewRecentSearchService.deleteRecentSearchLog(name, userId));
     }
 
     @DeleteMapping("/recent-search-logs/all")
     @Operation(summary = "최근 검색 키워드 전체 삭제", description = "사용자의 최근 검색 키워드를 전체 삭제합니다.")
     public ApplicationResponse<?> deleteAllRecentSearchLogs() {
         Long userId = getUserId();
-        reviewSearchService.deleteAllRecentSearchLogs(userId);
+        reviewRecentSearchService.deleteAllRecentSearchLogs(userId);
         return ApplicationResponse.ok();
     }
 

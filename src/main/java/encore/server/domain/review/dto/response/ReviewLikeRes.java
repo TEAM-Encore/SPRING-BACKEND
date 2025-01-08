@@ -16,35 +16,35 @@ public record ReviewLikeRes(
         LikeCountRes likeCountRes
 
 ) {
-        @Builder
-        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-        public record LikeCountRes(
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public record LikeCountRes(
 
-                @Schema(description = "총 좋아요 개수", example = "100")
-                Long totalLikeCount,
-                @Schema(description = "후속 추천 좋아요 개수", example = "100")
-                Long followUpLikeCount,
+            @Schema(description = "총 좋아요 개수", example = "100")
+            Long totalLikeCount,
+            @Schema(description = "후속 추천 좋아요 개수", example = "100")
+            Long followUpLikeCount,
 
-                @Schema(description = "꿀팁 가득 좋아요 개수", example = "100")
-                Long fullOfTipsLikeCount,
+            @Schema(description = "꿀팁 가득 좋아요 개수", example = "100")
+            Long fullOfTipsLikeCount,
 
-                @Schema(description = "꼼꼼 분석 좋아요 개수", example = "100")
-                Long thoroughAnalysisLikeCount
-        ){
-                public static LikeCountRes of(Review review) {
-                        return LikeCountRes.builder()
-                                .totalLikeCount(review.getLikeCount())
-                                .followUpLikeCount(review.getFollowUpLikeCount())
-                                .fullOfTipsLikeCount(review.getFullOfTipsLikeCount())
-                                .thoroughAnalysisLikeCount(review.getThoroughAnalysisLikeCount())
-                                .build();
-                }
+            @Schema(description = "꼼꼼 분석 좋아요 개수", example = "100")
+            Long thoroughAnalysisLikeCount
+    ){
+        public static LikeCountRes of(Review review) {
+            return LikeCountRes.builder()
+                    .totalLikeCount(review.getLikeCount())
+                    .followUpLikeCount(review.getFollowUpLikeCount())
+                    .fullOfTipsLikeCount(review.getFullOfTipsLikeCount())
+                    .thoroughAnalysisLikeCount(review.getThoroughAnalysisLikeCount())
+                    .build();
         }
+    }
 
-        public static ReviewLikeRes of(LikeType likeType, Review review) {
-                return ReviewLikeRes.builder()
-                        .likeType(likeType != null ? likeType : LikeType.NONE)
-                        .likeCountRes(LikeCountRes.of(review))
-                        .build();
-        }
+    public static ReviewLikeRes of(LikeType likeType, Review review) {
+        return ReviewLikeRes.builder()
+                .likeType(likeType != null ? likeType : LikeType.NONE)
+                .likeCountRes(LikeCountRes.of(review))
+                .build();
+    }
 }
