@@ -42,6 +42,7 @@ public class ReviewService {
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewRecentSearchService reviewRecentSearchService;
+    private final ReviewRelatedSearchService reviewRelatedSearchService;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -60,6 +61,7 @@ public class ReviewService {
         // business logic: create review
         Review review = ReviewConverter.toEntity(ticket, user, req);
         reviewRepository.save(review);
+        reviewRelatedSearchService.updateAllSuggestions(userId, review);
 
         // 작성자에게 포인트 제공
         user.addPoint(50L);

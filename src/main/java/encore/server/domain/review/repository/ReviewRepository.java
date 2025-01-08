@@ -19,5 +19,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
             "WHERE t.musical.id = :musicalId AND r.deletedAt IS NULL")
     List<Review> findReviewsByMusicalId(@Param("musicalId") Long musicalId);
 
-    List<Review> findByUserIdAndTitleContaining(Long userId, String keyword);
+    List<Review> findByUserIdAndTitleContainingAndDeletedAtIsNull(Long userId, String keyword);
 }

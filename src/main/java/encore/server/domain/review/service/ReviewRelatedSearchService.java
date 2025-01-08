@@ -85,7 +85,7 @@ public class ReviewRelatedSearchService {
             log.info("Redis에서 추천어를 찾았습니다: {}", redisSuggestions);
             finalResults.addAll(redisSuggestions);
         } else {
-            List<Review> reviews = reviewRepository.findByUserIdAndTitleContaining(userId, keyword);
+            List<Review> reviews = reviewRepository.findByUserIdAndTitleContainingAndDeletedAtIsNull(userId, keyword);
             log.info("DB에서 {}개의 리뷰를 찾았습니다. 키워드 '{}', userId {}", reviews.size(), keyword, userId);
 
             for (Review review : reviews) {
@@ -98,9 +98,31 @@ public class ReviewRelatedSearchService {
                     }
                 }
             }
-        }
+       }
 
         log.info("최종 자동 완성 추천어: {}", finalResults);
         return finalResults.stream().sorted().collect(Collectors.toList());
     }
+
+    /**
+     * 모든 추천 단어 삭제
+     *
+     * @param userId 사용자 ID
+     */
+    public void updateAllSuggestions(Long userId, Review review) {
+        //redis userId의 모든 key의 value를 가져온다.
+        Set<String> keys = redisTemplate.keys(userId + "_*");
+
+        // 새로운 단어를 기반으로 추천 단어 업데이트
+        for (String key : keys) {
+            if (review.getTitle().startsWith(key.split("_")[1])) {
+                Set<String> extractedWords = extractNouns.extractNounsStartingWith(review.getTitle(), key.split("_")[1]);
+                for (String word : extractedWords) {
+                    updateSuggestions(userId, key.split("_")[1], word);
+                }
+            }
+        }
+        log.info("모든 키워드에 대해 추천 단어가 업데이트되었습니다. userId: '{}'", userId);
+    }
+
 }
