@@ -3,9 +3,6 @@ package encore.server.domain.review.service;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.review.repository.ReviewRepository;
 import encore.server.global.common.ExtractNouns;
-import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
-import kr.co.shineware.nlp.komoran.core.Komoran;
-import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,6 @@ public class ReviewRelatedSearchService {
     @Autowired
     @Qualifier("relatedSearchLogRedisTemplate")
     private RedisTemplate<String, String> redisTemplate;
-
     private final ReviewRepository reviewRepository;
     private final ExtractNouns extractNouns;
 
@@ -41,7 +37,9 @@ public class ReviewRelatedSearchService {
         String redisKey = buildRedisKey(userId, keyword);
         Set<String> suggestions = redisTemplate.opsForZSet().reverseRange(redisKey, 0, -1);
         log.info("Redis에서 가져온 추천어 (key: '{}'): {}", redisKey, suggestions);
-        return suggestions;
+        return suggestions.stream()
+                .filter(word -> word != null && !word.isEmpty())
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -52,6 +50,9 @@ public class ReviewRelatedSearchService {
      * @param newWord 새로운 단어
      */
     public void updateSuggestions(Long userId, String keyword, String newWord) {
+        if (newWord == null) {
+            return;
+        }
         String redisKey = buildRedisKey(userId, keyword);
         redisTemplate.opsForZSet().incrementScore(redisKey, newWord, 1);
         log.info("Redis 업데이트 (key: '{}', word: '{}')", redisKey, newWord);
@@ -81,45 +82,48 @@ public class ReviewRelatedSearchService {
         Set<String> redisSuggestions = getSuggestionsFromRedis(userId, keyword);
         Set<String> finalResults = new HashSet<>();
 
+        /*
         if (redisSuggestions != null && !redisSuggestions.isEmpty()) {
             log.info("Redis에서 추천어를 찾았습니다: {}", redisSuggestions);
             finalResults.addAll(redisSuggestions);
         } else {
-            List<Review> reviews = reviewRepository.findByUserIdAndTitleContainingAndDeletedAtIsNull(userId, keyword);
-            log.info("DB에서 {}개의 리뷰를 찾았습니다. 키워드 '{}', userId {}", reviews.size(), keyword, userId);
 
-            for (Review review : reviews) {
-                if (review.getTitle().startsWith(keyword)) {
-                    Set<String> extractedWords = extractNouns.extractNounsStartingWith(review.getTitle(), keyword);
-                    finalResults.addAll(extractedWords);
+         */
+        List<Review> reviews = reviewRepository.findByReviewAutoCompleteSuggestions(userId, keyword);
+        log.info("DB에서 {}개의 리뷰를 찾았습니다. 키워드 '{}', userId {}", reviews.size(), keyword, userId);
 
-                    for (String word : extractedWords) {
-                        updateSuggestions(userId, keyword, word);
-                    }
-                }
+        for (Review review : reviews) {
+            Set<String> extractedWords = extractNouns.extractNounsStartingWithAnyField(
+                    review, keyword
+            );
+            log.info("리뷰에서 추출된 단어: {}", extractedWords);
+            finalResults.addAll(extractedWords);
+
+            for (String word : extractedWords) {
+                updateSuggestions(userId, keyword, word);
+                log.info("Redis에 추천어 추가: {}", word);
             }
-       }
+        }
+        //}
 
         log.info("최종 자동 완성 추천어: {}", finalResults);
         return finalResults.stream().sorted().collect(Collectors.toList());
     }
 
     /**
-     * 모든 추천 단어 삭제
+     * 리뷰 작성 시 모든 추천 단어 삭제 및 업데이트
      *
      * @param userId 사용자 ID
      */
     public void updateAllSuggestions(Long userId, Review review) {
-        //redis userId의 모든 key의 value를 가져온다.
         Set<String> keys = redisTemplate.keys(userId + "_*");
 
-        // 새로운 단어를 기반으로 추천 단어 업데이트
         for (String key : keys) {
-            if (review.getTitle().startsWith(key.split("_")[1])) {
-                Set<String> extractedWords = extractNouns.extractNounsStartingWith(review.getTitle(), key.split("_")[1]);
-                for (String word : extractedWords) {
-                    updateSuggestions(userId, key.split("_")[1], word);
-                }
+            Set<String> extractedWords = extractNouns.extractNounsStartingWithAnyField(
+                    review, key.split("_")[1]
+            );
+            for (String word : extractedWords) {
+                updateSuggestions(userId, key.split("_")[1], word);
             }
         }
         log.info("모든 키워드에 대해 추천 단어가 업데이트되었습니다. userId: '{}'", userId);
