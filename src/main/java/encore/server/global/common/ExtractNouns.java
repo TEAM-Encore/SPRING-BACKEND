@@ -63,8 +63,6 @@ public class ExtractNouns {
             }
         }
 
-        log.info("11111Extracted nouns: {}", result);
-
         // 모든 토큰이 명사일 경우, 마지막 문자 한 개를 제외한 명사 부분만 추가
         if (allNouns) {
             int endIndex = result.length() > 0 ? result.length() - 1 : result.length();
@@ -75,8 +73,6 @@ public class ExtractNouns {
             results.add(result.toString().substring(0, endIndex).trim());
         }
 
-        log.info("22222Extracted nouns: {}", results);
-
         // 키워드로 시작하는 명사를 필터링하여 추가
         for (Token token : tokens) {
             String word = token.getMorph();
@@ -84,8 +80,6 @@ public class ExtractNouns {
                 results.add(word);
             }
         }
-
-        log.info("33333Extracted nouns: {}", results);
 
         // 결과에서 빈 문자열 제거
         results.remove("");

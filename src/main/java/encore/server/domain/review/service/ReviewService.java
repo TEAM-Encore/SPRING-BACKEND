@@ -286,19 +286,4 @@ public class ReviewService {
         //reviewResList를 전달하여 SummaryRes 생성
         return ReviewConverter.toReviewSummaryRes(reviewResList, reviews);
     }
-
-    /*
-    public List<String> getAutoCompleteSuggestions(Long userId, String keyword) {
-        // validation: user
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
-        // business logic: get auto complete suggestions
-        List<String> suggestions = reviewRepository.findAutoCompleteSuggestions(user, keyword);
-
-        // return: auto complete suggestions
-        return suggestions;
-    }
-
-     */
 }
