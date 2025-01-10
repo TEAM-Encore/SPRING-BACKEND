@@ -2,6 +2,7 @@ package encore.server.domain.review.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import encore.server.domain.review.entity.ReviewData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -77,5 +78,31 @@ public record ReviewDataRes(
             @Schema(description = "평점 리뷰", example = "평점이 너무 좋았어요!")
             String ratingReview
     ) {
+    }
+
+    public static ReviewDataRes of(ReviewData reviewData) {
+        return ReviewDataRes.builder()
+                .view(ReviewDataRes.View.builder()
+                        .viewLevel(reviewData.getView().getViewLevel())
+                        .viewReview(reviewData.getView().getViewReview())
+                        .build())
+                .sound(ReviewDataRes.Sound.builder()
+                        .soundLevel(reviewData.getSound().getSoundLevel())
+                        .soundReview(reviewData.getSound().getSoundReview())
+                        .build())
+                .facility(ReviewDataRes.Facility.builder()
+                        .facilityLevel(reviewData.getFacility().getFacilityLevel())
+                        .facilityReview(reviewData.getFacility().getFacilityReview())
+                        .build())
+                .rating(ReviewDataRes.Rating.builder()
+                        .numberRating(reviewData.getRating().getNumberRating())
+                        .storyRating(reviewData.getRating().getStoryRating())
+                        .revisitRating(reviewData.getRating().getRevisitRating())
+                        .actorRating(reviewData.getRating().getActorRating())
+                        .performanceRating(reviewData.getRating().getPerformanceRating())
+                        .totalRating(reviewData.getRating().getTotalRating())
+                        .ratingReview(reviewData.getRating().getRatingReview())
+                        .build())
+                .build();
     }
 }

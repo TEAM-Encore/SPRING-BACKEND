@@ -26,6 +26,8 @@ public enum ErrorCode {
 
     // 3000: User Error
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 사용자입니다."),
+    PASSWORD_MISMATCH_EXCEPTION(HttpStatus.FORBIDDEN, 3001, "비밀번호가 일치하지 않습니다."),
+    USER_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 3002, "이미 존재하는 사용자입니다."),
 
     // 4000: Post Error
     POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 4000, "존재하지 않는 게시글입니다."),
@@ -46,6 +48,7 @@ public enum ErrorCode {
     REVIEW_TAG_NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, 8002, "존재하지 않는 태그입니다."),
     REVIEW_LOCKED_EXCEPTION(HttpStatus.FORBIDDEN, 8003, "리뷰가 잠겨있습니다."),
     REVIEW_ALREADY_UNLOCKED_EXCEPTION(HttpStatus.BAD_REQUEST, 8004, "이미 리뷰 잠금이 해제되었습니다."),
+    REVIEW_LIKE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 8007, "존재하지 않는 리뷰 좋아요입니다."),
     REVIEW_SELF_REPORT_EXCEPTION(HttpStatus.FORBIDDEN,8005,"본인의 리뷰는 신고할 수 없습니다." ),
     REVIEW_REPORT_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 8006, "이미 신고한 리뷰입니다."),
 

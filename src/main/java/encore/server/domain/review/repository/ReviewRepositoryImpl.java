@@ -67,7 +67,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         return queryFactory
                 .selectFrom(review)
                 .where(review.deletedAt.isNull())
-                .orderBy(review.likeCount.desc())
+                .orderBy(review.likeCount.desc(), review.createdAt.desc())
                 .limit(5)
                 .fetch();
     }
