@@ -56,12 +56,21 @@ public class TicketConverter {
                 .build();
     }
 
+    public static String convertSeriesToText(Long series) {
+        return switch (series.intValue()) {
+            case 1 -> "초연";
+            case 2 -> "재연";
+            default -> series + "연";
+        };
+    }
+
+
     public static TicketRes toTicketRes(Ticket ticket, Optional<Review> reviewOpt) {
         return TicketRes.builder()
                 .id(ticket.getId())
                 .userId(ticket.getUser().getId())
                 .musicalTitle(ticket.getMusical().getTitle())
-                .series(ticket.getMusical().getSeries())
+                .series(convertSeriesToText(ticket.getMusical().getSeries())) // 변환된 값 사용
                 .viewedDate(ticket.getViewedDate())
                 .location(ticket.getMusical().getLocation())
                 .seat(ticket.getSeat())
@@ -70,6 +79,7 @@ public class TicketConverter {
                         .collect(Collectors.toList()))
                 .hasReview(reviewOpt.isPresent())
                 .totalRating(reviewOpt.map(r -> r.getReviewData().getRating().getTotalRating()).orElse(null))
+                .ticketImageUrl(ticket.getTicketImageUrl())
                 .build();
     }
 }
