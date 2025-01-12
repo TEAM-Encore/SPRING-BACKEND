@@ -3,14 +3,11 @@ package encore.server.domain.review.service;
 import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
-import encore.server.domain.review.entity.Review;
-import encore.server.domain.review.entity.ReviewLike;
-import encore.server.domain.review.entity.UserReview;
-import encore.server.domain.review.entity.ViewImage;
-import encore.server.domain.review.repository.ReviewLikeRepository;
-import encore.server.domain.review.repository.ReviewRepository;
-import encore.server.domain.review.repository.UserReviewRepository;
-import encore.server.domain.review.repository.ViewImageRepository;
+import encore.server.domain.review.entity.*;
+import encore.server.domain.review.enumerate.ReportReason;
+import encore.server.domain.review.repository.*;
+import encore.server.domain.review.enumerate.LikeType;
+import encore.server.domain.review.mapping.LikeTypeMapping;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
@@ -26,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -44,6 +40,7 @@ public class ReviewService {
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewSearchService reviewSearchService;
+    private final ReviewReportRepository reviewReportRepository;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -69,8 +66,13 @@ public class ReviewService {
         // 업로드 시점
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
+        // likeType
+        Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(review, user);
+        LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
+
+
         // return: review response
-        return ReviewConverter.toReviewDetailRes(review, true, false, elapsedTime);
+        return ReviewDetailRes.of(review, true, likeType, elapsedTime);
     }
 
     public ViewImageRes viewImage(Long cycle) {
@@ -79,7 +81,7 @@ public class ReviewService {
         List<ViewImage> viewImages = viewImageRepository.findByIdBetween(start, start + 3);
 
         //return: view image response
-        return ReviewConverter.toViewImageRes(viewImages);
+        return ViewImageRes.of(viewImages);
     }
 
     public ReviewDetailRes getReview(Long userId, Long reviewId) {
@@ -90,7 +92,7 @@ public class ReviewService {
         Review review = reviewRepository.findReviewDetail(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
-        boolean isUnlocked = Objects.equals(user.getId(), review.getUser().getId()) ||
+        boolean isUnlocked = (user.getId() == review.getUser().getId()) ||
                 userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId);
 
         if (!isUnlocked) {
@@ -100,14 +102,15 @@ public class ReviewService {
         // 조회수 증가
         reviewViewService.addVisitedRedis(user, review);
 
-        // 좋아요 여부
-        boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, user);
+        // likeType
+        Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(review, user);
+        LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
 
         // 업로드 시점
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
         // return: review detail response
-        return ReviewConverter.toReviewDetailRes(review, isUnlocked, isLike, elapsedTime);
+        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
     }
 
     @Transactional
@@ -161,7 +164,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewLikeRes likeReview(Long userId, Long reviewId) {
+    public ReviewLikeRes likeReview(Long userId, Long reviewId, LikeType likeType) {
         // validation: user, review
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -176,18 +179,29 @@ public class ReviewService {
             reviewLike = ReviewLike.builder()
                     .review(review)
                     .user(user)
+                    .likeType(likeType)
                     .build();
             reviewLikeRepository.save(reviewLike);
         } else {
-            reviewLike.toggleLike(reviewLike.getIsLike());
+            reviewLike.toggleLike(likeType);
         }
 
-        long likeCount = reviewLikeRepository.countByReviewAndIsLikeTrue(review);
-        review.setLikeCount(likeCount);
+        Map<LikeType, Long> likeCounts = Arrays.stream(LikeType.values())
+                .collect(Collectors.toMap(
+                        lt -> lt,
+                        lt -> reviewLikeRepository.countByReviewAndLikeType(review, lt)
+                ));
+
+        likeCounts.forEach(review::setLikeCount);
+
+        long totalLikeCount = reviewLikeRepository.countByReview(review);
+        review.setTotalLikeCount(totalLikeCount);
+
+        // 리뷰 업데이트
         reviewRepository.save(review);
 
-        // return: like count
-        return ReviewConverter.toReviewLikeRes(reviewLike.getIsLike(), likeCount);
+        // return: like
+        return ReviewLikeRes.of(likeType, review);
     }
 
     private String getElapsedTime(long minutesAgo) {
@@ -202,7 +216,7 @@ public class ReviewService {
         }
     }
 
-    public List<ReviewSimpleRes> getPopularReviewList() {
+    public List<ReviewPreviewRes> getPopularReviewList() {
         // business logic: get popular review list
         List<Review> reviews = reviewRepository.findPopularReviews();
         if (reviews.isEmpty()) {
@@ -210,8 +224,13 @@ public class ReviewService {
         }
 
         // return: popular review list
-       return reviews.stream()
-                .map(this::convertToReviewSimpleRes)
+        return reviews.stream()
+                .map(r -> {
+                    String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(r.getCreatedAt(), LocalDateTime.now()));
+                    Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(r, r.getUser());
+                    LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
+                    return ReviewPreviewRes.of(r, elapsedTime, likeType);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -245,7 +264,108 @@ public class ReviewService {
     private ReviewSimpleRes convertToReviewSimpleRes(Review review) {
         long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
         String elapsedTime = getElapsedTime(minutesAgo);
-        Boolean isLike = reviewLikeRepository.existsByReviewAndUserAndIsLikeTrue(review, review.getUser());
-        return ReviewConverter.toReviewSimpleRes(review, elapsedTime, isLike);
+
+        return ReviewSimpleRes.of(review, elapsedTime);
+    }
+
+    public ReviewSummaryRes getReviewsByMusical(Long musicalId) {
+        List<Review> reviews = reviewRepository.findReviewsByMusicalId(musicalId);
+
+        //각 리뷰의 elapsedTime을 계산해서 ReviewRes 리스트로 변환
+        List<ReviewRes> reviewResList = reviews.stream()
+                .map(review -> {
+                    long minutesAgo = ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now());
+                    String elapsedTime = getElapsedTime(minutesAgo);
+                    return ReviewConverter.toReviewRes(review, elapsedTime);  // elapsedTime을 전달
+                })
+                .toList();
+
+        //reviewResList를 전달하여 SummaryRes 생성
+        return ReviewConverter.toReviewSummaryRes(reviewResList, reviews);
+
+    }
+
+
+    @Transactional
+    public ReviewDetailRes updateReview(Long userId, Long reviewId, ReviewReq req) {
+        //validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (review.getUser().getId() != user.getId()) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+        }
+
+        //business logic: update review
+        ReviewData reviewData = ReviewConverter.toReviewData(req.reviewDataReq());
+        review.updateReview(req, reviewData);
+
+
+        boolean isUnlocked = (user.getId() == review.getUser().getId())||
+                userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId);
+
+        if (!isUnlocked) {
+            throw new ApplicationException(ErrorCode.REVIEW_LOCKED_EXCEPTION);
+        }
+
+        // likeType
+        Optional<LikeTypeMapping> likeTypeMapping = reviewLikeRepository.findLikeTypeByReviewAndUser(review, user);
+        LikeType likeType = likeTypeMapping.map(LikeTypeMapping::getLikeType).orElse(LikeType.NONE);
+
+        // 업로드 시점
+        String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
+
+        // return: review detail response
+        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
+    }
+
+    @Transactional
+    public void deleteReview(Long userId, Long reviewId) {
+        //validation: user, review
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (review.getUser().getId() != user.getId()) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+        }
+
+        //business logic: delete review
+        reviewRepository.delete(review);
+    }
+
+    @Transactional
+    public ReviewReportRes reportReview(Long userId, Long reviewId, ReportReason reason) {
+        //validation: user, review, self report, duplicated report
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
+
+        if (review.getUser().getId() != user.getId()) {
+            throw new ApplicationException(ErrorCode.REVIEW_SELF_REPORT_EXCEPTION);
+        }
+
+        if(reviewReportRepository.existsByReporterAndReview(user, review)){
+            throw new ApplicationException(ErrorCode.REVIEW_REPORT_ALREADY_EXIST_EXCEPTION);
+        }
+
+        //business logic: report review
+        ReviewReport reviewReport = ReviewReport.builder()
+                .reporter(user)
+                .review(review)
+                .reason(reason)
+                .build();
+
+        reviewReportRepository.save(reviewReport);
+
+        //return
+        return ReviewReportRes.of(reviewReport);
     }
 }

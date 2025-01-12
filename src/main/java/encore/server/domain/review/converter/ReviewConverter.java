@@ -32,56 +32,6 @@ public class ReviewConverter {
         return review;
     }
 
-    public static ViewImageRes toViewImageRes(List<ViewImage> viewImages) {
-        return ViewImageRes.builder()
-                .viewImages(viewImages.stream()
-                        .map(viewImage -> ViewImageRes.ViewImage.builder()
-                                .id(viewImage.getId())
-                                .url(viewImage.getUrl())
-                                .level(viewImage.getLevel())
-                                .build())
-                        .collect(Collectors.toList()))
-                .build();
-    }
-
-    public static ReviewDetailRes toReviewDetailRes(Review review, Boolean isUnlocked, Boolean isLike, String elapsedTime) {
-        return ReviewDetailRes.builder()
-                .reviewId(review.getId())
-                .ticket(toTicketRes(review.getTicket()))
-                .userId(review.getUser().getId())
-                .profileImageUrl(review.getUser().getProfileImageUrl())
-                .title(review.getTitle())
-                .tags(tagToString(review.getTags()))
-                .reviewDataRes(toReviewDataRes(review.getReviewData()))
-                .isUnlocked(isUnlocked)
-                .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
-                .viewCount(review.getViewCount())
-                .elapsedTime(elapsedTime)
-                .likeRes(toReviewLikeRes(isLike, review.getLikeCount()))
-                .build();
-    }
-
-    public static ReviewSimpleRes toReviewSimpleRes(Review review, String elapsedTime, Boolean isLike) {
-        ReviewDataRes.Rating rating = review.getReviewData() != null ? toReviewDataRes(review.getReviewData()).rating() : null;
-        return ReviewSimpleRes.builder()
-                .reviewId(review.getId())
-                .userId(review.getUser().getId())
-                .title(review.getTitle())
-                .nickname(review.getUser().getNickName())
-                .elapsedTime(elapsedTime)
-                .viewCount(review.getViewCount())
-                .likeData(toReviewLikeRes(isLike, review.getLikeCount()))
-                .rating(rating)
-                .build();
-    }
-
-    public static ReviewLikeRes toReviewLikeRes(Boolean isLike, Long likeCount) {
-        return ReviewLikeRes.builder()
-                .isLike(isLike)
-                .likeCount(likeCount)
-                .build();
-    }
-
 
     private static List<ReviewTags> toReviewTags(List<String> tags, Review review) {
         try {
@@ -117,7 +67,7 @@ public class ReviewConverter {
                 .build();
     }
 
-    private static ReviewData toReviewData(ReviewDataReq req){
+    public static ReviewData toReviewData(ReviewDataReq req){
         return ReviewData.builder()
                 .view(ReviewData.View.builder()
                         .viewLevel(req.view().viewLevel())
@@ -166,6 +116,54 @@ public class ReviewConverter {
                         .totalRating(reviewData.getRating().getTotalRating())
                         .ratingReview(reviewData.getRating().getRatingReview())
                         .build())
+                .build();
+    }
+
+    public static ReviewRes toReviewRes(Review review, String elapsedTime) {
+        return ReviewRes.builder()
+                .title(review.getTitle())
+                .nickName(review.getUser().getNickName())
+                .elapsedTime(elapsedTime)
+                .totalRating(review.getReviewData().getRating().getTotalRating())
+                .viewCount(review.getViewCount())
+                .likeCount(review.getLikeCount())
+                .build();
+    }
+
+    public static ReviewSummaryRes toReviewSummaryRes(List<ReviewRes> reviewResList, List<Review> reviews) {
+
+        double averageTotalRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getTotalRating())
+                .average().orElse(0.0);
+
+        double averageNumberRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getNumberRating())
+                .average().orElse(0.0);
+
+        double averageStoryRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getStoryRating())
+                .average().orElse(0.0);
+
+        double averageRevisitRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getRevisitRating())
+                .average().orElse(0.0);
+
+        double averageActorRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getActorRating())
+                .average().orElse(0.0);
+
+        double averagePerformanceRating = reviews.stream()
+                .mapToDouble(r -> r.getReviewData().getRating().getPerformanceRating())
+                .average().orElse(0.0);
+
+        return ReviewSummaryRes.builder()
+                .reviews(reviewResList)
+                .averageTotalRating((float) averageTotalRating)
+                .averageNumberRating((float) averageNumberRating)
+                .averageStoryRating((float) averageStoryRating)
+                .averageRevisitRating((float) averageRevisitRating)
+                .averageActorRating((float) averageActorRating)
+                .averagePerformanceRating((float) averagePerformanceRating)
                 .build();
     }
 }

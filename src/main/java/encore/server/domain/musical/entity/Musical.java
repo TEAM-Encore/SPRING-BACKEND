@@ -52,4 +52,10 @@ public class Musical extends BaseTimeEntity {
     @Column(name = "show_time")
     private List<String> showTimes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "musical", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MusicalActor> musicalActors = new ArrayList<>();
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isFeatured; // 이달의 인기 뮤지컬 여부
+
 }
