@@ -2,7 +2,7 @@ package encore.server.domain.post.service;
 
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.repository.PostRepository;
-import encore.server.global.common.PostExtractNouns;
+import encore.server.global.common.ExtractNouns;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class PostRelatedSearchService {
     @Qualifier("relatedSearchLogRedisTemplate")
     private RedisTemplate<String, String> redisTemplate;
     private final PostRepository postRepository;
-    private final PostExtractNouns extractNouns;
+    private final ExtractNouns extractNouns;
 
     /**
      * Redis ZSET에서 키워드에 대한 추천 단어 가져오기
@@ -88,7 +88,7 @@ public class PostRelatedSearchService {
             List<Post> posts = postRepository.findByPostAutoCompleteSuggestions(userId, keyword);
 
             for (Post post : posts) {
-                Set<String> extractedWords = extractNouns.extractNounsStartingWithAnyField(
+                Set<String> extractedWords = extractNouns.extractNounsStartingWithPostField(
                         post, keyword
                 );
                 finalResults.addAll(extractedWords);
@@ -111,7 +111,7 @@ public class PostRelatedSearchService {
         Set<String> keys = redisTemplate.keys(userId + "_*");
 
         for (String key : keys) {
-            Set<String> extractedWords = extractNouns.extractNounsStartingWithAnyField(
+            Set<String> extractedWords = extractNouns.extractNounsStartingWithPostField(
                     post, key.split("_")[1]
             );
             for (String word : extractedWords) {

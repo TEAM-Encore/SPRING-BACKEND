@@ -86,7 +86,7 @@ public class ReviewRelatedSearchService {
             List<Review> reviews = reviewRepository.findByReviewAutoCompleteSuggestions(userId, keyword);
 
             for (Review review : reviews) {
-                Set<String> extractedWords = extractNouns.extractNounsStartingWithAnyField(
+                Set<String> extractedWords = extractNouns.extractNounsStartingWithReviewField(
                         review, keyword
                 );
                 finalResults.addAll(extractedWords);
@@ -109,7 +109,7 @@ public class ReviewRelatedSearchService {
         Set<String> keys = redisTemplate.keys(userId + "_*");
 
         for (String key : keys) {
-            Set<String> extractedWords = extractNouns.extractNounsStartingWithAnyField(
+            Set<String> extractedWords = extractNouns.extractNounsStartingWithReviewField(
                     review, key.split("_")[1]
             );
             for (String word : extractedWords) {
