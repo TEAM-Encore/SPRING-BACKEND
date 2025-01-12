@@ -15,9 +15,9 @@ public record UserPatchReq(
     String profileImageUrl,
     @Schema(description = "관람 빈도", example = "LEVEL1")
     ViewingFrequency viewingFrequency,
-    @Schema(description = "선호하는 공연 키워드", example = "[EMOTIONAL, ENTERTAINING]")
+    @Schema(description = "선호하는 공연 키워드", example = "[\"EMOTIONAL\", \"ENTERTAINING\"]")
     List<PreferredKeywordEnum> preferredKeywordEnums,
-    @Schema(description = "동의한 약관 타입", example = "[SERVICE_TERMS, PRIVACY_POLICY]")
+    @Schema(description = "동의한 약관 타입", example = "[\"SERVICE_TERMS\", \"PRIVACY_POLICY\"]")
     List<TermType> agreeTermEnums
 ) {
 
