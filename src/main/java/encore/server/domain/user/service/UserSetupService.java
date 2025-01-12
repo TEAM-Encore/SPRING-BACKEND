@@ -57,32 +57,42 @@ public class UserSetupService {
 
   @Transactional
   public void patchUserInfo(UserPatchReq request, Long userId) {
-
+    // validation : user 가 존재하는지 검증
     User userToUpdate = userRepository.findById(userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
+    // business logic
+    // 요청에 변경할 닉네임이 있을 경우 유효한 닉네임인지 검증 후 변경.
     if (request.nickName() != null) {
       validateUserNickname(request.nickName());
       userToUpdate.updateNickname(request.nickName());
     }
-
+    // 요청에 프로필 이미지 URL 이 있을 경우 변경.
     if (request.profileImageUrl() != null) {
       userToUpdate.updateProfileImageUrl(request.profileImageUrl());
     }
-
+    // 요청에 관람 빈도가 있을 경우 변경
     if (request.viewingFrequency() != null) {
       userToUpdate.updateViewingFrequency(request.viewingFrequency());
     }
-
+    // 요청에 선호하는 공연 키워드가 있을 경우
     if (request.preferredKeywordEnums() != null) {
-      List<PreferredKeyword> updateKeywordListManagedToEntityManager = preferredKeywordRepository.findAllByDeletedAtIsNullAndPreferredKeywordEnumIn(request.preferredKeywordEnums());
+      // 요청으로 들어온 키워드를 DB 에서 가져옴
+      List<PreferredKeyword> updateKeywordListManagedToEntityManager = preferredKeywordRepository.findAllByDeletedAtIsNullAndPreferredKeywordEnumIn(
+          request.preferredKeywordEnums());
+      // user 에 관련된 UserKeyword 중간 테이블 Row 를 모두 삭제
       userKeywordRepository.deleteAllByUserAndDeletedAtIsNull(userToUpdate);
+      // 유저 키워드 연관관계 추가
       userToUpdate.addUserPreferredKeywords(updateKeywordListManagedToEntityManager);
     }
-
+    // 요청에 이용약관이 있을 경우
     if (request.agreeTermEnums() != null) {
-      List<TermOfUse> updateTermOfUseListManagedToEntityManager = termOfUseRepository.findAllByDeletedAtIsNullAndTermTypeIn(request.agreeTermEnums());
+      // 요청으로 들어온 이용약관을 DB 에서 가져옴
+      List<TermOfUse> updateTermOfUseListManagedToEntityManager = termOfUseRepository.findAllByDeletedAtIsNullAndTermTypeIn(
+          request.agreeTermEnums());
+      // user 에 관련되 UserTermOfUse 중간 테이블 Row 를 모두 삭제
       userTermOfUseRepository.deleteAllByUserAndDeletedAtIsNull(userToUpdate);
+      // 이용약관 연관관계 추가
       userToUpdate.addUserTermOfUses(updateTermOfUseListManagedToEntityManager);
     }
 
