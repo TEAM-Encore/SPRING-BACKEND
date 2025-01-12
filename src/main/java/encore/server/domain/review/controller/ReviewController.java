@@ -2,6 +2,7 @@ package encore.server.domain.review.controller;
 
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
+import encore.server.domain.review.enumerate.ReportReason;
 import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.review.service.ReviewRecentSearchService;
 import encore.server.domain.review.service.ReviewRelatedSearchService;
@@ -32,9 +33,32 @@ public class ReviewController {
     @PostMapping("/{ticket_id}")
     @Operation(summary = "리뷰 작성", description = "티켓에 대한 리뷰를 작성합니다.")
     public ApplicationResponse<ReviewDetailRes> createReview(@PathVariable("ticket_id") Long ticketId,
-                                                       @RequestBody ReviewReq req) {
+                                                             @RequestBody ReviewReq req) {
         Long userId = getUserId();
         return ApplicationResponse.created(reviewService.createReview(ticketId, userId, req));
+    }
+
+    @PutMapping("/{review_id}")
+    @Operation(summary = "리뷰 수정", description = "리뷰를 수정합니다.")
+    public ApplicationResponse<ReviewDetailRes> updateReview(@PathVariable("review_id") Long reviewId,
+                                                             @RequestBody ReviewReq req) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok(reviewService.updateReview(userId, reviewId, req));
+    }
+
+    @DeleteMapping("/{review_id}")
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제합니다.")
+    public ApplicationResponse<?> deleteReview(@PathVariable("review_id") Long reviewId) {
+        Long userId = getUserId();
+        reviewService.deleteReview(userId, reviewId);
+        return ApplicationResponse.ok();
+    }
+
+    @PostMapping("/{review_id}/report")
+    @Operation(summary = "리뷰 신고", description = "리뷰를 신고합니다.")
+    public ApplicationResponse<ReviewReportRes> reportReview(@PathVariable("review_id") Long reviewId, @Valid @RequestParam("reason") ReportReason reason) {
+        Long userId = getUserId();
+        return ApplicationResponse.ok( reviewService.reportReview(userId, reviewId, reason));
     }
 
     @GetMapping("/view-image/{cycle}")

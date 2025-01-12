@@ -15,12 +15,13 @@ public record TicketRes(
         Long id,
         Long userId,
         String musicalTitle,
-        Long series,
+        String series, // 숫자 -> 문자열 변경
         LocalDate viewedDate,
         String location,
         String seat,
         List<String> actors,
         Boolean hasReview,
-        Float totalRating
+        Float totalRating,
+        String ticketImageUrl
 ) {
 }

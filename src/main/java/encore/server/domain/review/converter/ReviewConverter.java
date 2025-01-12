@@ -67,7 +67,7 @@ public class ReviewConverter {
                 .build();
     }
 
-    private static ReviewData toReviewData(ReviewDataReq req){
+    public static ReviewData toReviewData(ReviewDataReq req){
         return ReviewData.builder()
                 .view(ReviewData.View.builder()
                         .viewLevel(req.view().viewLevel())
