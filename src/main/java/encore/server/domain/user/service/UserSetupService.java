@@ -1,10 +1,19 @@
 package encore.server.domain.user.service;
 
 
+import encore.server.domain.user.dto.request.UserPatchReq;
 import encore.server.domain.user.dto.response.UserNicknameValidationRes;
+import encore.server.domain.user.entity.PreferredKeyword;
+import encore.server.domain.user.entity.TermOfUse;
+import encore.server.domain.user.entity.User;
+import encore.server.domain.user.repository.PreferredKeywordRepository;
+import encore.server.domain.user.repository.TermOfUseRepository;
+import encore.server.domain.user.repository.UserKeywordRepository;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.domain.user.repository.UserTermOfUseRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserSetupService {
 
   private final UserRepository userRepository;
+  private final PreferredKeywordRepository preferredKeywordRepository;
+  private final TermOfUseRepository termOfUseRepository;
+  private final UserTermOfUseRepository userTermOfUseRepository;
+  private final UserKeywordRepository userKeywordRepository;
 
   public UserNicknameValidationRes validateUserNickname(String nickname) {
     // business logic
@@ -41,5 +54,39 @@ public class UserSetupService {
         .isValid(true)
         .build();
   }
+
+  @Transactional
+  public void patchUserInfo(UserPatchReq request, Long userId) {
+
+    User userToUpdate = userRepository.findById(userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+    if (request.nickName() != null) {
+      validateUserNickname(request.nickName());
+      userToUpdate.updateNickname(request.nickName());
+    }
+
+    if (request.profileImageUrl() != null) {
+      userToUpdate.updateProfileImageUrl(request.profileImageUrl());
+    }
+
+    if (request.viewingFrequency() != null) {
+      userToUpdate.updateViewingFrequency(request.viewingFrequency());
+    }
+
+    if (request.preferredKeywordEnums() != null) {
+      List<PreferredKeyword> updateKeywordListManagedToEntityManager = preferredKeywordRepository.findAllByDeletedAtIsNullAndPreferredKeywordEnumIn(request.preferredKeywordEnums());
+      userKeywordRepository.deleteAllByUserAndDeletedAtIsNull(userToUpdate);
+      userToUpdate.addUserPreferredKeywords(updateKeywordListManagedToEntityManager);
+    }
+
+    if (request.agreeTermEnums() != null) {
+      List<TermOfUse> updateTermOfUseListManagedToEntityManager = termOfUseRepository.findAllByDeletedAtIsNullAndTermTypeIn(request.agreeTermEnums());
+      userTermOfUseRepository.deleteAllByUserAndDeletedAtIsNull(userToUpdate);
+      userToUpdate.addUserTermOfUses(updateTermOfUseListManagedToEntityManager);
+    }
+
+  }
+
 
 }
