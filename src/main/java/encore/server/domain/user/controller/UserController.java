@@ -53,7 +53,7 @@ public class UserController {
         return ApplicationResponse.ok(userSetupService.validateUserNickname(nickname));
     }
 
-    @PatchMapping("")
+    @PatchMapping("/me")
     @Operation(summary = "유저 정보 변경", description = "주어진 정보로 현재 로그인한 유저 정보를 변경합니다. 정보를 받은 요소만 변경합니다.")
     public ApplicationResponse<Void> patchUserInfo(@RequestBody @Valid UserPatchReq userPatchReq){
         Long userId = 1L;
