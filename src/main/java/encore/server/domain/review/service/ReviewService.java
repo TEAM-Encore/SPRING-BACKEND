@@ -94,7 +94,7 @@ public class ReviewService {
         Review review = reviewRepository.findReviewDetail(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
-        boolean isUnlocked = Objects.equals(user.getId(), review.getUser().getId()) ||
+        boolean isUnlocked = (user.getId() == review.getUser().getId()) ||
                 userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId);
 
         if (!isUnlocked) {
@@ -297,7 +297,7 @@ public class ReviewService {
         Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
-        if (!Objects.equals(review.getUser().getId(), user.getId())) {
+        if (review.getUser().getId() != user.getId()) {
             throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
         }
 
@@ -306,7 +306,7 @@ public class ReviewService {
         review.updateReview(req, reviewData);
 
 
-        boolean isUnlocked = Objects.equals(user.getId(), review.getUser().getId()) ||
+        boolean isUnlocked =  (user.getId() == review.getUser().getId())  ||
                 userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId);
 
         if (!isUnlocked) {
@@ -333,7 +333,7 @@ public class ReviewService {
         Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
-        if (!Objects.equals(review.getUser().getId(), user.getId())) {
+        if (review.getUser().getId() != user.getId()) {
             throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
         }
 
@@ -350,7 +350,7 @@ public class ReviewService {
         Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
-        if (Objects.equals(review.getUser().getId(), user.getId())) {
+        if (review.getUser().getId()!= user.getId()) {
             throw new ApplicationException(ErrorCode.REVIEW_SELF_REPORT_EXCEPTION);
         }
 
