@@ -3,10 +3,12 @@ package encore.server.domain.user.controller;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserPatchReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
+import encore.server.domain.user.dto.response.UserGetMeRes;
 import encore.server.domain.user.dto.response.UserLoginRes;
 import encore.server.domain.user.dto.response.UserNicknameValidationRes;
 import encore.server.domain.user.dto.response.UserSignupRes;
 import encore.server.domain.user.service.UserAuthService;
+import encore.server.domain.user.service.UserInfoService;
 import encore.server.domain.user.service.UserSetupService;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,8 @@ public class UserController {
 
     private final UserAuthService userAuthService;
     private final UserSetupService userSetupService;
+    private final UserInfoService userInfoService;
+
     // 회원가입
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "주어진 정보로 회원가입을 진행합니다.")
@@ -55,6 +59,12 @@ public class UserController {
         Long userId = 1L;
         userSetupService.patchUserInfo(userPatchReq, userId);
         return ApplicationResponse.ok();
+    }
+
+    @GetMapping("/me")
+    public ApplicationResponse<UserGetMeRes> getMyInfo(){
+        Long userId = 1L;
+        return ApplicationResponse.ok(userInfoService.getMyInfo(userId));
     }
 
 }
