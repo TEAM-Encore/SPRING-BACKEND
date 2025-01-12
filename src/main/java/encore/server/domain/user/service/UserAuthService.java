@@ -7,12 +7,12 @@ import encore.server.domain.user.dto.response.UserLoginRes;
 import encore.server.domain.user.dto.response.UserSignupRes;
 import encore.server.domain.user.entity.TermOfUse;
 import encore.server.domain.user.entity.User;
-import encore.server.domain.user.entity.UserTermOfUse;
 import encore.server.domain.user.repository.TermOfUseRepository;
 import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.util.JwtUtil;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -69,17 +69,16 @@ public class UserAuthService {
         String accessToken = jwtUtil.createToken(findUser.getEmail(), findUser.getRole());
 
         // businessLogic: 필수 이용 약관에 모두 동의하였는지 확인
-        Set<TermOfUse> termsByIsOptionalFalse =
-            termOfUseRepository.findAllByDeletedAtIsNullAndIsOptionalFalse();
+        long numOfTermsByIsOptionalFalse =
+            termOfUseRepository.countAllByDeletedAtIsNullAndIsOptionalFalse();
 
-        long numOfAgreedRequiredTerm =  findUser.getUserTermOfUses().stream()
-            .filter(UserTermOfUse::getIsAgreed)
-            .filter(ut -> termsByIsOptionalFalse.contains(ut.getTerm()))
+        long numOfAgreedRequiredTerm = findUser.getUserTermOfUses().stream()
+            .filter(userTermOfUse -> Objects.isNull(userTermOfUse.getDeletedAt())&&!userTermOfUse.getTermOfUse().getIsOptional())
             .count();
 
         return UserLoginRes.builder()
             .accessToken(accessToken)
-            .isAgreedRequiredTerm(numOfAgreedRequiredTerm == termsByIsOptionalFalse.size())
+            .isAgreedRequiredTerm(numOfAgreedRequiredTerm == numOfTermsByIsOptionalFalse)
             .build();
     }
 
