@@ -1,5 +1,6 @@
 package encore.server.domain.review.entity;
 
+import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
@@ -77,20 +78,26 @@ public class Review extends BaseTimeEntity {
     }
 
     public void setLikeCount(LikeType likeType, Long likeCount) {
-       switch (likeType) {
-           case FOLLOW_UP_RECOMMENDATION:
-               this.followUpLikeCount = likeCount;
-               break;
-           case FULL_OF_TIPS:
-               this.fullOfTipsLikeCount = likeCount;
-               break;
-           case THOROUGH_ANALYSIS:
-               this.thoroughAnalysisLikeCount = likeCount;
-               break;
-       }
+        switch (likeType) {
+            case FOLLOW_UP_RECOMMENDATION:
+                this.followUpLikeCount = likeCount;
+                break;
+            case FULL_OF_TIPS:
+                this.fullOfTipsLikeCount = likeCount;
+                break;
+            case THOROUGH_ANALYSIS:
+                this.thoroughAnalysisLikeCount = likeCount;
+                break;
+        }
     }
 
     public void setTotalLikeCount(Long likeCount) {
         this.likeCount = likeCount;
+    }
+
+
+    public void updateReview(ReviewReq req, ReviewData reviewData) {
+        this.title = req.title();
+        this.reviewData = reviewData;
     }
 }
