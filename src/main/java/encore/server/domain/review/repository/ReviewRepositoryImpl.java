@@ -87,6 +87,20 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .fetch();
     }
 
+    public List<Review> findByReviewAutoCompleteSuggestions(Long userId, String keyword) {
+        return queryFactory
+                .selectFrom(review)
+                .where(review.user.id.eq(userId)
+                        .and(review.deletedAt.isNull())
+                        .and(review.title.containsIgnoreCase(keyword)
+                                .or(review.reviewData.rating.ratingReview.containsIgnoreCase(keyword))
+                                .or(review.reviewData.facility.facilityReview.containsIgnoreCase(keyword))
+                                .or(review.reviewData.sound.soundReview.containsIgnoreCase(keyword))
+                                .or(review.reviewData.view.viewReview.containsIgnoreCase(keyword))))
+                .limit(5)
+                .fetch();
+    }
+
     // 정렬 조건 추가
     private OrderSpecifier<?>[] getSortOrder(Pageable pageable) {
         return pageable.getSort().stream()

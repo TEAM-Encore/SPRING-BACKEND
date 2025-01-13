@@ -53,6 +53,12 @@ public class RedisConfig {
         return createRedisTemplate(SearchLogRedis.class);
     }
 
+    // 연관검색어용 RedisTemplate
+    @Bean
+    public RedisTemplate<String, String> relatedSearchLogRedisTemplate() {
+        return createRedisTemplate(String.class);
+    }
+
     @Bean
     public CacheManager cacheManager() {
         RedisCacheManager.RedisCacheManagerBuilder builder = RedisCacheManager.builder(redisConnectionFactory());

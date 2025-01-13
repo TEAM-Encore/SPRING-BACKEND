@@ -10,6 +10,7 @@ import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
+import encore.server.domain.review.entity.Review;
 import encore.server.domain.term.entity.Term;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static encore.server.domain.hashtag.entity.QPostHashtag.postHashtag;
+import static encore.server.domain.review.entity.QReview.review;
 import static encore.server.domain.term.entity.QTerm.term;
 import static encore.server.domain.post.entity.QPost.post;
 import static encore.server.domain.post.entity.QPostImage.postImage;
@@ -149,4 +151,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         }
         return null;
     }
+
+    public List<Post> findByPostAutoCompleteSuggestions(Long userId, String keyword) {
+        return queryFactory
+                .selectFrom(post)
+                .where(post.user.id.eq(userId)
+                                .and(post.deletedAt.isNull())
+                                .and(post.title.containsIgnoreCase(keyword)
+                                                .or(post.content.containsIgnoreCase(keyword))))
+                .limit(5)
+                .fetch();
+    }
+
 }
