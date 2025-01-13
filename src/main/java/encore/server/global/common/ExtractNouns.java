@@ -1,5 +1,6 @@
 package encore.server.global.common;
 
+import encore.server.domain.post.entity.Post;
 import encore.server.domain.review.entity.Review;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;
@@ -14,7 +15,25 @@ import java.util.*;
 public class ExtractNouns {
     private final Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
 
-    public Set<String> extractNounsStartingWithAnyField(Review review, String keyword) {
+    public Set<String> extractNounsStartingWithPostField(Post post, String keyword) {
+        Set<String> words = new HashSet<>();
+
+        // 필드 리스트를 배열로 선언
+        String[] fields = {
+                post.getTitle(),  // 제목 필드
+                post.getContent() // 내용 필드
+        };
+
+        // Stream API를 사용하여 키워드와 시작하는 명사를 추출
+        Arrays.stream(fields)
+                .filter(field -> field != null && field.contains(keyword))
+                .forEach(field -> words.addAll(extractNounsStartingWith(field, keyword)));  // 명사 추가
+
+        return words;
+    }
+
+
+    public Set<String> extractNounsStartingWithReviewField(Review review, String keyword) {
         Set<String> words = new HashSet<>();
 
         // 필드 리스트를 배열로 선언
