@@ -74,9 +74,9 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd encore/
-            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            sudo docker-compose stop ${{ secrets.DOCKER_SERVICE_NAME }}
-            sudo docker-compose rm -f ${{ secrets.DOCKER_SERVICE_NAME }}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY}}
-            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY}} ${{ secrets.DOCKER_IMAGE_NAME }}
-            sudo docker compose up -d
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            docker-compose stop ${{ secrets.DOCKER_SERVICE_NAME }}
+            docker-compose rm -f ${{ secrets.DOCKER_SERVICE_NAME }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY}}
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY}} ${{ secrets.DOCKER_IMAGE_NAME }}
+            docker compose up -d
