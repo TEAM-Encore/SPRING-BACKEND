@@ -3,6 +3,7 @@ package encore.server.domain.post.repository;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
+import encore.server.domain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -42,4 +43,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
 
     Optional<Post> findByIdAndDeletedAtIsNull(Long id);
+
+    int countByUserAndDeletedAtIsNull(User user);
 }
