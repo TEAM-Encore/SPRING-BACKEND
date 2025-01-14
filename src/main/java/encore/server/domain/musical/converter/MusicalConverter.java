@@ -16,6 +16,7 @@ public class MusicalConverter {
                 .series(musical.getSeries())
                 .location(musical.getLocation())
                 .showTimes(musical.getShowTimes())
+                .imageUrl(musical.getImageUrl())
                 .build();
     }
 
