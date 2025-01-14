@@ -1,7 +1,7 @@
-name: Encore CI/CD
+name: Encore CD
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
