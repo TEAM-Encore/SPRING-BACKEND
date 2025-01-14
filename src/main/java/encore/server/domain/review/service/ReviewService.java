@@ -350,7 +350,7 @@ public class ReviewService {
         Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
-        if (review.getUser().getId()!= user.getId()) {
+        if (review.getUser().getId() != user.getId()) {
             throw new ApplicationException(ErrorCode.REVIEW_SELF_REPORT_EXCEPTION);
         }
 

@@ -7,6 +7,7 @@ import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
+import encore.server.domain.ticket.dto.response.TicketSimpleRes;
 import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
@@ -70,6 +71,15 @@ public class TicketController {
 
         return ApplicationResponse.ok();
     }
+
+    @Operation(summary = "뮤지컬 제목으로 티켓북 검색", description = "뮤지컬 제목을 통해 티켓북 목록을 검색합니다.")
+    @GetMapping("/search")
+    public ApplicationResponse<List<TicketSimpleRes>> getTicketsByMusicalTitle(@RequestParam String title) {
+        List<TicketSimpleRes> ticketList = ticketService.getTicketsByMusicalTitle(title);
+        return ApplicationResponse.ok(ticketList);
+    }
+
+
 
     private Long getUserId() {
         return 1L; // Mock user ID

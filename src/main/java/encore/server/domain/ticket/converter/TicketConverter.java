@@ -4,6 +4,7 @@ import encore.server.domain.review.entity.Review;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
+import encore.server.domain.ticket.dto.response.TicketSimpleRes;
 import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
@@ -82,4 +83,21 @@ public class TicketConverter {
                 .ticketImageUrl(ticket.getTicketImageUrl())
                 .build();
     }
+
+    public static TicketSimpleRes toTicketSimpleRes(Ticket ticket) {
+        return TicketSimpleRes.builder()
+                .id(ticket.getId())
+                .userId(ticket.getUser().getId())
+                .musicalTitle(ticket.getMusical().getTitle())
+                .series(convertSeriesToText(ticket.getMusical().getSeries())) // 숫자 -> 문자열 변환
+                .viewedDate(ticket.getViewedDate())
+                .location(ticket.getMusical().getLocation())
+                .seat(ticket.getSeat())
+                .actors(ticket.getActors().stream()
+                        .map(Actor::getName)
+                        .collect(Collectors.toList())) // 배우 이름 리스트로 변환
+                .ticketImageUrl(ticket.getTicketImageUrl())
+                .build();
+    }
+
 }

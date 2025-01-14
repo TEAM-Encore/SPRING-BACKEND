@@ -1,7 +1,7 @@
-package encore.server.domain.review.service;
+package encore.server.domain.post.service;
 
-import encore.server.domain.review.entity.Review;
-import encore.server.domain.review.repository.ReviewRepository;
+import encore.server.domain.post.entity.Post;
+import encore.server.domain.post.repository.PostRepository;
 import encore.server.global.common.ExtractNouns;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,19 +11,21 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ReviewRelatedSearchService {
+public class PostRelatedSearchService {
 
     @Autowired
     @Qualifier("relatedSearchLogRedisTemplate")
     private RedisTemplate<String, String> redisTemplate;
-    private final ReviewRepository reviewRepository;
+    private final PostRepository postRepository;
     private final ExtractNouns extractNouns;
 
     /**
@@ -83,11 +85,11 @@ public class ReviewRelatedSearchService {
         if (redisSuggestions != null && !redisSuggestions.isEmpty()) {
             finalResults.addAll(redisSuggestions);
         } else {
-            List<Review> reviews = reviewRepository.findByReviewAutoCompleteSuggestions(userId, keyword);
+            List<Post> posts = postRepository.findByPostAutoCompleteSuggestions(userId, keyword);
 
-            for (Review review : reviews) {
-                Set<String> extractedWords = extractNouns.extractNounsStartingWithReviewField(
-                        review, keyword
+            for (Post post : posts) {
+                Set<String> extractedWords = extractNouns.extractNounsStartingWithPostField(
+                        post, keyword
                 );
                 finalResults.addAll(extractedWords);
 
@@ -105,12 +107,12 @@ public class ReviewRelatedSearchService {
      *
      * @param userId 사용자 ID
      */
-    public void updateAllSuggestions(Long userId, Review review) {
+    public void updateAllSuggestions(Long userId, Post post) {
         Set<String> keys = redisTemplate.keys(userId + "_*");
 
         for (String key : keys) {
-            Set<String> extractedWords = extractNouns.extractNounsStartingWithReviewField(
-                    review, key.split("_")[1]
+            Set<String> extractedWords = extractNouns.extractNounsStartingWithPostField(
+                    post, key.split("_")[1]
             );
             for (String word : extractedWords) {
                 updateSuggestions(userId, key.split("_")[1], word);
