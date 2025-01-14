@@ -14,6 +14,7 @@ public record MusicalRes(
         String title,
         Long series,
         String location,
-        List<String> showTimes
+        List<String> showTimes,
+        String imageUrl
 ) {
 }

@@ -6,6 +6,7 @@ import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import encore.server.global.util.redis.SearchLogRedis;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,11 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ReviewSearchService {
+public class ReviewRecentSearchService {
 
     private final UserRepository userRepository;
+
+    @Qualifier("searchLogRedisTemplate")
     private final RedisTemplate<String, SearchLogRedis> redisTemplate;
 
     @Value("${redis.recent-keyword-size}")

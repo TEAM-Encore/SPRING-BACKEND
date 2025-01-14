@@ -39,7 +39,8 @@ public class ReviewService {
     private final UserReviewRepository userReviewRepository;
     private final ReviewViewService reviewViewService;
     private final ReviewLikeRepository reviewLikeRepository;
-    private final ReviewSearchService reviewSearchService;
+    private final ReviewRecentSearchService reviewRecentSearchService;
+    private final ReviewRelatedSearchService reviewRelatedSearchService;
     private final ReviewReportRepository reviewReportRepository;
 
     @Transactional
@@ -59,6 +60,7 @@ public class ReviewService {
         // business logic: create review
         Review review = ReviewConverter.toEntity(ticket, user, req);
         reviewRepository.save(review);
+        reviewRelatedSearchService.updateAllSuggestions(userId, review);
 
         // 작성자에게 포인트 제공
         user.addPoint(50L);
@@ -208,11 +210,11 @@ public class ReviewService {
         if (minutesAgo < 1) {
             return "방금 전";
         } else if (minutesAgo < 60) {
-            return minutesAgo + "분 전";
+            return String.format("%d분 전", minutesAgo);
         } else if (minutesAgo < 1440) {
-            return minutesAgo / 60 + "시간 전";
+            return String.format("%d시간 전", minutesAgo / 60);
         } else {
-            return minutesAgo / 1440 + "일 전";
+            return String.format("%d일 전", minutesAgo / 1440);
         }
     }
 
@@ -241,7 +243,7 @@ public class ReviewService {
 
         // business logic: get review list
         //0. 검색어 로그에 저장
-        reviewSearchService.saveRecentSearchLog(searchKeyword, userId);
+        reviewRecentSearchService.saveRecentSearchLog(searchKeyword, userId);
 
         //1. cursor 기반으로 리뷰 리스트 조회
         List<Review> reviews = reviewRepository.findReviewListByCursor(searchKeyword, cursor, tag, pageable);
