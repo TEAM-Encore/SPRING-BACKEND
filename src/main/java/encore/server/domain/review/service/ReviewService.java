@@ -306,7 +306,7 @@ public class ReviewService {
         review.updateReview(req, reviewData);
 
 
-        boolean isUnlocked = (user.getId() == review.getUser().getId())||
+        boolean isUnlocked =  (user.getId() == review.getUser().getId())  ||
                 userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId);
 
         if (!isUnlocked) {

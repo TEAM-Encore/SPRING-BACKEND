@@ -28,7 +28,6 @@ public class UserAuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final UserConverter userConverter;
     private final JwtUtil jwtUtil;
     private final TermOfUseRepository termOfUseRepository;
     private final Random random = new Random();
@@ -46,7 +45,7 @@ public class UserAuthService {
 
         // businessLogic: 요청값, 인코딩된 비밀번호, 랜덤 생성된 겹치지 않는 닉네임을 통해 User Entity를 만들고 저장함.
         String email = userRepository.save(
-            userConverter.toEntity(userSignupReq, encodedPassword, getUniqueNickName())).getEmail();
+            UserConverter.toEntity(userSignupReq, encodedPassword, getUniqueNickName())).getEmail();
 
         // return: 유저 email 반환
         return UserSignupRes.builder()
