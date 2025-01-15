@@ -4,6 +4,7 @@ import encore.server.domain.user.dto.request.UserSignupReq;
 import encore.server.domain.user.dto.response.UserGetMeRes;
 import encore.server.domain.user.entity.User;
 import java.util.List;
+import java.util.Objects;
 
 public class UserConverter {
 
@@ -23,13 +24,19 @@ public class UserConverter {
   }
 
   public static UserGetMeRes toUserGetMeRes(User user, List<String> userPreferredKeywords, int numOfWritePost) {
+
+    String viewingFrequency = "";
+    if (!Objects.isNull(user.getViewingFrequency())) {
+      viewingFrequency = user.getViewingFrequency().getText();
+    }
+
     return UserGetMeRes.builder()
         .point(user.getPoint())
         .nickname(user.getNickName())
         .numOfSubscriber(0)
         .numOfWritePost(numOfWritePost)
         .preferredKeywords(userPreferredKeywords)
-        .viewingFrequency(user.getViewingFrequency().getText())
+        .viewingFrequency(viewingFrequency)
         .email(user.getEmail())
         .build();
   }
