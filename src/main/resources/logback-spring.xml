@@ -1,34 +1,24 @@
 <configuration>
 
-  <!-- 콘솔에 로그 출력 -->
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <!-- 콘솔 로그 출력 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <!-- 로키에 push -->
-  <appender name="LOKI" class="io.prometheus.client.logback.LokiAppender">
-    <url>http://host.docker.internal:20045/loki/api/v1/push</url>
-    <labels>
-      <label key="job" value="springboot-application"/>
-    </labels>
-    <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
-    </encoder>
-  </appender>
-  <!-- 로그 파일에 출력
+  <!-- 파일 로그 출력 -->
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>/home/ita/encore/logs/backend/encore.log</file>
+    <file>/var/log/application.log</file>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-  쓰기 권한이 없어 사용 불가-->
+
   <!-- 루트 로거 설정 -->
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
-    <appender-ref ref="FILE" />
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
   </root>
 
 </configuration>
