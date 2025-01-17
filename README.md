@@ -118,12 +118,19 @@
 ![API 명세서 노션 페이지](https://www.notion.so/its-time/API-fffc706af83d81c3b3aee801b61ba002?pvs=4)
 
 ## 📅 ERD
-![image](https://github.com/user-attachments/assets/823a3fe1-f173-4331-8cf1-89726e2dcb61)
+![image](https://github.com/user-attachments/assets/823a3fe1-f173-4331-8cf1-897c26e2dcb61)
 - User:
   - 이용약관(TermOfUse) 테이블을 따로 두어 버전관리와 약관 변경에 용의하도록 설계
   - 선호키워드(PrefferredKeyword) 테이블을 따로 두어 이후 확장성(최대 선택 키워드 갯수 증가 혹은 내용 변경 등)에 용의하도록 설계.
 - Post:
   - 해시태그 테이블을 분리하여 게시글당 해시태그의 관리를 용의하게 설계하였으며, 해시태그를 통한 게시글 검색에 용의하도록 설계.
+- Musical:
+  - 배우(Actor) 테이블을 이용하여 전체 배우를 관리하도록 설계
+  - 뮤지컬 배우(MusicalActor) 테이블을 따로 두어 배우 관리에 용이하도록 설계.
+- Ticket:
+  - 티켓북 배우(TicketActors) 테이블을 따로 두어 회차마다 배우가 다른 특징을 구현할 수 있도록 설계.
+  - Musical id를 이용하여 해당 뮤지컬에 대한 티켓북 생성에 용이하도록 설계.
+  - 
 ## 💁 GitHub Issue, Pull Request 를 통한 협업 이용
 #### Issue
 
