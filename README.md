@@ -141,6 +141,8 @@
 - Ticket:
   - 티켓북 배우(TicketActors) 테이블을 따로 두어 회차마다 배우가 다른 특징을 구현할 수 있도록 설계.
   - Musical id를 이용하여 해당 뮤지컬에 대한 티켓북 생성에 용이하도록 설계.
+- Review:
+  - 사용자 리뷰(UserReview) 테이블을 따로 두어서 포인트를 사용하여 열람한 리뷰를 관리할 수 있도록 설계.
 
 ## 💁 GitHub Issue, Pull Request, Slack을 통한 협업 이용
 #### Issue
