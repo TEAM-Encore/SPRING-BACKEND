@@ -129,7 +129,7 @@
 ![API 명세서 노션 페이지](https://www.notion.so/its-time/API-fffc706af83d81c3b3aee801b61ba002?pvs=4)
 
 ## 📅 ERD
-![image](https://github.com/user-attachments/assets/823a3fe1-f173-4331-8cf1-897c26e2dcb61)
+![image](https://github.com/user-attachments/assets/3458ce74-af3f-4b5e-8bf6-121499a8b46b)
 - User:
   - 이용약관(TermOfUse) 테이블을 따로 두어 버전관리와 약관 변경에 용의하도록 설계
   - 선호키워드(PrefferredKeyword) 테이블을 따로 두어 이후 확장성(최대 선택 키워드 갯수 증가 혹은 내용 변경 등)에 용의하도록 설계.
