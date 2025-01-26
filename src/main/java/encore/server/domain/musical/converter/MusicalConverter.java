@@ -15,7 +15,9 @@ public class MusicalConverter {
                 .title(musical.getTitle())
                 .series(musical.getSeries())
                 .location(musical.getLocation())
-                .showTimes(musical.getShowTimes())
+                .showTimes(musical.getShowTimes().stream()
+                        .map(showTime -> showTime.getDay() + " " + showTime.getTime())
+                        .collect(Collectors.toList()))
                 .build();
     }
 

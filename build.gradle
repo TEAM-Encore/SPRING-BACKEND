@@ -68,6 +68,11 @@ dependencies {
 
     // Komoran
     implementation 'com.github.shin285:KOMORAN:3.3.9'
+
+    // Jsoup
+    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.0.0'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.0.3'
 }
 
 tasks.named('test') {
