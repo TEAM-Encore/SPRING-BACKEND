@@ -18,6 +18,7 @@ public class MusicalConverter {
                 .showTimes(musical.getShowTimes().stream()
                         .map(showTime -> showTime.getDay() + " " + showTime.getTime())
                         .collect(Collectors.toList()))
+                .imageUrl(musical.getImageUrl())
                 .build();
     }
 

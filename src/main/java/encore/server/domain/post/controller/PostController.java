@@ -8,6 +8,7 @@ import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.service.PostLikeService;
+import encore.server.domain.post.service.PostRelatedSearchService;
 import encore.server.domain.post.service.PostService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.BadRequestException;
@@ -36,6 +37,7 @@ public class PostController {
 
     private final PostService postService;
     private final PostLikeService postLikeService;
+    private final PostRelatedSearchService postSearchService;
 
     @PostMapping("/likes")
     @Operation(summary = "게시글 좋아요 API", description = "게시글 좋아요를 누릅니다.")
@@ -145,6 +147,14 @@ public class PostController {
                                                                                 @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
         return ApplicationResponse.ok(postService.getPostPaginationByHashtag(cursor, hashtag, pageable, mockUserIdProvide()));
     }
+
+    @GetMapping("/search-suggestions")
+    @Operation(summary = "게시판 검색어 자동완성", description = "게시판 검색어 자동완성을 제공합니다.")
+    public ApplicationResponse<List<String>> getSearchSuggestions(@RequestParam("keyword") String keyword) {
+        Long userId = mockUserIdProvide();
+        return ApplicationResponse.ok(postSearchService.getAutoCompleteSuggestions(userId, keyword));
+    }
+
 
 
     public Long mockUserIdProvide(){

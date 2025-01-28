@@ -69,6 +69,12 @@ dependencies {
     // Komoran
     implementation 'com.github.shin285:KOMORAN:3.3.9'
 
+    // Monitoring
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
     // Jsoup
     implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'org.seleniumhq.selenium:selenium-java:4.0.0'
