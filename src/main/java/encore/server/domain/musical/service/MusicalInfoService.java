@@ -153,12 +153,12 @@ public class MusicalInfoService {
 
                 String actorPhotoUrl = item.findElement(By.xpath(".//div[@class='castingTop']//img[@class='castingImage']")).getAttribute("src");
 
-                Actor actor = Actor.builder()
-                        .name(actorName)
-                        .actorImageUrl(actorPhotoUrl)
-                        .musicalActors(new ArrayList<>())
-                        .build();
-
+                Actor actor = actorRepository.findByActorImageUrl(actorPhotoUrl).orElse(
+                        Actor.builder()
+                            .name(actorName)
+                            .actorImageUrl(actorPhotoUrl)
+                            .musicalActors(new ArrayList<>())
+                            .build());
                 actorRepository.save(actor);
 
                 MusicalActor musicalActor = MusicalActor.builder()
