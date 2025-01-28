@@ -1,4 +1,4 @@
-package encore.server.global.util.jsoup;
+package encore.server.domain.musical.service;
 
 import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.global.config.JsoupConfig;
@@ -17,18 +17,19 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GetMusicals {
+public class MusicalListService {
     private final MusicalRepository musicalRepository;
     private final JsoupConfig jsoupConfig;
+    private final MusicalInfoService musicalInfoService;
 
     @Value("${jsoup.goods.list-url}")
     private String url;
 
     /**
-     * Interpark 뮤지컬 페이지에서 뮤지컬 ID(GroupCode)를 추출하는 메서드
+     * Interpark 뮤지컬 페이지에서 뮤지컬 ID(GroupCode)를 추출하여 저장하는 메서드
      * @return List<String> musicalIds (저장할 뮤지컬 ID 목록)
      */
-    public List<String> getMusicalIds() {
+    public List<String> crawlingMusicalInfo() {
         List<String> musicalIds = new ArrayList<>();
         try {
             // 1. Jsoup 연결 및 Document 가져오기
@@ -50,6 +51,7 @@ public class GetMusicals {
                     if (groupId != null) {
                         musicalIds.add(groupId);
                         log.info("GroupCode: " + groupId);
+                        musicalInfoService.fetchMusicalDetails(groupId); // 뮤지컬 상세 정보 가져오기
                     }
                 }
             }

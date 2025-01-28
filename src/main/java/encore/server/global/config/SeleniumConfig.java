@@ -1,5 +1,6 @@
 package encore.server.global.config;
 
+import jakarta.annotation.PostConstruct;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -11,13 +12,15 @@ import org.springframework.context.annotation.Configuration;
 public class SeleniumConfig {
 
     private WebDriver driver;
+
     @Value("${selenium.chrome-driver-path}")
     private String chromeDriverPath;
 
     /**
      * Selenium WebDriver 초기화
      */
-    public SeleniumConfig() {
+    @PostConstruct
+    public void initDriver() {
         try {
             // WebDriver 설정
             System.setProperty("webdriver.chrome.driver", chromeDriverPath);
@@ -25,7 +28,7 @@ public class SeleniumConfig {
             options.addArguments("--headless"); // 브라우저 창 없이 실행
             options.addArguments("--disable-gpu");
             options.addArguments("--no-sandbox");
-            options.addArguments("--disable-popup-blocking");       //팝업안띄움
+            options.addArguments("--disable-popup-blocking"); // 팝업 안 띄움
 
             this.driver = new ChromeDriver(options);
         } catch (Exception e) {
@@ -37,7 +40,9 @@ public class SeleniumConfig {
 
     @Bean
     public WebDriver getDriver() {
-        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        if (driver == null) {
+            throw new IllegalStateException("WebDriver is not initialized. Please check the Selenium configuration.");
+        }
         return driver;
     }
 

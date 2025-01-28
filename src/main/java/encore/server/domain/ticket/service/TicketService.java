@@ -55,7 +55,6 @@ public class TicketService {
         //actordto->actor
         List<Actor> actors = request.actors().stream()
                 .map(actorDTO -> Actor.builder()
-                        .id(actorDTO.id())
                         .name(actorDTO.name())
                         .actorImageUrl(actorDTO.actorImageUrl())
                         .build())
@@ -142,7 +141,6 @@ public class TicketService {
         if (request.actors() != null) {
             List<Actor> actors = request.actors().stream()
                     .map(actorDTO -> Actor.builder()
-                            .id(actorDTO.id())
                             .name(actorDTO.name())
                             .actorImageUrl(actorDTO.actorImageUrl())
                             .build())

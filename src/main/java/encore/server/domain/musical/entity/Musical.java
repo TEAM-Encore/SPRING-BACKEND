@@ -39,8 +39,8 @@ public class Musical extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "bigint")
     private Long runningTime;
 
-    @Column(nullable = false, columnDefinition = "bigint")
-    private Long age;
+    @Column(nullable = false, columnDefinition = "varchar(255)")
+    private String age;
 
     @Column(nullable = false, columnDefinition = "bigint")
     private Long series;
@@ -61,7 +61,7 @@ public class Musical extends BaseTimeEntity {
     private String interparkId;
 
     @Builder
-    public Musical(String title, LocalDateTime startDate, LocalDateTime endDate, String location, Long runningTime, Long age, Long series, String imageUrl, List<ShowTime> showTimes, List<MusicalActor> musicalActors, boolean isFeatured, String interparkId) {
+    public Musical(String title, LocalDateTime startDate, LocalDateTime endDate, String location, Long runningTime, String age, Long series, String imageUrl, List<ShowTime> showTimes, List<MusicalActor> musicalActors, boolean isFeatured, String interparkId) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -76,6 +76,9 @@ public class Musical extends BaseTimeEntity {
         this.interparkId = interparkId;
     }
 
+    public void addMusicalActors(MusicalActor musicalActor) {
+        this.musicalActors.add(musicalActor);
+    }
     public void addShowTime(ShowTime showTime) {
         this.showTimes.add(showTime);
     }
