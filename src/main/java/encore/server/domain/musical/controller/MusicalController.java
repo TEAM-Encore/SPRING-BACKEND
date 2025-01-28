@@ -4,14 +4,12 @@ import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
 import encore.server.domain.musical.dto.response.MusicalSeriesRes;
 import encore.server.domain.musical.dto.response.MusicalSimpleRes;
-import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.service.MusicalService;
-import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.global.common.ApplicationResponse;
+import encore.server.domain.musical.service.MusicalListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +21,7 @@ import java.util.List;
 @Tag(name = "Musical", description = "뮤지컬 API")
 public class MusicalController {
     private final MusicalService musicalService;
+    private final MusicalListService musicalListService;
 
     @Operation(summary = "뮤지컬 검색", description = "뮤지컬을 키워드로 검색합니다.")
     @GetMapping("/search")
@@ -58,6 +57,12 @@ public class MusicalController {
         return ApplicationResponse.ok(responses);
     }
 
-
+    // Todo: prod환경 테스트 후 스케줄링 할 예정
+    @Operation(summary = "뮤지컬 정보 크롤링 및 저장", description = "Interpark 뮤지컬 페이지에서 뮤지컬 정보를 크롤링하여 저장합니다.")
+    @GetMapping("/crawling")
+    public ApplicationResponse<String> crawlingMusicalInfo() {
+        musicalListService.crawlingMusicalInfo();
+        return ApplicationResponse.ok("크롤링 완료");
+    }
 }
 
