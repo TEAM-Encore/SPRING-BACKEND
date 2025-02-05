@@ -70,8 +70,8 @@ public class Musical extends BaseTimeEntity {
         this.age = age;
         this.series = series != null ? series : 1L;
         this.imageUrl = imageUrl;
-        this.showTimes = showTimes;
-        this.musicalActors = musicalActors;
+        this.showTimes = showTimes != null ? showTimes : new ArrayList<>();
+        this.musicalActors = musicalActors != null ? musicalActors : new ArrayList<>();
         this.isFeatured = isFeatured;
         this.interparkId = interparkId;
     }
