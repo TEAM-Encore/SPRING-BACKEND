@@ -4,6 +4,7 @@ package encore.server.domain.musical.entity;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -38,8 +39,8 @@ public class Musical extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "bigint")
     private Long runningTime;
 
-    @Column(nullable = false, columnDefinition = "bigint")
-    private Long age;
+    @Column(nullable = false, columnDefinition = "varchar(255)")
+    private String age;
 
     @Column(nullable = false, columnDefinition = "bigint")
     private Long series;
@@ -47,15 +48,60 @@ public class Musical extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String imageUrl;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "musical_show_times", joinColumns = @JoinColumn(name = "musical_id"))
-    @Column(name = "show_time")
-    private List<String> showTimes = new ArrayList<>();
+    @OneToMany(mappedBy = "musical", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShowTime> showTimes = new ArrayList<>();
 
     @OneToMany(mappedBy = "musical", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MusicalActor> musicalActors = new ArrayList<>();
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isFeatured; // 이달의 인기 뮤지컬 여부
+
+    @Column(columnDefinition = "varchar(255)")
+    private String interparkId;
+
+    @Builder
+    public Musical(String title, LocalDateTime startDate, LocalDateTime endDate, String location, Long runningTime, String age, Long series, String imageUrl, List<ShowTime> showTimes, List<MusicalActor> musicalActors, boolean isFeatured, String interparkId) {
+        this.title = title;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.location = location;
+        this.runningTime = runningTime;
+        this.age = age;
+        this.series = series != null ? series : 1L;
+        this.imageUrl = imageUrl;
+        this.showTimes = showTimes != null ? showTimes : new ArrayList<>();
+        this.musicalActors = musicalActors != null ? musicalActors : new ArrayList<>();
+        this.isFeatured = isFeatured;
+        this.interparkId = interparkId;
+    }
+
+    public void addMusicalActors(MusicalActor musicalActor) {
+        this.musicalActors.add(musicalActor);
+    }
+    public void addShowTime(ShowTime showTime) {
+        this.showTimes.add(showTime);
+    }
+    public void updateTitle(String title) { this.title = title;}
+
+    public void updateSeries(Long series) { this.series = series;}
+
+    public void updateLocation(String location) { this.location = location;}
+
+    public void updateStartDate(LocalDateTime startDate) { this.startDate = startDate;}
+
+    public void updateEndDate(LocalDateTime endDate) { this.endDate = endDate;}
+
+    public void updateRunningTime(Long runningTime) { this.runningTime = runningTime;}
+
+    public void updateAge(String age) { this.age = age;}
+
+    public void updateImageUrl(String imageUrl) { this.imageUrl = imageUrl;}
+
+    public void updateIsFeatured(boolean isFeatured) { this.isFeatured = isFeatured;}
+
+    public void clearMusicalActors() { this.musicalActors.clear();}
+
+    public void clearShowTimes() { this.showTimes.clear();}
 
 }
