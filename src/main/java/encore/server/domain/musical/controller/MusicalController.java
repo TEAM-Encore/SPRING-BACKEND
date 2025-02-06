@@ -74,5 +74,21 @@ public class MusicalController {
         return ApplicationResponse.ok(response);
     }
 
+    @Operation(summary = "뮤지컬 수정", description = "입력된 필드만 수정합니다.")
+    @PatchMapping("/{musical_id}")
+    public ApplicationResponse<MusicalDetailRes> updateMusical(
+            @PathVariable("musical_id") Long musicalId,
+            @RequestBody MusicalCreateReq request) {
+        MusicalDetailRes response = musicalService.updateMusical(musicalId, request);
+        return ApplicationResponse.ok(response);
+    }
+
+    @Operation(summary = "뮤지컬 삭제", description = "뮤지컬을 삭제합니다.")
+    @DeleteMapping("/{musical_id}")
+    public ApplicationResponse<Void> deleteMusical(@PathVariable("musical_id") Long musicalId) {
+        musicalService.deleteMusical(musicalId);
+        return ApplicationResponse.ok();
+    }
+
 }
 

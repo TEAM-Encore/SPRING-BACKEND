@@ -118,7 +118,7 @@ public class MusicalService {
         List<MusicalActor> musicalActors = request.actors().stream()
                 .map(actorReq -> {
                     Actor actor = actorRepository.findById(actorReq.actorId())
-                            .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+                            .orElseThrow(() -> new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION));
                     return new MusicalActor(musical, actor, actorReq.roleName(), actorReq.isMainActor());
                 }).collect(Collectors.toList());
 
@@ -140,6 +140,59 @@ public class MusicalService {
 
         // return: 뮤지컬 상세 응답 반환
         return MusicalConverter.toMusicalDetailRes(musical);
+    }
+
+    @Transactional
+    public MusicalDetailRes updateMusical(Long musicalId, MusicalCreateReq request) {
+        // validation: 뮤지컬 존재 여부 확인
+        Musical musical = musicalRepository.findByIdAndDeletedAtIsNull(musicalId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
+
+        // business logic
+        // 전달된 값만 업데이트
+        if (request.title() != null) musical.updateTitle(request.title());
+        if (request.series() != null) musical.updateSeries(request.series());
+        if (request.location() != null) musical.updateLocation(request.location());
+        if (request.startDate() != null) musical.updateStartDate(request.startDate());
+        if (request.endDate() != null) musical.updateEndDate(request.endDate());
+        if (request.runningTime() != null) musical.updateRunningTime(request.runningTime());
+        if (request.age() != null) musical.updateAge(request.age());
+        if (request.imageUrl() != null) musical.updateImageUrl(request.imageUrl());
+        musical.updateIsFeatured(request.isFeatured());
+
+        // 배우 정보 업데이트
+        if (request.actors() != null) {
+            musical.clearMusicalActors(); // 기존 배우 목록 삭제
+            List<MusicalActor> updatedActors = request.actors().stream()
+                    .map(actorReq -> {
+                        Actor actor = actorRepository.findById(actorReq.actorId())
+                                .orElseThrow(() -> new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION));
+                        return new MusicalActor(musical, actor, actorReq.roleName(), actorReq.isMainActor());
+                    }).collect(Collectors.toList());
+            updatedActors.forEach(musical::addMusicalActors);
+        }
+
+        // 공연 시간 업데이트
+        if (request.showTimes() != null) {
+            musical.clearShowTimes(); // 기존 공연 시간 삭제
+            List<ShowTime> updatedShowTimes = request.showTimes().stream()
+                    .map(showTimeReq -> new ShowTime(musical, showTimeReq.day(), showTimeReq.time()))
+                    .collect(Collectors.toList());
+            updatedShowTimes.forEach(musical::addShowTime);
+        }
+
+        // return: 뮤지컬 상세 응답 반환
+        return MusicalConverter.toMusicalDetailRes(musical);
+    }
+
+    @Transactional
+    public void deleteMusical(Long musicalId) {
+        // validation: 뮤지컬 존재 여부 확인
+        Musical musical = musicalRepository.findByIdAndDeletedAtIsNull(musicalId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
+
+        // business logic : 뮤지컬 soft delete
+        musicalRepository.delete(musical);
     }
 
 }
