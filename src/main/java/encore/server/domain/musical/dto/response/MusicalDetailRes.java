@@ -17,7 +17,7 @@ public record MusicalDetailRes(
         LocalDateTime endDate,
         String location,
         Long runningTime,
-        Long age,
+        String age,
         Long series,
         String imageUrl,
         List<MusicalActorRes> actors
