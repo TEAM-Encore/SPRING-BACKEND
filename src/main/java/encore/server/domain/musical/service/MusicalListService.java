@@ -57,7 +57,7 @@ public class MusicalListService {
             }
             log.info(("총 " + musicalIds.size() + "개의 뮤지컬 ID 추출 완료"));
         } catch (Exception e) {
-            e.printStackTrace();
+            e.getStackTrace();
         }
         return musicalIds;
     }
