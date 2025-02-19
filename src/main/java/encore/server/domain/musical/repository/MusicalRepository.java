@@ -18,4 +18,5 @@ public interface MusicalRepository extends JpaRepository<Musical, Long> {
     List<Musical> findUpcomingMusicals(LocalDateTime now);
 
     boolean existsByInterparkId(String interparkId);
+    boolean existsByTitleAndSeries(String title, Long series);
 }

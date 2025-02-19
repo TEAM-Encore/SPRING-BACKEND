@@ -70,8 +70,8 @@ public class Musical extends BaseTimeEntity {
         this.age = age;
         this.series = series != null ? series : 1L;
         this.imageUrl = imageUrl;
-        this.showTimes = showTimes;
-        this.musicalActors = musicalActors;
+        this.showTimes = showTimes != null ? showTimes : new ArrayList<>();
+        this.musicalActors = musicalActors != null ? musicalActors : new ArrayList<>();
         this.isFeatured = isFeatured;
         this.interparkId = interparkId;
     }
@@ -82,4 +82,26 @@ public class Musical extends BaseTimeEntity {
     public void addShowTime(ShowTime showTime) {
         this.showTimes.add(showTime);
     }
+    public void updateTitle(String title) { this.title = title;}
+
+    public void updateSeries(Long series) { this.series = series;}
+
+    public void updateLocation(String location) { this.location = location;}
+
+    public void updateStartDate(LocalDateTime startDate) { this.startDate = startDate;}
+
+    public void updateEndDate(LocalDateTime endDate) { this.endDate = endDate;}
+
+    public void updateRunningTime(Long runningTime) { this.runningTime = runningTime;}
+
+    public void updateAge(String age) { this.age = age;}
+
+    public void updateImageUrl(String imageUrl) { this.imageUrl = imageUrl;}
+
+    public void updateIsFeatured(boolean isFeatured) { this.isFeatured = isFeatured;}
+
+    public void clearMusicalActors() { this.musicalActors.clear();}
+
+    public void clearShowTimes() { this.showTimes.clear();}
+
 }

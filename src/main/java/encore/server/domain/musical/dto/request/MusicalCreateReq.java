@@ -1,5 +1,4 @@
-package encore.server.domain.musical.dto.response;
-
+package encore.server.domain.musical.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -11,33 +10,32 @@ import java.util.List;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record MusicalDetailRes(
-        Long id,
+public record MusicalCreateReq(
         String title,
+        Long series,
+        String location,
         LocalDateTime startDate,
         LocalDateTime endDate,
-        String location,
         Long runningTime,
         String age,
-        Long series,
         String imageUrl,
         boolean isFeatured,
-        List<MusicalActorRes> actors,
-        List<ShowTimeRes> showTimes
+        List<ActorRequest> actors,
+        List<ShowTimeRequest> showTimes
 ) {
     @Builder
-    public record MusicalActorRes(
-            String actorName,
-            String actorImageUrl,
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public record ActorRequest(
+            Long actorId,
             String roleName,
             boolean isMainActor
     ) {
     }
     @Builder
-    public record ShowTimeRes(
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public record ShowTimeRequest(
             Day day,
             String time
     ) {
     }
 }
-

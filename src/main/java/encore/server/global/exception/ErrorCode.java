@@ -66,7 +66,10 @@ public enum ErrorCode {
     MUSICAL_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 10000, "존재하지 않는 뮤지컬입니다."),
 
     // 11000: Ticket Error
-    TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다.");
+    TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다."),
+
+    // 12000: Actor Error
+    ACTOR_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 12000, "존재하지 않는 배우입니다.");
 
     private final HttpStatus httpStatus;
     private final Integer code;
