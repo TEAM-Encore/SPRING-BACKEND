@@ -32,11 +32,7 @@ public class TicketConverter {
                 .showTime(ticket.getShowTime())
                 .seat(ticket.getSeat())
                 .actors(ticket.getActors().stream()
-                        .map(actor -> ActorDTO.builder()
-                                .id(actor.getId())
-                                .name(actor.getName())
-                                .actorImageUrl(actor.getActorImageUrl())
-                                .build())
+                        .map(TicketConverter::toActorDTO)  // ActorDTO로 변환
                         .collect(Collectors.toList()))
                 .ticketImageUrl(ticket.getTicketImageUrl())
                 .build();
