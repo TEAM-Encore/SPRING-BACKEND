@@ -46,10 +46,10 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver
+# Install ChromeDriver (matching the Chrome version)
 RUN CHROME_VERSION=$(google-chrome --no-sandbox --version | awk '{print $3}' | awk -F. '{print $1}') \
     && CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") \
-    && wget -q --continue -P /chromedriver "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.58/linux64/chromedriver-linux64.zip" \
+    && wget -q --continue -P /chromedriver "https://storage.googleapis.com/chrome-for-testing-public/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip" \
     && unzip /chromedriver/chromedriver-linux64.zip -d /usr/bin/ \
     && mv /usr/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver \
     && rm -rf /chromedriver /usr/bin/chromedriver-linux64 \
@@ -69,4 +69,4 @@ ENV JAVA_OPTS="-Dwebdriver.chrome.driver=/usr/bin/chromedriver"
 ENV CHROME_BIN=/usr/bin/google-chrome
 
 # Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Duser.timezone=Asia/Seoul -jar /app.jar"]
