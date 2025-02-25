@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
 import encore.server.domain.user.dto.response.UserLoginRes;
-import encore.server.domain.user.service.UserService;
+import encore.server.domain.user.service.UserAuthService;
 import encore.server.global.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +24,7 @@ import java.util.Map;
 @Slf4j
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    private final UserService userService;
+    private final UserAuthService userAuthService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -34,13 +34,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         //이미 회원가입이 되어 있는지 확인
         try {
-            userService.signup(UserSignupReq.fromOauthAttributes(oauthLoginUserInfoAttributes));
+            userAuthService.signup(UserSignupReq.fromOauthAttributes(oauthLoginUserInfoAttributes));
         } catch (ApplicationException ignored){
             log.info("[OAuth2SuccessHandler]-[onAuthenticationSuccess] Already Sign upped User. Try Login");
         }
 
         //이후 login 시도 및 결과 반환
-        UserLoginRes loginRes = userService.login(UserLoginReq.fromOauthAttributes(oauthLoginUserInfoAttributes));
+        UserLoginRes loginRes = userAuthService.login(UserLoginReq.fromOauthAttributes(oauthLoginUserInfoAttributes));
 
         //HttpResponse Header Mapping
         response.setStatus(HttpStatus.OK.value());

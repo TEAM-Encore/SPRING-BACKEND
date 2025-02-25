@@ -29,6 +29,13 @@ public enum ErrorCode {
     PASSWORD_MISMATCH_EXCEPTION(HttpStatus.FORBIDDEN, 3001, "비밀번호가 일치하지 않습니다."),
     USER_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 3002, "이미 존재하는 사용자입니다."),
 
+    //Related to User Nickname
+    USER_NICKNAME_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 3003, "이미 존재하는 닉네임입니다."),
+    USER_NICKNAME_TOO_LONG_EXCEPTION(HttpStatus.BAD_REQUEST, 3004, "닉네임은 8자 이내 3자 이상이여야 합니다."),
+    USER_NICKNAME_TOO_SHORT_EXCEPTION(HttpStatus.BAD_REQUEST, 3006, "닉네임은 3자 이상 8자 이내여야 합니다."),
+    USER_NICKNAME_INVALID_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, 3007, "닉네임은 한글, 영어, 숫자로만 구성되어야 합니다."),
+
+
     // 4000: Post Error
     POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 4000, "존재하지 않는 게시글입니다."),
 
@@ -59,7 +66,10 @@ public enum ErrorCode {
     MUSICAL_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 10000, "존재하지 않는 뮤지컬입니다."),
 
     // 11000: Ticket Error
-    TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다.");
+    TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다."),
+
+    // 12000: Actor Error
+    ACTOR_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 12000, "존재하지 않는 배우입니다.");
 
     private final HttpStatus httpStatus;
     private final Integer code;

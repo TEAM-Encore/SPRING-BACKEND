@@ -17,5 +17,6 @@ public interface MusicalRepository extends JpaRepository<Musical, Long> {
     @Query("SELECT m FROM Musical m WHERE m.startDate > :now AND m.deletedAt IS NULL ORDER BY m.startDate ASC")
     List<Musical> findUpcomingMusicals(LocalDateTime now);
 
-
+    boolean existsByInterparkId(String interparkId);
+    boolean existsByTitleAndSeries(String title, Long series);
 }

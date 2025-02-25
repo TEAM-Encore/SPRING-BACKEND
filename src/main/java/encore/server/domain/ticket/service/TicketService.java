@@ -11,6 +11,7 @@ import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
 import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
+import encore.server.domain.ticket.dto.response.TicketSimpleRes;
 import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
@@ -55,7 +56,6 @@ public class TicketService {
         //actordto->actor
         List<Actor> actors = request.actors().stream()
                 .map(actorDTO -> Actor.builder()
-                        .id(actorDTO.id())
                         .name(actorDTO.name())
                         .actorImageUrl(actorDTO.actorImageUrl())
                         .build())
@@ -142,7 +142,6 @@ public class TicketService {
         if (request.actors() != null) {
             List<Actor> actors = request.actors().stream()
                     .map(actorDTO -> Actor.builder()
-                            .id(actorDTO.id())
                             .name(actorDTO.name())
                             .actorImageUrl(actorDTO.actorImageUrl())
                             .build())
@@ -166,4 +165,14 @@ public class TicketService {
         }
         ticketRepository.softDeleteByTicketId(ticketId);
     }
+
+    public List<TicketSimpleRes> getTicketsByMusicalTitle(String musicalTitle) {
+        List<Ticket> tickets = ticketRepository.findByMusical_TitleContainingAndDeletedAtIsNull(musicalTitle);
+
+        return tickets.stream()
+                .map(TicketConverter::toTicketSimpleRes) // 간단한 DTO 변환 사용
+                .collect(Collectors.toList());
+    }
+
+
 }

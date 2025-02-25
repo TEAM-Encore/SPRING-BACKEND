@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,9 +30,8 @@ public class Actor extends BaseTimeEntity {
     @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MusicalActor> musicalActors = new ArrayList<>();
 
-
-    public Actor(Long id, String name, String actorImageUrl, List<MusicalActor> musicalActors) {
-        this.id = id;
+    @Builder
+    public Actor(String name, String actorImageUrl, List<MusicalActor> musicalActors) {
         this.name = name;
         this.actorImageUrl = actorImageUrl;
         this.musicalActors = musicalActors != null ? musicalActors : new ArrayList<>();

@@ -3,6 +3,7 @@ package encore.server.domain.musical.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import encore.server.domain.musical.enumerate.Day;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -17,10 +18,12 @@ public record MusicalDetailRes(
         LocalDateTime endDate,
         String location,
         Long runningTime,
-        Long age,
+        String age,
         Long series,
         String imageUrl,
-        List<MusicalActorRes> actors
+        boolean isFeatured,
+        List<MusicalActorRes> actors,
+        List<ShowTimeRes> showTimes
 ) {
     @Builder
     public record MusicalActorRes(
@@ -28,6 +31,12 @@ public record MusicalDetailRes(
             String actorImageUrl,
             String roleName,
             boolean isMainActor
+    ) {
+    }
+    @Builder
+    public record ShowTimeRes(
+            Day day,
+            String time
     ) {
     }
 }
