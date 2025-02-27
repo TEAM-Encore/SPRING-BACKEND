@@ -6,6 +6,7 @@ import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.review.repository.ReviewRepository;
 import encore.server.domain.ticket.converter.TicketConverter;
+import encore.server.domain.ticket.dto.request.ActorCreateReq;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
@@ -48,18 +49,16 @@ public class TicketService {
 
         //validation
         Musical musical = musicalRepository.findById(request.musicalId())
-                .orElseThrow(() -> new RuntimeException("Musical not found"));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
 
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        //actordto->actor
-        List<Actor> actors = request.actors().stream()
-                .map(actorDTO -> Actor.builder()
-                        .name(actorDTO.name())
-                        .actorImageUrl(actorDTO.actorImageUrl())
-                        .build())
-                .collect(Collectors.toList());
+        // actorIds로 배우를 조회하여 리스트로 반환
+        List<Actor> actors = actorRepository.findAllByIdIn(request.actorIds());
+        if (actors.size() != request.actorIds().size()) {
+            throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
+        }
 
         //business logic
         //create ticket
@@ -86,6 +85,20 @@ public class TicketService {
         return actors.stream()
                 .map(TicketConverter::toActorDTO) // Converter를 이용해 변환
                 .toList();
+    }
+
+    // 새로운 배우 추가
+    @Transactional
+    public Actor createNewActor(ActorCreateReq actorCreateReq) {
+        // actorImageUrl이 null일 경우 그냥 null로 설정
+        String actorImageUrl = actorCreateReq.actorImageUrl();
+
+        Actor actor = Actor.builder()
+                .name(actorCreateReq.name())
+                .actorImageUrl(actorCreateReq.actorImageUrl())  // null도 허용
+                .build();
+
+        return actorRepository.save(actor);
     }
 
     //티켓북 조회

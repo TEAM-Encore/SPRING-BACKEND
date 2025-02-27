@@ -15,7 +15,7 @@ public record TicketCreateReq(
         LocalDate viewedDate,
         String showTime,
         String seat,
-        List<ActorDTO> actors, // Actor 리스트
+        List<Long> actorIds, // Actor 리스트
         String ticketImageUrl
 ) {
 }

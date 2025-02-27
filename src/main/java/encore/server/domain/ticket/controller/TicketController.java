@@ -2,6 +2,8 @@ package encore.server.domain.ticket.controller;
 
 
 
+import encore.server.domain.ticket.converter.TicketConverter;
+import encore.server.domain.ticket.dto.request.ActorCreateReq;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
@@ -9,6 +11,7 @@ import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.dto.response.TicketSimpleRes;
 import encore.server.domain.ticket.dto.response.TicketUpdateRes;
+import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.ErrorCode;
@@ -43,6 +46,14 @@ public class TicketController {
         List<ActorDTO> responses = ticketService.searchActorsByName(keyword);
         return ApplicationResponse.ok(responses);
     }
+
+    @Operation(summary = "배우 추가", description = "새로운 배우를 추가합니다.")
+    @PostMapping("/actors")
+    public ApplicationResponse<ActorDTO> addActor(@RequestBody ActorCreateReq actorCreateReq) {
+        Actor actor = ticketService.createNewActor(actorCreateReq);  // 배우 생성
+        return ApplicationResponse.ok(TicketConverter.toActorDTO(actor));
+    }
+
 
     @Operation(summary = "티켓북 리스트 조회", description = "기간별 티켓북 리스트를 조회합니다.")
     @GetMapping("/list")
