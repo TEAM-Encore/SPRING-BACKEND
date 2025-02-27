@@ -49,15 +49,15 @@ public class TicketService {
 
         //validation
         Musical musical = musicalRepository.findById(request.musicalId())
-                .orElseThrow(() -> new RuntimeException("Musical not found"));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
 
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         // actorIds로 배우를 조회하여 리스트로 반환
         List<Actor> actors = actorRepository.findAllByIdIn(request.actorIds());
         if (actors.size() != request.actorIds().size()) {
-            throw new RuntimeException("Some actors not found");
+            throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
         }
 
         //business logic
@@ -95,7 +95,7 @@ public class TicketService {
 
         Actor actor = Actor.builder()
                 .name(actorCreateReq.name())
-                .actorImageUrl(actorImageUrl)  // null도 허용
+                .actorImageUrl(actorCreateReq.actorImageUrl())  // null도 허용
                 .build();
 
         return actorRepository.save(actor);
