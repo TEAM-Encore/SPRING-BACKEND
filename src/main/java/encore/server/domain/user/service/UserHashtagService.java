@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -60,6 +62,7 @@ public class UserHashtagService {
                 .build();
     }
 
+    @Transactional
     public void deleteHashtag(Long userId, Long id) {
         // validation
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
@@ -70,5 +73,17 @@ public class UserHashtagService {
 
         // business logic
         userHashtagRepository.delete(userHashtag);
+    }
+
+    public List<UserHashtagRes> getHashtags(Long userId) {
+        // validation
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        // business logic
+        List<UserHashtag> userHashtags = userHashtagRepository.findAllByUser(user);
+
+        // response
+        return UserHashtagRes.listOf(userHashtags);
     }
 }

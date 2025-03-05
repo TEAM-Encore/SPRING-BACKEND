@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
@@ -77,5 +79,9 @@ public class UserController {
         return ApplicationResponse.ok();
     }
 
-
+    @GetMapping("/hashtags")
+    public ApplicationResponse<List<UserHashtagRes>> getHashtags(){
+        Long userId = 1L;
+        return ApplicationResponse.ok(userHashtagService.getHashtags(userId));
+    }
 }
