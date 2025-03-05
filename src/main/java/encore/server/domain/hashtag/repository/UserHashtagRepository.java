@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface UserHashtagRepository extends JpaRepository<UserHashtag, Long> {
     Optional<UserHashtag> findByUserAndHashtagName(User user, String name);
     Long countByUser(User user);
+    Optional<UserHashtag> findByIdAndUser(Long id, User user);
 }

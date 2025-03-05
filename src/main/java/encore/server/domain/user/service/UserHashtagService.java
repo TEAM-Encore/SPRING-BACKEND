@@ -59,4 +59,16 @@ public class UserHashtagService {
                 .name(userHashtag.getHashtag().getName())
                 .build();
     }
+
+    public void deleteHashtag(Long userId, Long id) {
+        // validation
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        UserHashtag userHashtag = userHashtagRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_HASHTAG_NOT_FOUND_EXCEPTION));
+
+        // business logic
+        userHashtagRepository.delete(userHashtag);
+    }
 }
