@@ -3,11 +3,9 @@ package encore.server.domain.user.controller;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserPatchReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
-import encore.server.domain.user.dto.response.UserGetMeRes;
-import encore.server.domain.user.dto.response.UserLoginRes;
-import encore.server.domain.user.dto.response.UserNicknameValidationRes;
-import encore.server.domain.user.dto.response.UserSignupRes;
+import encore.server.domain.user.dto.response.*;
 import encore.server.domain.user.service.UserAuthService;
+import encore.server.domain.user.service.UserHashtagService;
 import encore.server.domain.user.service.UserInfoService;
 import encore.server.domain.user.service.UserSetupService;
 import encore.server.global.common.ApplicationResponse;
@@ -32,6 +30,7 @@ public class UserController {
     private final UserAuthService userAuthService;
     private final UserSetupService userSetupService;
     private final UserInfoService userInfoService;
+    private final UserHashtagService userHashtagService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -67,4 +66,11 @@ public class UserController {
         return ApplicationResponse.ok(userInfoService.getMyInfo(userId));
     }
 
+    @PostMapping("/hashtag/{name}")
+    public ApplicationResponse<UserHashtagRes> addHashtag(
+            @PathVariable("name") String name
+    ){
+        Long userId = 1L;
+        return ApplicationResponse.ok(userHashtagService.addHashtag(userId, name));
+    }
 }
