@@ -12,4 +12,6 @@ public interface UserHashtagRepository extends JpaRepository<UserHashtag, Long> 
     Long countByUser(User user);
     Optional<UserHashtag> findByIdAndUser(Long id, User user);
     List<UserHashtag> findAllByUser(User user);
+
+    List<UserHashtag> findByHashtagNameIn(List<String> postHashtagNames);
 }

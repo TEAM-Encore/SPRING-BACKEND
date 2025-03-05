@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
+import encore.server.domain.post.entity.Post;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class FCMConfig {
     }
 
     // 알림 보내기
-    public void sendByTokenList(List<String> tokenList,String title, String body) {
+    public void sendByTokenList(List<String> tokenList, String title, String body) {
 
         // 메시지 만들기
         List<Message> messages = tokenList.stream().map(token -> Message.builder()
