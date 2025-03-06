@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface ActorRepository extends JpaRepository<Actor, Long> {
     List<Actor> findByNameContaining(String keyword);
     Optional<Actor> findByActorImageUrl(String actorImageUrl);
+    List<Actor> findAllByIdIn(List<Long> ids);
 }
