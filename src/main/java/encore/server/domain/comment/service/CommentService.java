@@ -12,6 +12,7 @@ import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.domain.user.service.UserFcmService;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final UserFcmService userFcmService;
 
     @Transactional
     public CommentRes create(Long postId, Long userId, CommentReq req) {
@@ -55,6 +57,7 @@ public class CommentService {
         Long numOfComment = commentRepository.countByPostAndDeletedAtIsNull(post);
         post.updateCommentCount(numOfComment+1);
         commentRepository.save(comment);
+        userFcmService.notifyUserByComment(post);
 
         // return: 생성된 댓글 정보 반환
         return CommentConverter.toResponse(comment, user, false);

@@ -79,6 +79,16 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'org.seleniumhq.selenium:selenium-java:4.0.0'
     implementation 'io.github.bonigarcia:webdrivermanager:5.0.3'
+
+    //fcm
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
+
+    //batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+    // Quartz
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
 }
 
 tasks.named('test') {

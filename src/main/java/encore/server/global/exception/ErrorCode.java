@@ -28,6 +28,9 @@ public enum ErrorCode {
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 사용자입니다."),
     PASSWORD_MISMATCH_EXCEPTION(HttpStatus.FORBIDDEN, 3001, "비밀번호가 일치하지 않습니다."),
     USER_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 3002, "이미 존재하는 사용자입니다."),
+    USER_HASHTAG_ALREADY_EXISTS_EXCEPTION(HttpStatus.BAD_REQUEST, 3005, "이미 존재하는 해시태그입니다."),
+    USER_HASHTAG_LIMIT_EXCEEDED_EXCEPTION(HttpStatus.BAD_REQUEST, 3008, "해시태그는 최대 10개까지만 추가할 수 있습니다."),
+    USER_HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 3009, "존재하지 않는 해시태그입니다."),
 
     //Related to User Nickname
     USER_NICKNAME_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 3003, "이미 존재하는 닉네임입니다."),

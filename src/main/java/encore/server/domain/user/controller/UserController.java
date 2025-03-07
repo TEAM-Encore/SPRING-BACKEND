@@ -3,11 +3,9 @@ package encore.server.domain.user.controller;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserPatchReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
-import encore.server.domain.user.dto.response.UserGetMeRes;
-import encore.server.domain.user.dto.response.UserLoginRes;
-import encore.server.domain.user.dto.response.UserNicknameValidationRes;
-import encore.server.domain.user.dto.response.UserSignupRes;
+import encore.server.domain.user.dto.response.*;
 import encore.server.domain.user.service.UserAuthService;
+import encore.server.domain.user.service.UserHashtagService;
 import encore.server.domain.user.service.UserInfoService;
 import encore.server.domain.user.service.UserSetupService;
 import encore.server.global.common.ApplicationResponse;
@@ -15,13 +13,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +26,7 @@ public class UserController {
     private final UserAuthService userAuthService;
     private final UserSetupService userSetupService;
     private final UserInfoService userInfoService;
+    private final UserHashtagService userHashtagService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -67,4 +62,26 @@ public class UserController {
         return ApplicationResponse.ok(userInfoService.getMyInfo(userId));
     }
 
+    @PostMapping("/hashtag/{name}")
+    public ApplicationResponse<UserHashtagRes> addHashtag(
+            @PathVariable("name") String name
+    ){
+        Long userId = 1L;
+        return ApplicationResponse.ok(userHashtagService.addHashtag(userId, name));
+    }
+
+    @DeleteMapping("/hashtag/{id}")
+    public ApplicationResponse<Void> deleteHashtag(
+            @PathVariable("id") Long id
+    ){
+        Long userId = 1L;
+        userHashtagService.deleteHashtag(userId, id);
+        return ApplicationResponse.ok();
+    }
+
+    @GetMapping("/hashtags")
+    public ApplicationResponse<List<UserHashtagRes>> getHashtags(){
+        Long userId = 1L;
+        return ApplicationResponse.ok(userHashtagService.getHashtags(userId));
+    }
 }

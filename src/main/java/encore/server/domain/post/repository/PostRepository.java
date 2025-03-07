@@ -45,4 +45,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     Optional<Post> findByIdAndDeletedAtIsNull(Long id);
 
     int countByUserAndDeletedAtIsNull(User user);
+
+    Post findTopByOrderByLikeCountDesc();
 }

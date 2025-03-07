@@ -24,6 +24,7 @@ import encore.server.domain.post.repository.PostLikeRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.domain.user.service.UserFcmService;
 import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,7 @@ public class PostService {
     private final PostConverter postConverter;
     private final PostHashtagConverter postHashtagConverter;
     private final PostImageConverter postImageConverter;
+    private final UserFcmService userFcmService;
 
 
     public PostDetailsGetRes getPostDetails(Long postId, Long userId) {
@@ -253,6 +255,7 @@ public class PostService {
             phashTagsToSave.add(pHashtagToSave);
         }
 
+        userFcmService.notifyUsersByHashtag(post, phashTagsToSave);
 
         // content를 기준으로 MusicalTerm 조회
         List<Term> matchingTerms = musicalTermRepository.findByTermIn(post.getContent());

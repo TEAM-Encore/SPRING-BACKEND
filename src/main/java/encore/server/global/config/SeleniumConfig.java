@@ -1,6 +1,5 @@
 package encore.server.global.config;
 
-import jakarta.annotation.PostConstruct;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -16,10 +15,6 @@ public class SeleniumConfig {
     @Value("${selenium.chrome-driver-path}")
     private String chromeDriverPath;
 
-    /**
-     * Selenium WebDriver 초기화
-     */
-    @PostConstruct
     public void initDriver() {
         try {
             // WebDriver 설정
@@ -32,14 +27,14 @@ public class SeleniumConfig {
 
             this.driver = new ChromeDriver(options);
         } catch (Exception e) {
-            // 예외 처리
-            System.err.println("Error initializing Selenium WebDriver: " + e.getMessage());
             e.printStackTrace();
+            this.driver = null; // WebDriver 초기화 실패 시 null로 설정
         }
     }
 
     @Bean
     public WebDriver getDriver() {
+        initDriver();
         if (driver == null) {
             throw new IllegalStateException("WebDriver is not initialized. Please check the Selenium configuration.");
         }
