@@ -103,6 +103,23 @@ public class UserFcmService {
         notificationRepository.save(notification);
     }
 
+    @Transactional
+    public void notifyUserByLike(Post post){
+        Notification notification = Notification.builder()
+                .title("좋아요 " + post.getLikeCount() + "개를 달성했어요")
+                .content('"' + post.getTitle() + '"' + "게시글")
+                .createdAt(LocalDateTime.now())
+                .type(NotificationType.ACTIVITY)
+                .build();
+
+        fcmConfig.sendByTokenList(
+                post.getUser().getFcmTokens().stream()
+                        .map(FCMToken::getToken)
+                        .collect(Collectors.toList()),
+                notification.getTitle(),
+                notification.getContent());
+    }
+
 
     public List<NotificationRes> getNotifications(Long userId, String type) {
         // validation
