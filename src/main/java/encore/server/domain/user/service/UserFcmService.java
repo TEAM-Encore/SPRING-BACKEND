@@ -84,6 +84,25 @@ public class UserFcmService {
         notificationRepository.save(notification);
     }
 
+    @Transactional
+    public void notifyUserByComment(Post post){
+        Notification notification = Notification.builder()
+                .title("답글이 달렸어요")
+                .content('"' + post.getTitle() + '"' + "게시글")
+                .createdAt(LocalDateTime.now())
+                .type(NotificationType.ACTIVITY)
+                .build();
+
+        fcmConfig.sendByTokenList(
+                post.getUser().getFcmTokens().stream()
+                        .map(FCMToken::getToken)
+                        .collect(Collectors.toList()),
+                notification.getTitle(),
+                notification.getContent());
+
+        notificationRepository.save(notification);
+    }
+
 
     public List<NotificationRes> getNotifications(Long userId, String type) {
         // validation
