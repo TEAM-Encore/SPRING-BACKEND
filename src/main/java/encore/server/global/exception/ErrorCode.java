@@ -69,7 +69,11 @@ public enum ErrorCode {
     TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다."),
 
     // 12000: Actor Error
-    ACTOR_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 12000, "존재하지 않는 배우입니다.");
+    ACTOR_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 12000, "존재하지 않는 배우입니다."),
+
+    // 13000: Subscription Error
+    ALREADY_SUBSCRIBE_EXCEPTION(HttpStatus.BAD_REQUEST, 13000, "이미 구독중입니다."),
+    ALREADY_UNSUBSCRIBE_EXCEPTION(HttpStatus.BAD_REQUEST, 13001, "이미 구독중이 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final Integer code;
