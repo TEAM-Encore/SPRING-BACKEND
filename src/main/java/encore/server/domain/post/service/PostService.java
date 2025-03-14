@@ -24,13 +24,18 @@ import encore.server.domain.post.repository.PostLikeRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.BadRequestException;
+import encore.server.global.exception.ErrorCode;
 import encore.server.global.exception.UserNotFoundException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -328,6 +333,55 @@ public class PostService {
                 .map(post -> PostConverter.toSimplePostRes(post, post.getUser(), likedPostMap.contains(post)))
                 .collect(Collectors.toList());
 
+        return new SliceImpl<>(postResponses, pageable, hasNext);
+    }
+
+    /**
+     * 사용자가 작성한 게시글을 커서 기반으로 페이징 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @param cursor 기준 시간 (null일 경우 최신부터 조회)
+     * @param size   페이지 크기
+     * @return 사용자의 게시글 목록 (SimplePostRes 형태)의 Slice
+     */
+    public Slice<SimplePostRes> getMyPostPagination(Long userId, LocalDateTime cursor, int size) {
+
+        // 1. 페이징 및 정렬 정보 설정 (최신순 정렬)
+        Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
+
+        // 2. userId에 해당하는 유저 조회 (없으면 예외 발생)
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        // 3. cursor가 null이면 최신 글부터 조회, 아니면 cursor 기준 이전 글 조회
+        List<Post> posts;
+        if (cursor == null) {
+            posts = postRepository.findByUserAndDeletedAtIsNullOrderByCreatedAtDesc(user, pageable);
+        } else {
+            posts = postRepository.findByUserAndCreatedAtBeforeAndDeletedAtIsNullOrderByCreatedAtDesc(user, cursor, pageable);
+        }
+
+        // 4. 사용자가 해당 게시물에 눌렀던 좋아요 가져오기 (좋아요가 눌러진 경우만)
+        List<PostLike> postLikes = postLikeRepository.findByUserAndPostIn(user, posts)
+            .stream()
+            .filter(PostLike::isLiked)
+            .toList();
+
+        // 5. 좋아요를 누른 게시물만 Set으로 저장하여 빠른 조회 가능하게 함
+        Set<Post> likedPostMap = postLikes.stream()
+            .map(PostLike::getPost)
+            .collect(Collectors.toSet());
+
+        // 6. 다음 페이지 여부 판단 (조회한 posts 개수가 페이지 사이즈보다 크면 next 있음)
+        boolean hasNext = posts.size() > pageable.getPageSize();
+
+        // 7. SimplePostRes로 변환 + 좋아요 여부 포함해서 응답 객체 생성
+        List<SimplePostRes> postResponses = posts.stream()
+            .limit(pageable.getPageSize())
+            .map(post -> PostConverter.toSimplePostRes(post, post.getUser(), likedPostMap.contains(post)))
+            .collect(Collectors.toList());
+
+        // 8. Slice 형태로 결과 반환 (hasNext 포함)
         return new SliceImpl<>(postResponses, pageable, hasNext);
     }
 }
