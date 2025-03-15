@@ -5,16 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.List;
 import lombok.Builder;
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
-public record UserGetMeRes(
-    Long point,
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public record UserGetRes(
+    Long userId,
     String nickname,
     Long numOfSubscriber,
     Long numOfWritePost,
     List<String> preferredKeywords,
-    String viewingFrequency,
-    String email
+    String viewingFrequency
 ) {
 
 }

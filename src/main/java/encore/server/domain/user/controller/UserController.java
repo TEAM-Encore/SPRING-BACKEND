@@ -1,9 +1,11 @@
 package encore.server.domain.user.controller;
 
+import encore.server.domain.user.dto.request.UserImposePenaltyReq;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserPatchReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
 import encore.server.domain.user.dto.response.UserGetMeRes;
+import encore.server.domain.user.dto.response.UserGetRes;
 import encore.server.domain.user.dto.response.UserLoginRes;
 import encore.server.domain.user.dto.response.UserNicknameValidationRes;
 import encore.server.domain.user.dto.response.UserSignupRes;
@@ -62,9 +64,24 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ApplicationResponse<UserGetMeRes> getMyInfo(){
+    @Operation(summary = "내 정보 조회", description = "현재 로그인한 유저 정보를 조회합니다.")
+    public ApplicationResponse<UserGetMeRes> getMyInfo() {
         Long userId = 1L;
         return ApplicationResponse.ok(userInfoService.getMyInfo(userId));
+    }
+
+    @GetMapping("/{userId}")
+    @Operation(summary = "유저 정보 조회", description = "주어진 아이디로 유저 정보를 조회합니다.")
+    public ApplicationResponse<UserGetRes> getUserInfo(@PathVariable @Valid Long userId) {
+        userId = 1L;
+        return ApplicationResponse.ok(userInfoService.getUserInfo(userId));
+    }
+
+    @PostMapping("/penalties")
+    @Operation(summary = "유저 계정 정지", description = "설정한 값 만큼 계정 정지를 진행합니다.")
+    public ApplicationResponse<Void> grantPenalty(@RequestBody @Valid UserImposePenaltyReq request) {
+        userAuthService.imposePenalty(request);
+        return ApplicationResponse.ok();
     }
 
 }

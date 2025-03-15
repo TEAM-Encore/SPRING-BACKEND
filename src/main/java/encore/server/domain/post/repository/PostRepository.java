@@ -4,6 +4,9 @@ import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.user.entity.User;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,8 +44,11 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @EntityGraph(attributePaths = {"postImages", "user"})
     Optional<Post> findFetchJoinPostImageAndUserByIdAndDeletedAtIsNull(Long postId);
 
-
     Optional<Post> findByIdAndDeletedAtIsNull(Long id);
 
-    int countByUserAndDeletedAtIsNull(User user);
+    long countByUserAndDeletedAtIsNull(User user);
+
+    List<Post> findByUserAndDeletedAtIsNullOrderByCreatedAtDesc(User user, Pageable pageable);
+
+    List<Post> findByUserAndCreatedAtBeforeAndDeletedAtIsNullOrderByCreatedAtDesc(User user, LocalDateTime cursor, Pageable pageable);
 }

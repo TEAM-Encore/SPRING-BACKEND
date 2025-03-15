@@ -6,10 +6,10 @@ import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostCreateRes;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
-import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.service.PostLikeService;
 import encore.server.domain.post.service.PostRelatedSearchService;
 import encore.server.domain.post.service.PostService;
+import encore.server.global.aop.annotation.LoginUserId;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.exception.BadRequestException;
 import encore.server.global.exception.ErrorCode;
@@ -155,6 +155,14 @@ public class PostController {
         return ApplicationResponse.ok(postSearchService.getAutoCompleteSuggestions(userId, keyword));
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "내가 작성한 게시글 페이징 조회 API", description = "내가 작성한 게시글을 커서 기반 페이징으로 조회합니다.")
+    public ApplicationResponse<Slice<SimplePostRes>> getMyPostPagination(
+        @RequestParam(required = false) LocalDateTime cursor,
+        @RequestParam(defaultValue = "30") int size,
+        @LoginUserId Long userId) {
+        return ApplicationResponse.ok(postService.getMyPostPagination(userId, cursor, size));
+    }
 
 
     public Long mockUserIdProvide(){
