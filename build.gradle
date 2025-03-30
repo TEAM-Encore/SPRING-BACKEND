@@ -94,3 +94,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    from sourceSets.main.resources
+    include '**/*.json'
+}
