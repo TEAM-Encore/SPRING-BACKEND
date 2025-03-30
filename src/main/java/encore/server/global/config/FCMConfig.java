@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,19 +30,19 @@ public class FCMConfig {
     @PostConstruct
     public void init() {
         try {
+            FileInputStream serviceAccount = new FileInputStream(fcmKeyPath);
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(
-                            GoogleCredentials
-                                    .fromStream(new ClassPathResource(fcmKeyPath).getInputStream())
+                            GoogleCredentials.fromStream(serviceAccount)
                                     .createScoped(List.of(fcmScope)))
                     .build();
+
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
                 log.info("Firebase application has been initialized");
             }
         } catch (IOException e) {
             log.error(e.getMessage());
-            // spring 뜰때 알림 서버가 잘 동작하지 않는 것이므로 바로 죽임
             throw new RuntimeException(e.getMessage());
         }
     }
