@@ -1,18 +1,18 @@
-# OpenJDK 17을 기반으로 사용
-FROM openjdk:17
+FROM openjdk:17.0.1-jdk-slim
 
-# 필요한 패키지 설치 (wget, unzip 등)
-RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# 필수 패키지 설치
+RUN apt-get -y update \
+    && apt-get -y install wget unzip curl \
+    && apt-get clean
 
-# ChromeDriver 다운로드 및 설치
-RUN wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip -O /tmp/chromedriver.zip
-RUN unzip /tmp/chromedriver.zip -d /usr/local/bin/
-RUN chmod +x /usr/local/bin/chromedriver
+# Google Chrome 설치
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt-get -y install ./google-chrome-stable_current_amd64.deb || apt-get -y -f install
 
+# ChromeDriver 설치
+RUN wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip \
+    && unzip /tmp/chromedriver.zip chromedriver -d /usr/bin \
+    && rm /tmp/chromedriver.zip  # 설치 후 압축파일 삭제
 # 애플리케이션 jar 파일 추가
 ADD ./build/libs/server-0.0.1-SNAPSHOT.jar /app.jar
 
