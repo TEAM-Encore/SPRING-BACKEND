@@ -139,9 +139,16 @@ public class MusicalInfoService {
             });
              */
 
-            WebElement moreButton = driver.findElement(By.xpath("//a[@class='contentToggleBtn' and @aria-label='여닫기']"));
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("arguments[0].click();", moreButton);
+            List<WebElement> moreButtons = driver.findElements(By.xpath("//a[@class='contentToggleBtn' and @aria-label='여닫기']"));
+
+            if (!moreButtons.isEmpty()) {
+                WebElement moreButton = moreButtons.get(0);
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].click();", moreButton);
+                log.info("✅ '여닫기' 버튼 클릭 성공");
+            } else {
+                log.info("⚠️ '여닫기' 버튼이 존재하지 않아 클릭하지 않음");
+            }
 
             // 뮤지컬 캐스팅정보, 배우 정보 가져오기
             List<WebElement> castingItems = driver.findElements(By.xpath("//ul[@class='castingList']/li[@class='castingItem']"));
