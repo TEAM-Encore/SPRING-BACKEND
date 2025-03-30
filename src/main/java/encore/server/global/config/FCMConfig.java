@@ -28,7 +28,6 @@ public class FCMConfig {
     @Value("${firebase.scope}")
     String fcmScope;
 
-    @PostConstruct
     public void init() {
         try {
             InputStream serviceAccount = getClass().getResourceAsStream(fcmKeyPath);

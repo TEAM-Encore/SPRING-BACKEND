@@ -16,7 +16,13 @@ import java.util.stream.Collectors;
 public class FcmNotificationService {
     private final FCMConfig fcmConfig;
 
+    //FCM init() 메서드 호출
+    public void init() {
+        fcmConfig.init();
+    }
+
     public void sendToUser(User user, Notification notification) {
+        init();
         List<String> tokens = user.getFcmTokens().stream()
                 .map(FCMToken::getToken)
                 .collect(Collectors.toList());
@@ -25,6 +31,7 @@ public class FcmNotificationService {
     }
 
     public void sendToUsers(Set<User> users, Notification notification) {
+        init();
         List<String> tokens = users.stream()
                 .flatMap(user -> user.getFcmTokens().stream().map(FCMToken::getToken))
                 .collect(Collectors.toList());
