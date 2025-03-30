@@ -12,9 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,10 +31,15 @@ public class FCMConfig {
     @PostConstruct
     public void init() {
         try {
+            InputStream serviceAccount = getClass().getResourceAsStream(fcmKeyPath);
+
+            if (Objects.isNull(serviceAccount)) {
+                throw new NullPointerException("service account is null");
+            }
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(
                             GoogleCredentials
-                                    .fromStream(new ClassPathResource(fcmKeyPath).getInputStream())
+                                    .fromStream(serviceAccount)
                                     .createScoped(List.of(fcmScope)))
                     .build();
             if (FirebaseApp.getApps().isEmpty()) {
