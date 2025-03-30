@@ -60,6 +60,9 @@ public class User extends BaseTimeEntity {
   @Column(columnDefinition = "TEXT")
   private String profileImageUrl;
 
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+  private List<FCMToken> fcmTokens = new ArrayList<>();
+
   @Builder
   public User(String nickName, Long point) {
     this.nickName = nickName;
