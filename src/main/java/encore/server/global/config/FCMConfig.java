@@ -10,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.parameters.P;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -28,14 +30,12 @@ public class FCMConfig {
     @Value("${firebase.scope}")
     String fcmScope;
 
+    @PostConstruct
     public void init() {
         try {
-            InputStream serviceAccount = getClass().getResourceAsStream(fcmKeyPath);
+            FileInputStream serviceAccount = new FileInputStream(fcmKeyPath);
 
-            if (Objects.isNull(serviceAccount)) {
-                throw new NullPointerException("service account is null");
-            }
-            FirebaseOptions options = new FirebaseOptions.Builder()
+            FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(
                             GoogleCredentials
                                     .fromStream(serviceAccount)
