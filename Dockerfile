@@ -1,5 +1,5 @@
 # OpenJDK 17을 기반으로 사용
-FROM openjdk:17-jdk-slim
+FROM openjdk:17
 
 # 필요한 패키지 설치 (wget, unzip 등)
 RUN apt-get update && apt-get install -y \
