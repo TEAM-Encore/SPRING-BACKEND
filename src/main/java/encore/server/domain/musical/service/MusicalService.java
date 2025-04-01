@@ -1,6 +1,5 @@
 package encore.server.domain.musical.service;
 
-import encore.server.domain.musical.converter.MusicalConverter;
 import encore.server.domain.musical.dto.request.MusicalCreateReq;
 import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
@@ -33,7 +32,7 @@ public class MusicalService {
     public List<MusicalRes> searchMusicalsByTitle(String keyword) {
         List<Musical> musicals = musicalRepository.findByTitleContaining(keyword);
         return musicals.stream()
-                .map(MusicalConverter::toResponse) // Converter를 이용해 변환으로 수정!
+                .map(MusicalRes::from) // dto로 수정
                 .toList();
     }
 
@@ -42,7 +41,7 @@ public class MusicalService {
         Musical musical = musicalRepository.findByIdAndDeletedAtIsNull(musicalId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
 
-        return MusicalConverter.toMusicalDetailRes(musical);
+        return MusicalDetailRes.from(musical); //dto로 수정
     }
 
     public List<MusicalSeriesRes> getAllSeriesByMusicalId(Long musicalId) {
@@ -139,7 +138,7 @@ public class MusicalService {
         musicalRepository.save(musical);
 
         // return: 뮤지컬 상세 응답 반환
-        return MusicalConverter.toMusicalDetailRes(musical);
+        return MusicalDetailRes.from(musical); //dto로 수정
     }
 
     @Transactional
@@ -182,7 +181,7 @@ public class MusicalService {
         }
 
         // return: 뮤지컬 상세 응답 반환
-        return MusicalConverter.toMusicalDetailRes(musical);
+        return MusicalDetailRes.from(musical); //dto로 수정
     }
 
     @Transactional
