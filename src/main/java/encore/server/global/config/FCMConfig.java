@@ -33,7 +33,7 @@ public class FCMConfig {
     @PostConstruct
     public void init() {
         try {
-            FileInputStream serviceAccount = new FileInputStream(fcmKeyPath);
+            InputStream serviceAccount = new ClassPathResource(fcmKeyPath).getInputStream();
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(
