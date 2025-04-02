@@ -37,6 +37,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+       # Firebase JSON 파일 생성
+      - name: Create Firebase JSON Config
+        run: |
+          echo "${{ secrets.FIREBASE_CONFIG_JSON }}" | base64 --decode > ./src/main/resources/firebase-config.json
+        shell: bash
+
       # application.yml 생성
       - name: Make application-secret.yml
         run: |
