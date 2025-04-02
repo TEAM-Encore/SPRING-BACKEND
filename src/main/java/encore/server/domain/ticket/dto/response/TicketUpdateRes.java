@@ -2,6 +2,7 @@ package encore.server.domain.ticket.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 import lombok.Builder;
 
@@ -21,4 +22,18 @@ public record TicketUpdateRes(
         String seat,
         List<String> actors
 ) {
+    public static TicketUpdateRes from(Ticket ticket) {
+        return TicketUpdateRes.builder()
+                .id(ticket.getId())
+                .userId(ticket.getUser().getId())
+                .musicalTitle(ticket.getMusical().getTitle())
+                .series(ticket.getMusical().getSeries())
+                .viewedDate(ticket.getViewedDate())
+                .location(ticket.getMusical().getLocation())
+                .seat(ticket.getSeat())
+                .actors(ticket.getActors().stream()
+                        .map(Actor::getName)
+                        .collect(Collectors.toList()))
+                .build();
+    }
 }

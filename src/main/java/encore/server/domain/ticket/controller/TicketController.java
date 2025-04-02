@@ -2,7 +2,6 @@ package encore.server.domain.ticket.controller;
 
 
 
-import encore.server.domain.ticket.converter.TicketConverter;
 import encore.server.domain.ticket.dto.request.ActorCreateReq;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
@@ -51,7 +50,7 @@ public class TicketController {
     @PostMapping("/actors")
     public ApplicationResponse<ActorDTO> addActor(@RequestBody ActorCreateReq actorCreateReq) {
         Actor actor = ticketService.createNewActor(actorCreateReq);  // 배우 생성
-        return ApplicationResponse.ok(TicketConverter.toActorDTO(actor));
+        return ApplicationResponse.ok(ActorDTO.from(actor));
     }
 
 

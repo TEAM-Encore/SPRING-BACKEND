@@ -22,4 +22,18 @@ public record TicketCreateRes(
         List<ActorDTO> actors,
         String ticketImageUrl
 ) {
+    public static TicketCreateRes from(Ticket ticket) {
+        return TicketCreateRes.builder()
+                .id(ticket.getId())
+                .userId(ticket.getUser().getId())
+                .musicalId(ticket.getMusical().getId())
+                .viewedDate(ticket.getViewedDate())
+                .showTime(ticket.getShowTime())
+                .seat(ticket.getSeat())
+                .actors(ticket.getActors().stream()
+                        .map(ActorDTO::from)  // ActorDTO로 변환
+                        .collect(Collectors.toList()))
+                .ticketImageUrl(ticket.getTicketImageUrl())
+                .build();
+    }
 }

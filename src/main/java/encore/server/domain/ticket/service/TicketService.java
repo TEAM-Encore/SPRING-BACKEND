@@ -5,7 +5,6 @@ import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.review.repository.ReviewRepository;
-import encore.server.domain.ticket.converter.TicketConverter;
 import encore.server.domain.ticket.dto.request.ActorCreateReq;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
@@ -74,8 +73,7 @@ public class TicketService {
 
         ticketRepository.save(ticket);
 
-        // TicketConverter 이용
-        return TicketConverter.toTicketCreateRes(ticket);
+        return TicketCreateRes.from(ticket); // converter 삭제
 
     }
 
@@ -83,7 +81,7 @@ public class TicketService {
     public List<ActorDTO> searchActorsByName(String keyword) {
         List<Actor> actors = actorRepository.findByNameContaining(keyword);
         return actors.stream()
-                .map(TicketConverter::toActorDTO) // Converter를 이용해 변환
+                .map(ActorDTO::from) // converter 삭제
                 .toList();
     }
 
@@ -127,7 +125,7 @@ public class TicketService {
         return tickets.stream()
                 .map(ticket -> {
                     Optional<Review> review = reviewRepository.findByTicketIdAndDeletedAtIsNull(ticket.getId());
-                    return TicketConverter.toTicketRes(ticket, review);
+                    return TicketRes.from(ticket, review); // converter삭제
                 })
                 .collect(Collectors.toList());
     }
@@ -166,7 +164,7 @@ public class TicketService {
         }
 
         ticketRepository.save(ticket);
-        return TicketConverter.toTicketUpdateRes(ticket);
+        return TicketUpdateRes.from(ticket); //converter삭제
     }
 
     //티켓북 삭제
@@ -183,7 +181,7 @@ public class TicketService {
         List<Ticket> tickets = ticketRepository.findByMusical_TitleContainingAndDeletedAtIsNull(musicalTitle);
 
         return tickets.stream()
-                .map(TicketConverter::toTicketSimpleRes) // 간단한 DTO 변환 사용
+                .map(TicketSimpleRes::from) // converter 삭제
                 .collect(Collectors.toList());
     }
 
