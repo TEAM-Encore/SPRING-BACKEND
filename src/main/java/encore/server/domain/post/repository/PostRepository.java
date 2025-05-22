@@ -48,6 +48,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     long countByUserAndDeletedAtIsNull(User user);
 
+    Post findTopByOrderByLikeCountDesc();
+
     List<Post> findByUserAndDeletedAtIsNullOrderByCreatedAtDesc(User user, Pageable pageable);
 
     List<Post> findByUserAndCreatedAtBeforeAndDeletedAtIsNullOrderByCreatedAtDesc(User user, LocalDateTime cursor, Pageable pageable);

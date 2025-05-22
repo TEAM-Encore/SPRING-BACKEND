@@ -7,6 +7,7 @@ import encore.server.domain.post.repository.PostLikeRepository;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.domain.user.service.UserFcmService;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final UserFcmService userFcmService;
 
     @Transactional
     public void toggleLike(PostLikeReq postLikeReq) throws Exception {
@@ -53,5 +55,9 @@ public class PostLikeService {
         post.setLikeCount(newLikeCount);
 
         postRepository.save(post); // likeCount를 갱신한 후 post를 저장
+
+        if (newLikeCount % 10 == 0) {
+            userFcmService.notifyUserByLike(post);
+        }
     }
 }
