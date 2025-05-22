@@ -8,7 +8,9 @@ import lombok.Builder;
 @Builder
 public record UserLoginRes(
     String accessToken,
-    Boolean isAgreedRequiredTerm
+    Boolean isAgreedRequiredTerm,
+    Boolean isActivePenalty,
+    UserPenaltyInfo userPenaltyInfo
 ) {
 
 }
