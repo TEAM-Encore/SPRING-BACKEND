@@ -1,5 +1,6 @@
 package encore.server.domain.user.controller;
 
+import encore.server.domain.user.dto.request.UserImposePenaltyReq;
 import encore.server.domain.user.dto.request.UserLoginReq;
 import encore.server.domain.user.dto.request.UserPatchReq;
 import encore.server.domain.user.dto.request.UserSignupReq;
