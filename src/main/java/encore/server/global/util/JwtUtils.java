@@ -1,6 +1,8 @@
 package encore.server.global.util;
 
 import encore.server.domain.user.enumerate.UserRole;
+import encore.server.global.exception.ApplicationException;
+import encore.server.global.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -94,7 +96,7 @@ public class JwtUtils {
       return tokenValue.substring(7);
     }
     log.error("Not Found Token");
-    throw new NullPointerException("Not Found Token");
+    throw new ApplicationException(ErrorCode.JWT_NOT_FOUND);
   }
 
   // 토큰 검증
@@ -104,15 +106,14 @@ public class JwtUtils {
       return true;
     } catch (SecurityException | MalformedJwtException |
              io.jsonwebtoken.security.SignatureException e) {
-      log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+      throw new ApplicationException(ErrorCode.INVALID_JWT_SIGNATURE);
     } catch (ExpiredJwtException e) {
-      log.error("Expired JWT token, 만료된 JWT token 입니다.");
+      throw new ApplicationException(ErrorCode.EXPIRED_JWT_TOKEN);
     } catch (UnsupportedJwtException e) {
-      log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+      throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
     } catch (IllegalArgumentException e) {
-      log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+      throw new ApplicationException(ErrorCode.JWT_CLAIMS_IS_EMPTY);
     }
-    return false;
   }
 
   public String getTokenFromRequest(HttpServletRequest request) {

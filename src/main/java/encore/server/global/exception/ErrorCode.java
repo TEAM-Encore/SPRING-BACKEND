@@ -76,7 +76,15 @@ public enum ErrorCode {
 
     // 13000: Subscription Error
     ALREADY_SUBSCRIBE_EXCEPTION(HttpStatus.BAD_REQUEST, 13000, "이미 구독중입니다."),
-    ALREADY_UNSUBSCRIBE_EXCEPTION(HttpStatus.BAD_REQUEST, 13001, "이미 구독중이 아닙니다.");
+    ALREADY_UNSUBSCRIBE_EXCEPTION(HttpStatus.BAD_REQUEST, 13001, "이미 구독중이 아닙니다."),
+
+    // 14000: JWT Error
+    INVALID_JWT_SIGNATURE(HttpStatus.UNAUTHORIZED, 14000, "유효하지 않은 JWT 서명입니다."),
+    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, 14001, "JWT 가 만료되었습니다."),
+    UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, 14002, "지원되지 않는 JWT 입니다."),
+    JWT_CLAIMS_IS_EMPTY(HttpStatus.UNAUTHORIZED, 14003, "잘못된 JWT 입니다."),
+    JWT_NOT_FOUND(HttpStatus.NOT_FOUND, 14004, "헤더에서 JWT 를 찾을 수 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final Integer code;
