@@ -18,8 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
-@Builder
-@AllArgsConstructor
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE inquiry_about_category SET deleted_at = NOW() where id = ?")
@@ -43,4 +41,14 @@ public class InquiryAboutCategory extends BaseTimeEntity {
   @Column(nullable = false, columnDefinition = "varchar(255)")
   private String requestCategoryName;
   private Boolean isProcessed;
+
+  @Builder
+  public InquiryAboutCategory(User user, String reason, PostType requestPostType,
+      String requestCategoryName, Boolean isProcessed) {
+    this.user = user;
+    this.reason = reason;
+    this.requestPostType = requestPostType;
+    this.requestCategoryName = requestCategoryName;
+    this.isProcessed = isProcessed;
+  }
 }

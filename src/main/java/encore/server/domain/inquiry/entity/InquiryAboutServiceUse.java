@@ -17,8 +17,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
-@Builder
-@AllArgsConstructor
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE inquiry_about_service_use SET deleted_at = NOW() where id = ?")
@@ -42,4 +40,14 @@ public class InquiryAboutServiceUse extends BaseTimeEntity {
   @Column(columnDefinition = "TEXT")
   private String imageURL;
   private Boolean isProcessed;
+
+  @Builder
+  public InquiryAboutServiceUse(User user, String content, String emailToReceive, String imageURL,
+      Boolean isProcessed) {
+    this.user = user;
+    this.content = content;
+    this.emailToReceive = emailToReceive;
+    this.imageURL = imageURL;
+    this.isProcessed = isProcessed;
+  }
 }

@@ -16,8 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Builder
-@AllArgsConstructor
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Subscription extends BaseTimeEntity {
@@ -39,5 +37,11 @@ public class Subscription extends BaseTimeEntity {
         .follower(follower)
         .following(following)
         .build();
+  }
+
+  @Builder
+  public Subscription(User follower, User following) {
+    this.follower = follower;
+    this.following = following;
   }
 }
