@@ -11,6 +11,7 @@ import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.dto.response.TicketSimpleRes;
 import encore.server.domain.ticket.dto.response.TicketUpdateRes;
+import encore.server.domain.ticket.dto.response.TicketDetailRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
@@ -63,6 +64,15 @@ public class TicketController {
         return ApplicationResponse.ok(ticketList);
     }
 
+    @Operation(summary = "티켓북 상세 조회", description = "티켓북의 상세 정보를 조회합니다.")
+    @GetMapping("/{ticketId}")
+    public ApplicationResponse<TicketDetailRes> getTicketDetail(@PathVariable Long ticketId) {
+        Long userId = getUserId(); // 현재는 mock
+        TicketDetailRes detail = ticketService.getTicketDetail(ticketId, userId);
+        return ApplicationResponse.ok(detail);
+    }
+
+
     @Operation(summary = "티켓북 수정", description = "티켓북을 수정합니다.")
     @PatchMapping("/{ticketId}")
     public ApplicationResponse<TicketUpdateRes> updateTicket(
@@ -89,6 +99,15 @@ public class TicketController {
         List<TicketSimpleRes> ticketList = ticketService.getTicketsByMusicalTitle(title);
         return ApplicationResponse.ok(ticketList);
     }
+
+    @Operation(summary = "리뷰 작성되지 않은 티켓북 리스트 조회", description = "리뷰가 작성되지 않은 티켓북 목록을 조회합니다.")
+    @GetMapping("/unreviewed")
+    public ApplicationResponse<List<TicketRes>> getUnreviewedTicketList() {
+        Long userId = getUserId(); // mock
+        List<TicketRes> tickets = ticketService.getUnreviewedTicketList(userId);
+        return ApplicationResponse.ok(tickets);
+    }
+
 
 
 

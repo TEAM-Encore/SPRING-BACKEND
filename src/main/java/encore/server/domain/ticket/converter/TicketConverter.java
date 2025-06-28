@@ -28,6 +28,7 @@ public class TicketConverter {
                 .id(ticket.getId())
                 .userId(ticket.getUser().getId())
                 .musicalId(ticket.getMusical().getId())
+                .title(ticket.getTitle())
                 .viewedDate(ticket.getViewedDate())
                 .showTime(ticket.getShowTime())
                 .seat(ticket.getSeat())
@@ -77,6 +78,7 @@ public class TicketConverter {
                 .hasReview(reviewOpt.isPresent())
                 .totalRating(reviewOpt.map(r -> r.getReviewData().getRating().getTotalRating()).orElse(null))
                 .ticketImageUrl(ticket.getTicketImageUrl())
+                .musicalImageUrl(ticket.getMusical().getImageUrl())
                 .build();
     }
 

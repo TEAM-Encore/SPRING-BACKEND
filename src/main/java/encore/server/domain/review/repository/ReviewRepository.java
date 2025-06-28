@@ -13,6 +13,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
     Optional<Review> findByIdAndDeletedAtIsNull(Long reviewId);
     List<Review> findByUserIdAndDeletedAtIsNull(Long userId);
 
+    Optional<Review> findByTicketIdAndUserIdAndDeletedAtIsNull(Long ticketId, Long userId);
     @Query("SELECT r FROM Review r " +
             "JOIN FETCH r.user u " +
             "JOIN FETCH r.ticket t " +
