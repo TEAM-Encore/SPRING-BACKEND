@@ -65,6 +65,7 @@ public class TicketService {
         Ticket ticket = Ticket.builder()
                 .user(user)
                 .musical(musical)
+                .title(musical.getTitle())
                 .viewedDate(request.viewedDate())
                 .showTime(request.showTime())
                 .seat(request.seat())
