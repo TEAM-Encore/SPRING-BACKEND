@@ -228,5 +228,23 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
+    //리뷰 작성하지 않은 티켓북만 조회
+    public List<TicketRes> getUnreviewedTicketList(Long userId) {
+        // validation
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        //business login
+        // 전체 티켓 조회
+        List<Ticket> tickets = ticketRepository.findByUserIdAndDeletedAtIsNull(userId);
+
+        // 리뷰 없는 티켓만 필터링
+        return tickets.stream()
+                .filter(ticket -> reviewRepository.findByTicketIdAndDeletedAtIsNull(ticket.getId()).isEmpty())
+                .map(ticket -> TicketConverter.toTicketRes(ticket, Optional.empty()))
+                .collect(Collectors.toList());
+    }
+
+
 
 }

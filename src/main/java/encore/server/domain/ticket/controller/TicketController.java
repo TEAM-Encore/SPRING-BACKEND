@@ -100,6 +100,15 @@ public class TicketController {
         return ApplicationResponse.ok(ticketList);
     }
 
+    @Operation(summary = "리뷰 작성되지 않은 티켓북 리스트 조회", description = "리뷰가 작성되지 않은 티켓북 목록을 조회합니다.")
+    @GetMapping("/unreviewed")
+    public ApplicationResponse<List<TicketRes>> getUnreviewedTicketList() {
+        Long userId = getUserId(); // mock
+        List<TicketRes> tickets = ticketService.getUnreviewedTicketList(userId);
+        return ApplicationResponse.ok(tickets);
+    }
+
+
 
 
     private Long getUserId() {

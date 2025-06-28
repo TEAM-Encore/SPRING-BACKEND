@@ -22,6 +22,7 @@ public record TicketRes(
         List<String> actors,
         Boolean hasReview,
         Float totalRating,
-        String ticketImageUrl
+        String ticketImageUrl,
+        String musicalImageUrl
 ) {
 }

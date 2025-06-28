@@ -16,6 +16,7 @@ public record TicketCreateRes(
         Long id,
         Long userId,
         Long musicalId,
+        String title,
         LocalDate viewedDate,
         String showTime,
         String seat,
