@@ -11,6 +11,7 @@ import encore.server.domain.ticket.dto.response.TicketCreateRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.dto.response.TicketSimpleRes;
 import encore.server.domain.ticket.dto.response.TicketUpdateRes;
+import encore.server.domain.ticket.dto.response.TicketDetailRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.common.ApplicationResponse;
@@ -62,6 +63,15 @@ public class TicketController {
         List<TicketRes> ticketList = ticketService.getTicketList(userId, dateRange);
         return ApplicationResponse.ok(ticketList);
     }
+
+    @Operation(summary = "티켓북 상세 조회", description = "티켓북의 상세 정보를 조회합니다.")
+    @GetMapping("/{ticketId}")
+    public ApplicationResponse<TicketDetailRes> getTicketDetail(@PathVariable Long ticketId) {
+        Long userId = getUserId(); // 현재는 mock
+        TicketDetailRes detail = ticketService.getTicketDetail(ticketId, userId);
+        return ApplicationResponse.ok(detail);
+    }
+
 
     @Operation(summary = "티켓북 수정", description = "티켓북을 수정합니다.")
     @PatchMapping("/{ticketId}")

@@ -10,10 +10,7 @@ import encore.server.domain.ticket.dto.request.ActorCreateReq;
 import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.ticket.dto.request.TicketCreateReq;
 import encore.server.domain.ticket.dto.request.TicketUpdateReq;
-import encore.server.domain.ticket.dto.response.TicketCreateRes;
-import encore.server.domain.ticket.dto.response.TicketRes;
-import encore.server.domain.ticket.dto.response.TicketSimpleRes;
-import encore.server.domain.ticket.dto.response.TicketUpdateRes;
+import encore.server.domain.ticket.dto.response.*;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.repository.ActorRepository;
@@ -102,7 +99,7 @@ public class TicketService {
         return actorRepository.save(actor);
     }
 
-    //티켓북 조회
+    //티켓북 리스트 조회
     public List<TicketRes> getTicketList(Long userId, String dateRange) {
 
         // validation: user
@@ -132,6 +129,49 @@ public class TicketService {
                 })
                 .collect(Collectors.toList());
     }
+
+    //티켓북 상세 조회
+    @Transactional(readOnly = true)
+    public TicketDetailRes getTicketDetail(Long ticketId, Long userId) {
+
+        // validation: user, ticket
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Ticket ticket = ticketRepository.findByIdAndUserIdAndDeletedAtIsNull(ticketId, userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION));
+
+        Musical musical = ticket.getMusical();
+
+        //연관 리뷰 정보
+        Optional<Review> reviewOpt = reviewRepository.findByTicketIdAndUserIdAndDeletedAtIsNull(ticketId, userId);
+        boolean hasReview = reviewOpt.isPresent();
+        Long reviewId = hasReview ? reviewOpt.get().getId() : null;
+
+        return TicketDetailRes.builder()
+                .ticketId(ticket.getId())
+                .ticketTitle(ticket.getTitle())
+                .seat(ticket.getSeat())
+                .showTime(ticket.getShowTime())
+                .ticketImageUrl(ticket.getTicketImageUrl())
+                .viewedDate(ticket.getViewedDate())
+                .hasReview(hasReview)
+                .reviewId(reviewId)
+                .musicalId(musical.getId())
+                .musicalTitle(musical.getTitle())
+                .location(musical.getLocation())
+                .startDate(musical.getStartDate())
+                .endDate(musical.getEndDate())
+                .runningTime(musical.getRunningTime())
+                .age(musical.getAge())
+                .imageUrl(musical.getImageUrl())
+                .series(musical.getSeries())
+                .actors(ticket.getActors().stream()
+                        .map(TicketConverter::toActorDTO)
+                        .toList())
+                .build();
+    }
+
 
 
     //티켓북 수정
