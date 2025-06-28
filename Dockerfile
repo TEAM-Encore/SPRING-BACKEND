@@ -5,7 +5,7 @@ USER root
 RUN apt-get update && apt-get install -y openjdk-17-jdk wget unzip
 
 # ChromeDriver 다운로드 및 설치
-ARG CHROMEDRIVER_VERSION=134.0.6998.165
+ARG CHROMEDRIVER_VERSION=137.0.7151.68
 RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip -O /tmp/chromedriver.zip \
     && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
     && mv /usr/local/bin/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
