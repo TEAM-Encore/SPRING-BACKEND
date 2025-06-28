@@ -77,10 +77,9 @@ public class ReviewService {
         return ReviewDetailRes.of(review, true, likeType, elapsedTime);
     }
 
-    public ViewImageRes viewImage(Long cycle) {
+    public ViewImageRes viewImage() {
         //validation: cycle
-        long start = (cycle - 1) * 4 + 1;
-        List<ViewImage> viewImages = viewImageRepository.findByIdBetween(start, start + 3);
+        List<ViewImage> viewImages = viewImageRepository.findRandom4();
 
         //return: view image response
         return ViewImageRes.of(viewImages);

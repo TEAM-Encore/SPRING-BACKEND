@@ -63,8 +63,8 @@ public class ReviewController {
 
     @GetMapping("/view-image/{cycle}")
     @Operation(summary = "시야 이미지 조회", description = "cycle 별로 시야 이미지를 조회합니다.")
-    public ApplicationResponse<ViewImageRes> viewImage(@PathVariable("cycle") Long cycle) {
-        return ApplicationResponse.ok(reviewService.viewImage(cycle));
+    public ApplicationResponse<ViewImageRes> viewImage(@PathVariable(value = "cycle", required = false) Long cycle) {
+        return ApplicationResponse.ok(reviewService.viewImage());
     }
 
     @PostMapping("/{review_id}/unlock")
