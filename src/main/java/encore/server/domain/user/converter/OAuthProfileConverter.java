@@ -27,7 +27,7 @@ public class OAuthProfileConverter {
     return UserSignupReq.builder()
         .email(profile.getKakao_account().getEmail())
         .password(profile.getKakao_account().getEmail())
-        .name(profile.getKakao_account().getName())
+        .name(profile.getProperties().getNickname())
         .provider(AuthProvider.KAKAO)
         .role(UserRole.BASIC)
         .build();
