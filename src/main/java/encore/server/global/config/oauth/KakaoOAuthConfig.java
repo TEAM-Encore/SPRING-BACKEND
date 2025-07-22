@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class KakaoOAuthConfig {
   private String clientId;
+  private String clientSecret;
   private String redirectUri;
   private String scope;
 }

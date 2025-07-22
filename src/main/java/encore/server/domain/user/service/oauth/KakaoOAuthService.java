@@ -68,6 +68,7 @@ public class KakaoOAuthService implements OAuthLoginService {
     MultiValueMap<String, String> tokenParams = new LinkedMultiValueMap<>();
     tokenParams.add("grant_type", "authorization_code");
     tokenParams.add("client_id", config.getClientId());
+    tokenParams.add("client_secret", config.getClientSecret());
     tokenParams.add("redirect_uri", config.getRedirectUri());
     tokenParams.add("code", code);
 
