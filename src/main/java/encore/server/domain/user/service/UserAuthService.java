@@ -98,6 +98,7 @@ public class UserAuthService {
         return UserLoginRes.builder()
             .accessToken(accessToken)
             .isAgreedRequiredTerm(numOfAgreedRequiredTerm == numOfTermsByIsOptionalFalse)
+            .isActivePenalty(true)
             .userPenaltyInfo(
                 UserPenaltyInfo.builder()
                     .penaltyStatus(penaltyHistory.getStatus())
@@ -114,6 +115,7 @@ public class UserAuthService {
     return UserLoginRes.builder()
         .accessToken(accessToken)
         .isAgreedRequiredTerm(numOfAgreedRequiredTerm == numOfTermsByIsOptionalFalse)
+        .isActivePenalty(false)
         .build();
   }
 
