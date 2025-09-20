@@ -44,7 +44,6 @@ public class TicketConverter {
                 .id(ticket.getId())
                 .userId(ticket.getUser().getId())
                 .musicalTitle(ticket.getMusical().getTitle())
-                .series(ticket.getMusical().getSeries())
                 .viewedDate(ticket.getViewedDate())
                 .location(ticket.getMusical().getLocation())
                 .seat(ticket.getSeat())
@@ -68,7 +67,6 @@ public class TicketConverter {
                 .id(ticket.getId())
                 .userId(ticket.getUser().getId())
                 .musicalTitle(ticket.getMusical().getTitle())
-                .series(convertSeriesToText(ticket.getMusical().getSeries())) // 변환된 값 사용
                 .viewedDate(ticket.getViewedDate())
                 .location(ticket.getMusical().getLocation())
                 .seat(ticket.getSeat())
@@ -87,7 +85,6 @@ public class TicketConverter {
                 .id(ticket.getId())
                 .userId(ticket.getUser().getId())
                 .musicalTitle(ticket.getMusical().getTitle())
-                .series(convertSeriesToText(ticket.getMusical().getSeries())) // 숫자 -> 문자열 변환
                 .viewedDate(ticket.getViewedDate())
                 .location(ticket.getMusical().getLocation())
                 .seat(ticket.getSeat())

@@ -17,6 +17,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Deprecated
 public class MusicalListService {
     private final MusicalRepository musicalRepository;
     private final JsoupConfig jsoupConfig;
@@ -45,9 +46,9 @@ public class MusicalListService {
                 if (linkElement != null) { // GroupCode가 포함된 링크가 존재하는 경우
                     String href = linkElement.attr("href");
                     String groupId = extractGroupId(href); // GroupCode 추출
-                    if(musicalRepository.existsByInterparkId(groupId)) { // 이미 저장했던 뮤지컬인 경우 패스
-                        continue;
-                    }
+//                    if(musicalRepository.existsByInterparkId(groupId)) { // 이미 저장했던 뮤지컬인 경우 패스
+//                        continue;
+//                    }
                     if (groupId != null) {
                         musicalIds.add(groupId);
                         log.info("GroupCode: " + groupId);

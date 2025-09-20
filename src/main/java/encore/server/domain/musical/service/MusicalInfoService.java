@@ -29,6 +29,7 @@ import java.util.*;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Deprecated
 public class MusicalInfoService {
     private final SeleniumConfig seleniumConfig;
     private final MusicalRepository musicalRepository;
@@ -100,16 +101,13 @@ public class MusicalInfoService {
             String age = ageElement.getText();
 
             Musical musical = Musical.builder()
-                    .interparkId(groupId)
                     .title(title)
                     .imageUrl(imageUrl)
                     .location(location)
                     .startDate(parseDate(startDate))
                     .endDate(parseDate(endDate))
                     .runningTime(runningTime)
-                    .age(age)
                     .musicalActors(new ArrayList<>())
-                    .showTimes(new ArrayList<>())
                     .build();
 
             musicalRepository.save(musical);
@@ -192,9 +190,9 @@ public class MusicalInfoService {
      * @param dateStr
      * @return
      */
-    private LocalDateTime parseDate(String dateStr) {
+    private LocalDate parseDate(String dateStr) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         LocalDate date = LocalDate.parse(dateStr, dateFormatter);
-        return date.atStartOfDay();
+        return date;
     }
 }

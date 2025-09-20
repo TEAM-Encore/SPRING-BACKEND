@@ -25,10 +25,10 @@ public class MusicalController {
     private final MusicalService musicalService;
     private final MusicalListService musicalListService;
 
-    @Operation(summary = "뮤지컬 검색", description = "뮤지컬을 키워드로 검색합니다.")
+    @Operation(summary = "뮤지컬 검색", description = "뮤지컬을 제목으로 검색합니다.")
     @GetMapping("/search")
-    public ApplicationResponse<List<MusicalRes>> searchMusicals(@RequestParam String keyword) {
-        List<MusicalRes> responses = musicalService.searchMusicalsByTitle(keyword);
+    public ApplicationResponse<List<MusicalRes>> searchMusicals(@RequestParam String title) {
+        List<MusicalRes> responses = musicalService.searchMusicalsByTitle(title);
         return ApplicationResponse.ok(responses);
     }
 
@@ -45,12 +45,12 @@ public class MusicalController {
         return ApplicationResponse.ok(responses);
     }
 
-    @Operation(summary = "이달의 인기 뮤지컬 조회", description = "이달의 인기 뮤지컬 8개를 조회합니다.")
-    @GetMapping("/featured")
-    public ApplicationResponse<List<MusicalSimpleRes>> getFeaturedMusicals() {
-        List<MusicalSimpleRes> musicals = musicalService.getFeaturedMusicals();
-        return ApplicationResponse.ok(musicals);
-    }
+//    @Operation(summary = "이달의 인기 뮤지컬 조회", description = "이달의 인기 뮤지컬 8개를 조회합니다.")
+//    @GetMapping("/featured")
+//    public ApplicationResponse<List<MusicalSimpleRes>> getFeaturedMusicals() {
+//        List<MusicalSimpleRes> musicals = musicalService.getFeaturedMusicals();
+//        return ApplicationResponse.ok(musicals);
+//    }
 
     @Operation(summary = "개봉 예정 뮤지컬 조회", description = "개봉이 임박한 뮤지컬을 최대 8개 조회합니다.")
     @GetMapping("/upcoming")

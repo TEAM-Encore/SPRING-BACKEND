@@ -6,10 +6,7 @@ import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
@@ -18,22 +15,14 @@ import java.util.List;
 
 
 @Getter
+@Setter
 @Entity
 @SQLDelete(sql = "UPDATE ticket SET deleted_at = NOW() where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Ticket extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, columnDefinition = "bigint")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, columnDefinition = "bigint")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "musical_id", nullable = false, columnDefinition = "bigint")
-    private Musical musical;
 
     @Column(nullable = true, columnDefinition = "varchar(255)")
     private String title;
@@ -50,6 +39,14 @@ public class Ticket extends BaseTimeEntity {
     //관람 회차 시간
     @Column(nullable = false, columnDefinition = "varchar(50)")
     private String showTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, columnDefinition = "bigint")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "musical_id", nullable = false, columnDefinition = "bigint")
+    private Musical musical;
 
     @ManyToMany
     @JoinTable(
@@ -73,31 +70,6 @@ public class Ticket extends BaseTimeEntity {
         this.seat = seat;
         this.showTime = showTime;
         this.review = review;
-        this.actors = actors;
-    }
-
-    // Setter 메서드 추가
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setTicketImageUrl(String ticketImageUrl) {
-        this.ticketImageUrl = ticketImageUrl;
-    }
-
-    public void setViewedDate(LocalDate viewedDate) {
-        this.viewedDate = viewedDate;
-    }
-
-    public void setSeat(String seat) {
-        this.seat = seat;
-    }
-
-    public void setShowTime(String showTime) {
-        this.showTime = showTime;
-    }
-
-    public void setActors(List<Actor> actors) {
         this.actors = actors;
     }
 }

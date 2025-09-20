@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "musical_actor")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MusicalActor {
 
@@ -27,17 +26,9 @@ public class MusicalActor {
     @JoinColumn(name = "actor_id", nullable = false)
     private Actor actor;
 
-    @Column(nullable = false, columnDefinition = "varchar(255)")
-    private String roleName; // 배역 이름
-
-    @Column(nullable = false)
-    private boolean isMainActor; // 주연 여부
-
     @Builder
     public MusicalActor(Musical musical, Actor actor, String roleName, boolean isMainActor) {
         this.musical = musical;
         this.actor = actor;
-        this.roleName = roleName;
-        this.isMainActor = isMainActor;
     }
 }
