@@ -21,20 +21,14 @@ public class UserInfoService {
 
   private final UserRepository userRepository;
   private final PostRepository postRepository;
-  private final SubscriptionService subscriptionService;
 
   public UserGetMeRes getMyInfo(Long userId) {
     User me = userRepository.findById(userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
     long numOfWritePost = postRepository.countByUserAndDeletedAtIsNull(me);
-    long numOfSubscriber = subscriptionService.getSubscriberCount(userId);
 
-    List<String> userPreferredKeywords = me.getUserPreferredKeywords().stream()
-        .map(upk -> upk.getPreferredKeyword().getPreferredKeywordEnum().getKeywordText())
-        .toList();
-
-    return UserConverter.toUserGetMeRes(me, userPreferredKeywords, numOfWritePost, numOfSubscriber);
+    return UserConverter.toUserGetMeRes(me, numOfWritePost);
   }
 
   public UserGetRes getUserInfo(Long userId) {
@@ -42,13 +36,8 @@ public class UserInfoService {
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
     long numOfWritePost = postRepository.countByUserAndDeletedAtIsNull(user);
-    long numOfSubscriber = subscriptionService.getSubscriberCount(userId);
 
-    List<String> userPreferredKeywords = user.getUserPreferredKeywords().stream()
-        .map(upk -> upk.getPreferredKeyword().getPreferredKeywordEnum().getKeywordText())
-        .toList();
-
-    return UserConverter.toUserGetRes(user, userPreferredKeywords, numOfWritePost, numOfSubscriber);
+    return UserConverter.toUserGetRes(user, numOfWritePost);
   }
 
 }

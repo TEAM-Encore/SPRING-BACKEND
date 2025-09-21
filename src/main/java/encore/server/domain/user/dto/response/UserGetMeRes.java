@@ -10,10 +10,7 @@ import lombok.Builder;
 public record UserGetMeRes(
     Long point,
     String nickname,
-    Long numOfSubscriber,
     Long numOfWritePost,
-    List<String> preferredKeywords,
-    String viewingFrequency,
     String email
 ) {
 
