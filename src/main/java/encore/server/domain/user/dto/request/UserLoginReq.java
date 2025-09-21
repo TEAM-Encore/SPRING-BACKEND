@@ -14,16 +14,11 @@ import java.util.Map;
 public record UserLoginReq(
         @Schema(description = "이메일", example = "encore@gmail.com")
         @NotNull
-        String email,
-        @Schema(description = "비밀번호", example = "password")
-        @NotNull
-        String password
+        String email
 ) {
     public static UserLoginReq fromOauthAttributes(Map<String,Object> oauthLoginUserInfoAttributes) {
         return UserLoginReq.builder()
                 .email((String) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.EMAIL_KEY))
-                .password((String) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.EMAIL_KEY)) // 비밀번호와 이메일이 동일하게 설정되는 경우
                 .build();
-
     }
 }

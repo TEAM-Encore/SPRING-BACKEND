@@ -12,22 +12,18 @@ public class OAuthProfileConverter {
   public static UserLoginReq profileToLoginReq(KakaoProfileResponse profile) {
     return UserLoginReq.builder()
         .email(profile.getKakao_account().getEmail())
-        .password(profile.getKakao_account().getEmail())
         .build();
   }
 
   public static UserLoginReq profileToLoginReq(GoogleUserProfile profile) {
     return UserLoginReq.builder()
         .email(profile.getEmail())
-        .password(profile.getEmail())
         .build();
   }
 
   public static UserSignupReq profileToSignupReq(KakaoProfileResponse profile) {
     return UserSignupReq.builder()
         .email(profile.getKakao_account().getEmail())
-        .password(profile.getKakao_account().getEmail())
-        .name(profile.getProperties().getNickname())
         .provider(AuthProvider.KAKAO)
         .role(UserRole.BASIC)
         .build();
@@ -36,8 +32,6 @@ public class OAuthProfileConverter {
   public static UserSignupReq profileToSignupReq(GoogleUserProfile profile) {
     return UserSignupReq.builder()
         .email(profile.getEmail())
-        .password(profile.getEmail())
-        .name(profile.getName())
         .provider(AuthProvider.GOOGLE)
         .role(UserRole.BASIC)
         .build();
