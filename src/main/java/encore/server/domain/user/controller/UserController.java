@@ -9,6 +9,7 @@ import encore.server.domain.user.service.UserAuthService;
 import encore.server.domain.user.service.UserHashtagService;
 import encore.server.domain.user.service.UserInfoService;
 import encore.server.domain.user.service.UserSetupService;
+import encore.server.global.aop.annotation.LoginUserId;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,43 +32,43 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    @Operation(summary = "회원가입", description = "주어진 정보로 회원가입을 진행합니다.")
+    @Operation(summary = "(MVP) 회원가입", description = "주어진 정보로 회원가입을 진행합니다.")
     public ApplicationResponse<UserSignupRes> signup(@RequestBody @Valid UserSignupReq userSignupReq) {
         return ApplicationResponse.ok(userAuthService.signup(userSignupReq));
     }
 
     // 로그인
     @PostMapping("/login")
-    @Operation(summary = "로그인", description = "주어진 정보로 로그인을 진행합니다.")
+    @Operation(summary = "(MVP) 로그인", description = "주어진 정보로 로그인을 진행합니다.")
     public ApplicationResponse<UserLoginRes> login(@RequestBody @Valid UserLoginReq userLoginReq) {
         return ApplicationResponse.ok(userAuthService.login(userLoginReq));
     }
 
     @GetMapping("/nickname-validation/{nickname}")
-    @Operation(summary = "유저 닉네임 검증", description = "주어진 파라미터로 중복확인과 제약조건 검증을 진행합니다.")
+    @Operation(summary = "(MVP) 유저 닉네임 검증", description = "주어진 파라미터로 중복확인과 제약조건 검증을 진행합니다.")
     public ApplicationResponse<UserNicknameValidationRes> validateUserNickname(@PathVariable String nickname) {
         return ApplicationResponse.ok(userSetupService.validateUserNickname(nickname));
     }
 
     @PatchMapping("/me")
-    @Operation(summary = "유저 정보 변경", description = "주어진 정보로 현재 로그인한 유저 정보를 변경합니다. 정보를 받은 요소만 변경합니다.")
-    public ApplicationResponse<Void> patchUserInfo(@RequestBody @Valid UserPatchReq userPatchReq){
-        Long userId = 1L;
-        userSetupService.patchUserInfo(userPatchReq, userId);
+    @Operation(summary = "(MVP) 유저 정보 변경", description = "주어진 정보로 현재 로그인한 유저 정보를 변경합니다. 정보를 받은 요소만 변경합니다.")
+    public ApplicationResponse<Void> patchUserInfo(
+        @RequestBody @Valid UserPatchReq userPatchReq,
+        @LoginUserId Long loginUserId
+    ){
+        userSetupService.patchUserInfo(userPatchReq, loginUserId);
         return ApplicationResponse.ok();
     }
 
     @GetMapping("/me")
-    @Operation(summary = "내 정보 조회", description = "현재 로그인한 유저 정보를 조회합니다.")
-    public ApplicationResponse<UserGetMeRes> getMyInfo() {
-        Long userId = 1L;
-        return ApplicationResponse.ok(userInfoService.getMyInfo(userId));
+    @Operation(summary = "(MVP) 내 정보 조회", description = "현재 로그인한 유저 정보를 조회합니다.")
+    public ApplicationResponse<UserGetMeRes> getMyInfo(@LoginUserId Long loginUserId) {
+        return ApplicationResponse.ok(userInfoService.getMyInfo(loginUserId));
     }
 
     @GetMapping("/{userId}")
-    @Operation(summary = "유저 정보 조회", description = "주어진 아이디로 유저 정보를 조회합니다.")
+    @Operation(summary = "(MVP) 유저 정보 조회", description = "주어진 아이디로 유저 정보를 조회합니다.")
     public ApplicationResponse<UserGetRes> getUserInfo(@PathVariable @Valid Long userId) {
-        userId = 1L;
         return ApplicationResponse.ok(userInfoService.getUserInfo(userId));
     }
 
