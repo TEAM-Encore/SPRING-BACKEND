@@ -31,20 +31,28 @@ public class UserSetupService {
 
   public UserNicknameValidationRes validateUserNickname(String nickname) {
     // business logic
-    // 1. 허용 문자 검증
+    // 1. 공백 및 null 여부 검증
+    if (nickname == null || nickname.trim().isEmpty()) {
+      throw new ApplicationException(ErrorCode.USER_NICKNAME_INVALID_FORMAT_EXCEPTION);
+    }
+    if (nickname.contains(" ")) {
+      throw new ApplicationException(ErrorCode.USER_NICKNAME_CONTAINS_WHITESPACE_EXCEPTION);
+    }
+    
+    // 2. 허용 문자 검증
     if (!nickname.matches("^[가-힣a-zA-Z0-9]+$")) {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_INVALID_FORMAT_EXCEPTION);
     }
 
-    // 2. 길이 검증
+    // 3. 길이 검증
     if (nickname.length() < 3) {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_TOO_SHORT_EXCEPTION);
     }
-    if (nickname.length() > 8) {
+    if (nickname.length() > 6) {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_TOO_LONG_EXCEPTION);
     }
 
-    // 3. 이미 존재하는 닉네임인지 검증
+    // 4. 이미 존재하는 닉네임인지 검증
     if (userRepository.existsByNickName(nickname)) {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_ALREADY_EXIST_EXCEPTION);
     }
@@ -71,20 +79,7 @@ public class UserSetupService {
     if (request.profileImageUrl() != null) {
       userToUpdate.updateProfileImageUrl(request.profileImageUrl());
     }
-    // 요청에 관람 빈도가 있을 경우 변경
-    if (request.viewingFrequency() != null) {
-      userToUpdate.updateViewingFrequency(request.viewingFrequency());
-    }
-    // 요청에 선호하는 공연 키워드가 있을 경우
-    if (request.preferredKeywordEnums() != null) {
-      // 요청으로 들어온 키워드를 DB 에서 가져옴
-      List<PreferredKeyword> updateKeywordListManagedToEntityManager = preferredKeywordRepository.findAllByDeletedAtIsNullAndPreferredKeywordEnumIn(
-          request.preferredKeywordEnums());
-      // user 에 관련된 UserKeyword 중간 테이블 Row 를 모두 삭제
-      userKeywordRepository.deleteAllByUserAndDeletedAtIsNull(userToUpdate);
-      // 유저 키워드 연관관계 추가
-      userToUpdate.addUserPreferredKeywords(updateKeywordListManagedToEntityManager);
-    }
+
     // 요청에 이용약관이 있을 경우
     if (request.agreeTermEnums() != null) {
       // 요청으로 들어온 이용약관을 DB 에서 가져옴

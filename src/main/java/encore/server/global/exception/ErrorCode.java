@@ -34,9 +34,10 @@ public enum ErrorCode {
 
     //Related to User Nickname
     USER_NICKNAME_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 3003, "이미 존재하는 닉네임입니다."),
-    USER_NICKNAME_TOO_LONG_EXCEPTION(HttpStatus.BAD_REQUEST, 3004, "닉네임은 8자 이내 3자 이상이여야 합니다."),
-    USER_NICKNAME_TOO_SHORT_EXCEPTION(HttpStatus.BAD_REQUEST, 3006, "닉네임은 3자 이상 8자 이내여야 합니다."),
-    USER_NICKNAME_INVALID_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, 3007, "닉네임은 한글, 영어, 숫자로만 구성되어야 합니다."),
+    USER_NICKNAME_TOO_LONG_EXCEPTION(HttpStatus.BAD_REQUEST, 3004, "닉네임은 6자 이내 3자 이상이여야 합니다."),
+    USER_NICKNAME_TOO_SHORT_EXCEPTION(HttpStatus.BAD_REQUEST, 3005, "닉네임은 3자 이상 6자 이내여야 합니다."),
+    USER_NICKNAME_INVALID_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, 3006, "닉네임은 한글, 영어, 숫자로만 구성되어야 합니다."),
+    USER_NICKNAME_CONTAINS_WHITESPACE_EXCEPTION(HttpStatus.BAD_REQUEST, 3007 ,"닉네임에 공백이 포함되면 안됩니다." ),
 
 
     // 4000: Post Error
@@ -84,6 +85,7 @@ public enum ErrorCode {
     UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, 14002, "지원되지 않는 JWT 입니다."),
     JWT_CLAIMS_IS_EMPTY(HttpStatus.UNAUTHORIZED, 14003, "잘못된 JWT 입니다."),
     JWT_NOT_FOUND(HttpStatus.NOT_FOUND, 14004, "헤더에서 JWT 를 찾을 수 없습니다.");
+
 
 
     private final HttpStatus httpStatus;
