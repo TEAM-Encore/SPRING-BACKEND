@@ -47,11 +47,6 @@ public class SeleniumConfig {
 
     @Bean
     public WebDriver getDriver() {
-        if (!enabled) {
-            log.warn("[Selenium] disabled by property. Using NoOpWebDriver.");
-            return new NoOpWebDriver();
-        }
-
         initDriver();
         if (driver == null) {
             throw new IllegalStateException("WebDriver is not initialized. Please check the Selenium configuration.");
@@ -64,26 +59,4 @@ public class SeleniumConfig {
             driver.quit();
         }
     }
-
-    /**
-     * 가짜 드라이버: 호출 시 예외 대신 빈 값/No-Op 동작
-     */
-    private static final class NoOpWebDriver implements WebDriver, JavascriptExecutor {
-        @Override public void get(String url) {}
-        @Override public String getCurrentUrl() { return ""; }
-        @Override public String getTitle() { return ""; }
-        @Override public List<WebElement> findElements(By by) { return List.of(); }
-        @Override public WebElement findElement(By by) { throw new NoSuchElementException("NoOpWebDriver"); }
-        @Override public String getPageSource() { return ""; }
-        @Override public void close() {}
-        @Override public void quit() {}
-        @Override public Set<String> getWindowHandles() { return Set.of(); }
-        @Override public String getWindowHandle() { return "noop"; }
-        @Override public TargetLocator switchTo() { throw new UnsupportedOperationException("NoOpWebDriver"); }
-        @Override public Navigation navigate() { throw new UnsupportedOperationException("NoOpWebDriver"); }
-        @Override public Options manage() { throw new UnsupportedOperationException("NoOpWebDriver"); }
-        @Override public Object executeScript(String script, Object... args) { return null; }
-        @Override public Object executeAsyncScript(String script, Object... args) { return null; }
-    }
-
 }

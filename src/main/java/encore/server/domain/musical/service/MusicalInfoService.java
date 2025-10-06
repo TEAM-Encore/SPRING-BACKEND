@@ -1,7 +1,6 @@
 package encore.server.domain.musical.service;
 
 import encore.server.domain.musical.entity.Musical;
-import encore.server.domain.musical.entity.MusicalActor;
 import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.repository.ActorRepository;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -106,8 +104,6 @@ public class MusicalInfoService {
                     .location(location)
                     .startDate(parseDate(startDate))
                     .endDate(parseDate(endDate))
-                    .runningTime(runningTime)
-                    .musicalActors(new ArrayList<>())
                     .build();
 
             musicalRepository.save(musical);
@@ -162,18 +158,8 @@ public class MusicalInfoService {
                         Actor.builder()
                             .name(actorName)
                             .actorImageUrl(actorPhotoUrl)
-                            .musicalActors(new ArrayList<>())
                             .build());
                 actorRepository.save(actor);
-
-                MusicalActor musicalActor = MusicalActor.builder()
-                        .actor(actor)
-                        .roleName(roleName)
-                        .isMainActor(true)
-                        .musical(musical)
-                        .build();
-
-                musical.addMusicalActors(musicalActor);
             }
 
         } catch (Exception e) {

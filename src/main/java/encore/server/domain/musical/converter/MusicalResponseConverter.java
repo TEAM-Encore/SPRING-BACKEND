@@ -3,10 +3,6 @@ package encore.server.domain.musical.converter;
 import encore.server.domain.musical.dto.response.MusicalDetailRes;
 import encore.server.domain.musical.dto.response.MusicalRes;
 import encore.server.domain.musical.entity.Musical;
-import encore.server.domain.musical.entity.MusicalActor;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MusicalResponseConverter {
     public static MusicalRes toResponse(Musical musical) {
@@ -26,16 +22,15 @@ public class MusicalResponseConverter {
                 .endDate(musical.getEndDate())
                 .location(musical.getLocation())
                 .imageUrl(musical.getImageUrl())
-                .actors(toActorResponses(musical.getMusicalActors()))
                 .build();
     }
 
-    private static List<MusicalDetailRes.MusicalActorRes> toActorResponses(List<MusicalActor> musicalActors) {
-        return musicalActors.stream()
-                .map(actor -> MusicalDetailRes.MusicalActorRes.builder()
-                        .actorName(actor.getActor().getName())
-                        .actorImageUrl(actor.getActor().getActorImageUrl())
-                        .build())
-                .collect(Collectors.toList());
-    }
+//    private static List<MusicalDetailRes.MusicalActorRes> toActorResponses(List<MusicalActor> musicalActors) {
+//        return musicalActors.stream()
+//                .map(actor -> MusicalDetailRes.MusicalActorRes.builder()
+//                        .actorName(actor.getActor().getName())
+//                        .actorImageUrl(actor.getActor().getActorImageUrl())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 }

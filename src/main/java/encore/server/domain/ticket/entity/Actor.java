@@ -1,15 +1,11 @@
 package encore.server.domain.ticket.entity;
 
-import encore.server.domain.musical.entity.MusicalActor;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -27,13 +23,9 @@ public class Actor extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String actorImageUrl;
 
-    @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MusicalActor> musicalActors = new ArrayList<>();
-
     @Builder
-    public Actor(String name, String actorImageUrl, List<MusicalActor> musicalActors) {
+    public Actor(String name, String actorImageUrl) {
         this.name = name;
         this.actorImageUrl = actorImageUrl;
-        this.musicalActors = musicalActors != null ? musicalActors : new ArrayList<>();
     }
 }

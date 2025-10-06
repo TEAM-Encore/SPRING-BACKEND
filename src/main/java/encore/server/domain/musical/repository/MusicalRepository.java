@@ -12,9 +12,11 @@ public interface MusicalRepository extends JpaRepository<Musical, Long> {
     List<Musical> findByTitleContaining(String keyword);
     Optional<Musical> findByIdAndDeletedAtIsNull(Long id);
     List<Musical> findByTitleAndDeletedAtIsNull(String title);
+    List<Musical> findByOpenApiIdIn(List<String> openApiIds);
 
     @Query("SELECT m FROM Musical m WHERE m.startDate > :now AND m.deletedAt IS NULL ORDER BY m.startDate ASC")
     List<Musical> findUpcomingMusicals(LocalDateTime now);
 
     boolean existsByTitle(String title);
+    boolean existsByOpenApiId(String openApiId);
 }
