@@ -29,7 +29,9 @@ public class SecurityConfig{
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions().sameOrigin()) // ✅ H2 콘솔 허용
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/h2-console/**").permitAll() // ✅ 콘솔 접근 허용
                         .requestMatchers("/**").permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())

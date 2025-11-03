@@ -9,7 +9,6 @@ import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.ticket.entity.Actor;
-import encore.server.domain.ticket.entity.Companion;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.exception.ApplicationException;
@@ -56,14 +55,9 @@ public class ReviewConverter {
     private static ReviewDetailRes.TicketRes toTicketRes(Ticket ticket) {
         return ReviewDetailRes.TicketRes.builder()
                 .ticketId(ticket.getId())
-                .ticketTitle(ticket.getTitle())
-                .seat(ticket.getSeat())
+                .ticketTitle(ticket.getMusical().getTitle())
                 .viewedDate(ticket.getViewedDate())
                 .imageUrl(ticket.getTicketImageUrl())
-                .actors(ticket.getActors()
-                        .stream()
-                        .map(Actor::getName)
-                        .collect(Collectors.toList()))
                 .build();
     }
 

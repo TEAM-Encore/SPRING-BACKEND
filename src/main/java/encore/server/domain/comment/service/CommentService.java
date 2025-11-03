@@ -37,7 +37,7 @@ public class CommentService {
     @Transactional
     public CommentRes create(Long postId, Long userId, CommentReq req) {
         // validation: user, post 유효성 확인
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
@@ -66,7 +66,7 @@ public class CommentService {
     @Transactional
     public CommentRes update(Long postId, Long commentId, Long userId, CommentReq commentReq) {
         // validation: user, post, comment 유효성 및 댓글 작성자인지 확인
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
@@ -92,7 +92,7 @@ public class CommentService {
     @Transactional
     public void delete(Long postId, Long commentId, Long userId) {
         //validation: user, post, comment 유효성 및 댓글 작성자인지 확인
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
@@ -114,7 +114,7 @@ public class CommentService {
         //validation: post 유효성 확인
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         //business logic: 게시글의 댓글 목록 반환
@@ -129,7 +129,7 @@ public class CommentService {
     @Transactional
     public CommentLikeRes like(Long postId, Long commentId, Long userId) {
         //validation: user, post, comment 유효성 확인
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.POST_NOT_FOUND_EXCEPTION));

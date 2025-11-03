@@ -11,14 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    List<Ticket> findByUserIdAndViewedDateAfterAndDeletedAtIsNull(Long userId, LocalDate date);
-    List<Ticket> findByUserIdAndDeletedAtIsNull(Long userId);
-    List<Ticket> findByMusical_TitleContainingAndDeletedAtIsNull(String keyword);
+    Optional<Ticket> findByIdAndUserId(Long ticketId, Long userId);
 
+    List<Ticket> findByUserIdAndViewedDateAfter(Long userId, LocalDate startDate);
 
-    @Modifying
-    @Query("UPDATE Ticket t SET t.deletedAt = CURRENT_TIMESTAMP WHERE t.id = :ticketId")
-    void softDeleteByTicketId(@Param("ticketId") Long ticketId);
+    List<Ticket> findByUserId(Long userId);
 
-    Optional<Ticket> findByIdAndUserIdAndDeletedAtIsNull(Long ticketId, Long userId);
+    List<Ticket> findByMusical_TitleContaining(String musicalTitle);
 }

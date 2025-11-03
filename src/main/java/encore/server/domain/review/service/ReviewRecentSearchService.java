@@ -29,7 +29,7 @@ public class ReviewRecentSearchService {
 
     public void saveRecentSearchLog(String keyword, Long userId) {
         // validation
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         double score = System.currentTimeMillis();
@@ -57,7 +57,7 @@ public class ReviewRecentSearchService {
     }
 
     public Set<SearchLogRedis> deleteRecentSearchLog(String name, Long userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         String key = searchLogKey(userId);
@@ -76,7 +76,7 @@ public class ReviewRecentSearchService {
     }
 
     public void deleteAllRecentSearchLogs(Long userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
         String key = searchLogKey(userId);
 

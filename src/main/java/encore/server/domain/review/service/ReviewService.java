@@ -46,13 +46,13 @@ public class ReviewService {
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
         // validation: user, ticket, review
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Ticket ticket = ticketRepository.findByIdAndUserIdAndDeletedAtIsNull(ticketId, userId)
+        Ticket ticket = ticketRepository.findByIdAndUserId(ticketId, userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION));
 
-        reviewRepository.findByTicketIdAndDeletedAtIsNull(ticketId)
+        reviewRepository.findByTicketId(ticketId)
                 .ifPresent(existingReview -> {
                     throw new ApplicationException(ErrorCode.REVIEW_ALREADY_EXIST_EXCEPTION);
                 });
@@ -87,7 +87,7 @@ public class ReviewService {
 
     public ReviewDetailRes getReview(Long userId, Long reviewId) {
         // validation: user, review, isUnlocked
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Review review = reviewRepository.findReviewDetail(reviewId)
@@ -117,10 +117,10 @@ public class ReviewService {
     @Transactional
     public void unlockReview(Long userId, Long reviewId) {
         //validation: user, review
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
         if (userReviewRepository.existsByUserIdAndReviewIdAndDeletedAtIsNull(userId, reviewId)) {
@@ -142,11 +142,11 @@ public class ReviewService {
 
     public List<ReviewSimpleRes> getUserReviews(Long userId, Long reviewId) {
         // validation: user
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         // business logic: get user reviews (현재 보고 있는 review 제외)
-        List<Review> reviews = reviewRepository.findByUserIdAndDeletedAtIsNull(userId);
+        List<Review> reviews = reviewRepository.findByUserId(userId);
         if (reviews.isEmpty()) {
             throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
         }
@@ -167,9 +167,9 @@ public class ReviewService {
     @Transactional
     public ReviewLikeRes likeReview(Long userId, Long reviewId, LikeType likeType) {
         // validation: user, review
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
         // business logic: like review
@@ -237,7 +237,7 @@ public class ReviewService {
 
     public Slice<ReviewSimpleRes> getReviewList(Long userId, String searchKeyword, Long cursor, String tag, Pageable pageable) {
         // validation: user, review
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         // business logic: get review list
@@ -290,10 +290,10 @@ public class ReviewService {
     @Transactional
     public ReviewDetailRes updateReview(Long userId, Long reviewId, ReviewReq req) {
         //validation: user, review
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
         if (review.getUser().getId() != user.getId()) {
@@ -326,10 +326,10 @@ public class ReviewService {
     @Transactional
     public void deleteReview(Long userId, Long reviewId) {
         //validation: user, review
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
         if (review.getUser().getId() != user.getId()) {
@@ -343,10 +343,10 @@ public class ReviewService {
     @Transactional
     public ReviewReportRes reportReview(Long userId, Long reviewId, ReportReason reason) {
         //validation: user, review, self report, duplicated report
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Review review = reviewRepository.findByIdAndDeletedAtIsNull(reviewId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION));
 
         if (review.getUser().getId() != user.getId()) {

@@ -10,11 +10,12 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record TicketUpdateReq(
-        String title,
+        String ticketImageUrl,
         LocalDate viewedDate,
+        Long floor,
+        String zone,
+        String col,
+        String number,
         String showTime,
-        String seat,
-        List<ActorDTO> actors,
-        String ticketImageUrl
-) {
-}
+        List<Long> actorIds
+) { }
