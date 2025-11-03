@@ -2,74 +2,107 @@ package encore.server.domain.ticket.entity;
 
 import encore.server.domain.review.entity.Review;
 import encore.server.domain.musical.entity.Musical;
-import encore.server.domain.ticket.dto.request.ActorDTO;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
 @Getter
-@Setter
 @Entity
-@SQLDelete(sql = "UPDATE ticket SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE ticket SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Ticket extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true, columnDefinition = "varchar(255)")
-    private String title;
-
     @Column(nullable = true, columnDefinition = "text")
     private String ticketImageUrl;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    @Column(nullable = false)
     private LocalDate viewedDate;
 
-    @Column(nullable = false, columnDefinition = "varchar(255)")
-    private String seat;
+    @Column(nullable = true)
+    private Long floor;
 
-    //관람 회차 시간
-    @Column(nullable = false, columnDefinition = "varchar(50)")
+    @Column(nullable = true)
+    private String zone;
+
+    @Column(nullable = false)
+    private String col;
+
+    @Column(nullable = false)
+    private String number;
+
+    @Column(nullable = false)
     private String showTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, columnDefinition = "bigint")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "musical_id", nullable = false, columnDefinition = "bigint")
+    @JoinColumn(name = "musical_id", nullable = false)
     private Musical musical;
 
-    @ManyToMany
-    @JoinTable(
-            name = "ticket_actors",
-            joinColumns = @JoinColumn(name = "ticket_id"),
-            inverseJoinColumns = @JoinColumn(name = "actor_id")
-    )
-    private List<Actor> actors;
-
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", unique = true, nullable = true)
     private Review review;
 
-    @Builder
-    public Ticket(User user, Musical musical, String title, String ticketImageUrl, LocalDate viewedDate, String seat, String showTime, Review review, List<Actor> actors) {
-        this.user = user;
-        this.musical = musical;
-        this.title = title;
-        this.ticketImageUrl = ticketImageUrl;
-        this.viewedDate = viewedDate;
-        this.seat = seat;
-        this.showTime = showTime;
+    @Builder.Default
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TicketActor> ticketActorList = new ArrayList<>();
+
+
+    public void updateTicketImageUrl(String ticketImageUrl) {
+        if (ticketImageUrl != null && !ticketImageUrl.isBlank()) {
+            this.ticketImageUrl = ticketImageUrl;
+        }
+    }
+
+    public void updateViewedDate(LocalDate viewedDate) {
+        if (viewedDate != null) {
+            this.viewedDate = viewedDate;
+        }
+    }
+
+    public void updateFloor(Long floor) {
+        this.floor = floor;
+    }
+
+    public void updateZone(String zone) {
+        this.zone = zone;
+    }
+
+    public void updateCol(String col) {
+        if (col != null && !col.isBlank()) {
+            this.col = col;
+        }
+    }
+
+    public void updateNumber(String number) {
+        if (number != null && !number.isBlank()) {
+            this.number = number;
+        }
+    }
+
+    public void updateShowTime(String showTime) {
+        if (showTime != null && !showTime.isBlank()) {
+            this.showTime = showTime;
+        }
+    }
+
+    public void updateReview(Review review) {
         this.review = review;
-        this.actors = actors;
     }
 }

@@ -1,98 +1,54 @@
 package encore.server.domain.ticket.converter;
 
-import encore.server.domain.review.entity.Review;
-import encore.server.domain.ticket.dto.request.ActorDTO;
-import encore.server.domain.ticket.dto.response.TicketCreateRes;
+import encore.server.domain.ticket.dto.response.ActorRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
-import encore.server.domain.ticket.dto.response.TicketSimpleRes;
-import encore.server.domain.ticket.dto.response.TicketUpdateRes;
 import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TicketConverter {
 
-    public static ActorDTO toActorDTO(Actor actor) {
-        return ActorDTO.builder()
+    public static TicketRes toTicketRes(Ticket ticket) {
+        var musical = ticket.getMusical();
+
+        // TODO: N+1 문제 해결
+        List<ActorRes> actors = ticket.getTicketActorList().stream()
+                .map(ticketActor -> ActorRes.builder()
+                        .id(ticketActor.getActor().getId())
+                        .name(ticketActor.getActor().getName())
+                        .actorImageUrl(ticketActor.getActor().getActorImageUrl())
+                        .build())
+                .collect(Collectors.toList());
+
+        return TicketRes.builder()
+                .id(ticket.getId())
+                .userId(ticket.getUser().getId())
+
+                .musicalId(musical.getId())
+                .musicalTitle(musical.getTitle())
+                .location(musical.getLocation())
+                .musicalImageUrl(musical.getImageUrl())
+
+                .viewedDate(ticket.getViewedDate())
+                .ticketImageUrl(ticket.getTicketImageUrl())
+
+                .floor(ticket.getFloor())
+                .zone(ticket.getZone())
+                .col(ticket.getCol())
+                .number(ticket.getNumber())
+
+                .actors(actors)
+
+                .build();
+    }
+
+    public static ActorRes toActorRes(Actor actor) {
+        return ActorRes.builder()
                 .id(actor.getId())
                 .name(actor.getName())
                 .actorImageUrl(actor.getActorImageUrl())
                 .build();
     }
-
-    public static TicketCreateRes toTicketCreateRes(Ticket ticket) {
-        return TicketCreateRes.builder()
-                .id(ticket.getId())
-                .userId(ticket.getUser().getId())
-                .musicalId(ticket.getMusical().getId())
-                .title(ticket.getTitle())
-                .viewedDate(ticket.getViewedDate())
-                .showTime(ticket.getShowTime())
-                .seat(ticket.getSeat())
-                .actors(ticket.getActors().stream()
-                        .map(TicketConverter::toActorDTO)  // ActorDTO로 변환
-                        .collect(Collectors.toList()))
-                .ticketImageUrl(ticket.getTicketImageUrl())
-                .build();
-    }
-
-    public static TicketUpdateRes toTicketUpdateRes(Ticket ticket) {
-        return TicketUpdateRes.builder()
-                .id(ticket.getId())
-                .userId(ticket.getUser().getId())
-                .musicalTitle(ticket.getMusical().getTitle())
-                .viewedDate(ticket.getViewedDate())
-                .location(ticket.getMusical().getLocation())
-                .seat(ticket.getSeat())
-                .actors(ticket.getActors().stream()
-                        .map(Actor::getName)
-                        .collect(Collectors.toList()))
-                .build();
-    }
-
-    public static String convertSeriesToText(Long series) {
-        return switch (series.intValue()) {
-            case 1 -> "초연";
-            case 2 -> "재연";
-            default -> series + "연";
-        };
-    }
-
-
-    public static TicketRes toTicketRes(Ticket ticket, Optional<Review> reviewOpt) {
-        return TicketRes.builder()
-                .id(ticket.getId())
-                .userId(ticket.getUser().getId())
-                .musicalTitle(ticket.getMusical().getTitle())
-                .viewedDate(ticket.getViewedDate())
-                .location(ticket.getMusical().getLocation())
-                .seat(ticket.getSeat())
-                .actors(ticket.getActors().stream()
-                        .map(Actor::getName)
-                        .collect(Collectors.toList()))
-                .hasReview(reviewOpt.isPresent())
-                .totalRating(reviewOpt.map(r -> r.getReviewData().getRating().getTotalRating()).orElse(null))
-                .ticketImageUrl(ticket.getTicketImageUrl())
-                .musicalImageUrl(ticket.getMusical().getImageUrl())
-                .build();
-    }
-
-    public static TicketSimpleRes toTicketSimpleRes(Ticket ticket) {
-        return TicketSimpleRes.builder()
-                .id(ticket.getId())
-                .userId(ticket.getUser().getId())
-                .musicalTitle(ticket.getMusical().getTitle())
-                .viewedDate(ticket.getViewedDate())
-                .location(ticket.getMusical().getLocation())
-                .seat(ticket.getSeat())
-                .actors(ticket.getActors().stream()
-                        .map(Actor::getName)
-                        .collect(Collectors.toList())) // 배우 이름 리스트로 변환
-                .ticketImageUrl(ticket.getTicketImageUrl())
-                .build();
-    }
-
 }
