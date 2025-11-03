@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @Getter
+@Table(name = "users") // 예약어 충돌 방지
 @Entity
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
