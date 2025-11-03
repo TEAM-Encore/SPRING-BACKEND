@@ -13,6 +13,8 @@ import java.util.List;
 
 @Getter
 @Entity
+@SQLDelete(sql = "UPDATE musical SET deleted_at = NOW() where id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {@UniqueConstraint(name = "UNIQUE: title - location", columnNames = {"title", "location"})})
 @Builder

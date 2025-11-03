@@ -10,7 +10,6 @@ public class MusicalResponseConverter {
                 .musicalId(musical.getId())
                 .title(musical.getTitle())
                 .location(musical.getLocation())
-                .imageUrl(musical.getImageUrl())
                 .build();
     }
 
