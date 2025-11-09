@@ -2,28 +2,26 @@ package encore.server.domain.ticket.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TicketActor {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, columnDefinition = "bigint")
+    @Column(nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_id", nullable = false, columnDefinition = "bigint")
+    @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "actor_id", nullable = false, columnDefinition = "bigint")
+    @JoinColumn(name = "actor_id")
     private Actor actor;
-
-    @Builder
-    public TicketActor(Long id, Ticket ticket, Actor actor) {
-        this.id = id;
-        this.ticket = ticket;
-        this.actor = actor;
-    }
-
 }

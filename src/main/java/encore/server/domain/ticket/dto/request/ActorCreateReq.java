@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@Deprecated
 public record ActorCreateReq(
         String name,
         String actorImageUrl  //null 가능

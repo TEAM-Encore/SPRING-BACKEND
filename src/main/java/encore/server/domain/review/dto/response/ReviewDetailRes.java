@@ -79,14 +79,9 @@ public record ReviewDetailRes(
         private static ReviewDetailRes.TicketRes of(Ticket ticket) {
             return ReviewDetailRes.TicketRes.builder()
                     .ticketId(ticket.getId())
-                    .ticketTitle(ticket.getTitle())
-                    .seat(ticket.getSeat())
+                    .ticketTitle(ticket.getMusical().getTitle())
                     .viewedDate(ticket.getViewedDate())
                     .imageUrl(ticket.getTicketImageUrl())
-                    .actors(ticket.getActors()
-                            .stream()
-                            .map(Actor::getName)
-                            .collect(Collectors.toList()))
                     .build();
         }
     }

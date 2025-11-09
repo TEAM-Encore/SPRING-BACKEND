@@ -3,11 +3,9 @@ package encore.server.domain.post.converter;
 
 import encore.server.domain.term.converter.MusicalTermConverter;
 import encore.server.domain.post.dto.request.PostCreateReq;
-import encore.server.domain.post.dto.request.PostUpdateReq;
 import encore.server.domain.post.dto.response.PostDetailsGetRes;
 import encore.server.domain.post.dto.response.SimplePostRes;
 import encore.server.domain.post.entity.Post;
-import encore.server.domain.post.entity.PostImage;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.term.entity.Term;
@@ -59,7 +57,7 @@ public class PostConverter {
         if (Objects.equals(post.getModifiedAt(), post.getCreatedAt())) {
             isModified = false;
         }
-        User user = userRepository.findByIdAndDeletedAtIsNull(1L).orElseThrow();
+        User user = userRepository.findById(1L).orElseThrow();
 
         return new PostDetailsGetRes(
                 post.getId(),

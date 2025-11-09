@@ -11,10 +11,12 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record TicketCreateReq(
         Long musicalId,
-        Long userId,
         LocalDate viewedDate,
         String showTime,
-        String seat,
+        Long floor,
+        String zone,
+        String col,
+        String number,
         List<Long> actorIds, // Actor 리스트
         String ticketImageUrl
 ) {

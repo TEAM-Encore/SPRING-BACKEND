@@ -26,7 +26,7 @@ public class UserHashtagService {
     @Transactional
     public UserHashtagRes addHashtag(Long userId, String name) {
         // validation
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         if(userHashtagRepository.countByUser(user) >= 10) {
@@ -65,7 +65,7 @@ public class UserHashtagService {
     @Transactional
     public void deleteHashtag(Long userId, Long id) {
         // validation
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         UserHashtag userHashtag = userHashtagRepository.findByIdAndUser(id, user)
@@ -77,7 +77,7 @@ public class UserHashtagService {
 
     public List<UserHashtagRes> getHashtags(Long userId) {
         // validation
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         // business logic
