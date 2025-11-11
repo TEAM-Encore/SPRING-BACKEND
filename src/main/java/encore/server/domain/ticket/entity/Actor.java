@@ -1,39 +1,29 @@
 package encore.server.domain.ticket.entity;
 
-import encore.server.domain.musical.entity.MusicalActor;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "birth_year"})})
 public class Actor extends BaseTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, columnDefinition = "bigint")
     private Long id;
 
     @Column(nullable = false, columnDefinition = "varchar(255)")
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = true)
+    private Integer birthYear;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String actorImageUrl;
-
-    @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MusicalActor> musicalActors = new ArrayList<>();
-
-    @Builder
-    public Actor(String name, String actorImageUrl, List<MusicalActor> musicalActors) {
-        this.name = name;
-        this.actorImageUrl = actorImageUrl;
-        this.musicalActors = musicalActors != null ? musicalActors : new ArrayList<>();
-    }
 }

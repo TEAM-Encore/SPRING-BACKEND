@@ -9,11 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom {
-    Optional<Review> findByTicketIdAndDeletedAtIsNull(Long ticketId);
-    Optional<Review> findByIdAndDeletedAtIsNull(Long reviewId);
-    List<Review> findByUserIdAndDeletedAtIsNull(Long userId);
+    Optional<Review> findByTicketId(Long ticketId);
+    List<Review> findByUserId(Long userId);
+    Optional<Review> findByTicketIdAndUserId(Long ticketId, Long userId);
 
-    Optional<Review> findByTicketIdAndUserIdAndDeletedAtIsNull(Long ticketId, Long userId);
     @Query("SELECT r FROM Review r " +
             "JOIN FETCH r.user u " +
             "JOIN FETCH r.ticket t " +

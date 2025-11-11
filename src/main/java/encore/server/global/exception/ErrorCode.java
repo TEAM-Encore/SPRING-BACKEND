@@ -68,6 +68,8 @@ public enum ErrorCode {
 
     // 10000: Musical Error
     MUSICAL_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 10000, "존재하지 않는 뮤지컬입니다."),
+    KOPIS_SERVICE_KEY_INVALID(HttpStatus.UNAUTHORIZED, 10001, "KOPIS 서비스키가 유효하지 않습니다."),
+    KOPIS_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 10002, "KOPIS 서버 에러입니다."),
 
     // 11000: Ticket Error
     TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다."),

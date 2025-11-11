@@ -58,10 +58,6 @@ public record ReviewPreviewRes(
                 .likeData(ReviewLikeRes.of(likeType, review))
                 .rating(ReviewDataRes.of(review.getReviewData()).rating())
                 .location(review.getTicket().getMusical().getLocation())
-                .seat(review.getTicket().getSeat())
-                .actors(review.getTicket().getActors().stream()
-                        .map(Actor::getName)
-                        .toList())
                 .build();
 
     }

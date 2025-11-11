@@ -138,7 +138,7 @@ public class UserAuthService {
   @Transactional
   public void imposePenalty(UserImposePenaltyReq penalty) {
     //validation: 존재하는 유저인지 확인
-    User user = userRepository.findByIdAndDeletedAtIsNull(penalty.userId())
+    User user = userRepository.findById(penalty.userId())
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
     //business logic: 만료 시간 설정
     LocalDateTime expiresAt = switch (penalty.type()) {
