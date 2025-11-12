@@ -12,7 +12,12 @@ import java.util.Map;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record UserLoginReq(
-        @Schema(description = "이메일", example = "encore@gmail.com")
+
+        @Schema(
+            description = "로그인할 사용자의 이메일 주소.",
+            example = "encore@gmail.com",
+            required = true
+        )
         @NotNull
         String email
 ) {
