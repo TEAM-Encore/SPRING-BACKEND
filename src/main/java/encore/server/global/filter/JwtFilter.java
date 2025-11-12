@@ -1,7 +1,10 @@
 package encore.server.global.filter;
 
 import encore.server.global.auth.UserDetailsImpl;
+import encore.server.global.exception.ApplicationException;
+import encore.server.global.exception.ErrorCode;
 import encore.server.global.util.JwtUtils;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
@@ -29,35 +33,32 @@ public class JwtFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
     String uri = request.getRequestURI();
     log.info(uri);
-  /*
+
     if (publicURLs.stream()
         .anyMatch(f -> f.equals(uri))) {
       filterChain.doFilter(request, response);
       return;
     }
 
-  */
-    //이후 삭제
-    if (true) {
-      setUserIdToSecurityContextHolder(1L, "encore@naver.com");
-      filterChain.doFilter(request, response);
-      return;
-    }
-  /*
     String tokenValue = jwtUtils.getTokenFromRequest(request);
 
-    if (!(StringUtils.hasText(tokenValue) && jwtUtils.validateToken(tokenValue))) {
-      throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+    if (!(StringUtils.hasText(tokenValue))) {
+      //todo: 완전한 로그인 시스템 구현 후 삭제
+      setUserIdToSecurityContextHolder(1L, "encore123@naver.com");
+      filterChain.doFilter(request, response);
+      return;
+      //jwtUtils.validateToken(tokenValue)
+      //throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
     }
-
+    log.info("tokenValue: " + tokenValue);
     Claims claim = jwtUtils.getUserInfoFromToken(tokenValue);
 
-    setUserIdToSecurityContextHolder((Long) claim.get(jwtUtils.ID_KEY),
-        (String) claim.get(JwtUtil.EMAIL_KEY));
+    setUserIdToSecurityContextHolder(Long.parseLong(String.valueOf(claim.get(jwtUtils.ID_KEY))),
+        (String) claim.get(jwtUtils.EMAIL_KEY));
 
     filterChain.doFilter(request, response);
 
-   */
+
   }
 
   public void setUserIdToSecurityContextHolder(Long userId, String email) {
