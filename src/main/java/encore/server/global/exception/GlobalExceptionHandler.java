@@ -1,5 +1,6 @@
 package encore.server.global.exception;
 
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApplicationException.class)
     protected ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException e){
         log.error("{} {}", e, e.getErrorCode().toString());
+        e.printStackTrace();
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
                 .body(new ErrorResponse(e.getErrorCode()));
     }
