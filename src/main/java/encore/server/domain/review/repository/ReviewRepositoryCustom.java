@@ -13,6 +13,6 @@ public interface ReviewRepositoryCustom {
     List<Review> findPopularReviews();
 
     List<Review> findReviewListByCursor(String searchKeyword, Long cursor, String tag, Pageable pageable);
-
+    List<Review> findReviewListByCursorAndSearchKeyword(String searchKeyword, Long cursor, Pageable pageable);
     List<Review> findByReviewAutoCompleteSuggestions(Long userId, String keyword);
 }
