@@ -3,6 +3,7 @@ package encore.server.domain.review.dto.request;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record ReviewDataReq(
@@ -20,10 +21,11 @@ public record ReviewDataReq(
 ) {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record View(
-            @Schema(description = "시야 점수", example = "3")
+            @Schema(description = "시야 사진 번호", example = "3")
             Long viewLevel,
 
             @Schema(description = "시야 리뷰", example = "시야가 너무 좋았어요!")
+            @Size(min = 20, max = 500, message = "시야 리뷰는 20자 이상 500자 이하로 작성해주세요.")
             String viewReview
     ) {
     }
@@ -34,6 +36,7 @@ public record ReviewDataReq(
             Long soundLevel,
 
             @Schema(description = "음향 리뷰", example = "음향이 너무 좋았어요!")
+            @Size(min = 20, max = 500, message = "사운드 리뷰는 20자 이상 500자 이하로 작성해주세요.")
             String soundReview
     ) {
     }
@@ -44,6 +47,7 @@ public record ReviewDataReq(
             Long facilityLevel,
 
             @Schema(description = "시설 리뷰", example = "시설이 너무 좋았어요!")
+            @Size(min = 20, max = 500, message = "시설 리뷰는 20자 이상 500자 이하로 작성해주세요.")
             String facilityReview
     ) {
     }
@@ -69,6 +73,7 @@ public record ReviewDataReq(
             Float totalRating,
 
             @Schema(description = "평점 리뷰", example = "평점이 너무 좋았어요!")
+            @Size(min = 20, max = 500, message = "총평은 20자 이상 500자 이하로 작성해주세요.")
             String ratingReview
     ) {
     }
