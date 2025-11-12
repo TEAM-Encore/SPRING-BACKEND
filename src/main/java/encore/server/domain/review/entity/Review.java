@@ -1,11 +1,12 @@
 package encore.server.domain.review.entity;
 
-import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.enumerate.LikeType;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -98,8 +99,23 @@ public class Review extends BaseTimeEntity {
     }
 
 
-    public void updateReview(ReviewReq req, ReviewData reviewData) {
-        this.title = req.title();
+    public void updateReview(String title, ReviewData reviewData) {
+        this.title = title;
         this.reviewData = reviewData;
     }
+
+    public String getElapsedTime() {
+        long minutesAgo = ChronoUnit.MINUTES.between(this.getCreatedAt(), LocalDateTime.now());
+
+        if (minutesAgo < 1) {
+            return "방금 전";
+        } else if (minutesAgo < 60) {
+            return String.format("%d분 전", minutesAgo);
+        } else if (minutesAgo < 1440) {
+            return String.format("%d시간 전", minutesAgo / 60);
+        } else {
+            return String.format("%d일 전", minutesAgo / 1440);
+        }
+    }
+
 }
