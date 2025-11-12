@@ -9,6 +9,7 @@ import encore.server.domain.review.service.ReviewRelatedSearchService;
 import encore.server.domain.review.service.ReviewService;
 import encore.server.global.common.ApplicationResponse;
 import encore.server.global.util.redis.SearchLogRedis;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
+@Hidden
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/review")

@@ -27,6 +27,23 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    public List<Review> findReviewListByCursorAndSearchKeyword(String searchKeyword, Long cursor, Pageable pageable) {
+        BooleanBuilder predicate = new BooleanBuilder();
+        predicate.and(review.deletedAt.isNull())
+            .and(addCursorCondition(cursor));
+
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            predicate.and(addKeywordCondition(searchKeyword));
+        }
+
+        return queryFactory
+            .selectFrom(review)
+            .where(predicate)
+            .orderBy(getSortOrder(pageable))
+            .limit(pageable.getPageSize() + 1)
+            .fetch();
+    }
+
     public Optional<Review> findReviewDetail(Long reviewId) {
         Review fetchedReview = queryFactory
                 .selectFrom(review)

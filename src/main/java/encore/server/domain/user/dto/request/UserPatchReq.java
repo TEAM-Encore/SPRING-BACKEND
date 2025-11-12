@@ -10,14 +10,25 @@ import java.util.List;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record UserPatchReq(
-    @Schema(description = "닉네임", example = "encore123")
+    @Schema(
+        description = "변경할 닉네임.",
+        example = "encore123",
+        required = false
+    )
     String nickName,
+
+    @Schema(
+        description = "변경할 프로필 이미지의 URL.",
+        example = "https://cdn.encore.com/profile/encore123.png",
+        required = false
+    )
     String profileImageUrl,
-    @Schema(description = "관람 빈도", example = "LEVEL1")
-    ViewingFrequency viewingFrequency,
-    @Schema(description = "선호하는 공연 키워드", example = "[\"EMOTIONAL\", \"ENTERTAINING\"]")
-    List<PreferredKeywordEnum> preferredKeywordEnums,
-    @Schema(description = "동의한 약관 타입", example = "[\"SERVICE_TERMS\", \"PRIVACY_POLICY\"]")
+
+    @Schema(
+        description = "동의한 약관 목록. 약관 종류는 Enum(TermType)으로 정의되어 있습니다.",
+        example = "[\"SERVICE_TERMS\", \"PRIVACY_POLICY\", \"MARKETING_CONSENT\"]",
+        required = false
+    )
     List<TermType> agreeTermEnums
 ) {
 

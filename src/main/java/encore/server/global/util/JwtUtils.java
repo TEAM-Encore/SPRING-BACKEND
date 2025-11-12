@@ -119,7 +119,9 @@ public class JwtUtils {
   public String getTokenFromRequest(HttpServletRequest request) {
 
     String header = request.getHeader(AUTHORIZATION_HEADER);
-
+    if (header == null || !header.startsWith(BEARER_PREFIX)) {
+      return "";
+    }
     return substringToken(header);
 
   }

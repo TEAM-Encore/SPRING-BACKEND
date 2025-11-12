@@ -49,7 +49,9 @@ public class LoginUserIdResolver implements HandlerMethodArgumentResolver {
 
     // 인증 정보가 없거나 principal이 UserDetailsImpl 타입이 아닌 경우 예외 처리
     if (authentication == null || !(authentication.getPrincipal() instanceof UserDetailsImpl userDetails)) {
-      throw new ApplicationException(ErrorCode.UNAUTHORIZED_EXCEPTION);
+      //todo: 완전환 로그인 시스템 구현 후 변경
+      return 1;
+      //throw new ApplicationException(ErrorCode.UNAUTHORIZED_EXCEPTION);
     }
 
     // userId 반환 (컨트롤러 메서드 파라미터에 주입됨)

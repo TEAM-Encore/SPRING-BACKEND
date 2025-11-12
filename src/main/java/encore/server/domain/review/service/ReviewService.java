@@ -302,7 +302,7 @@ public class ReviewService {
 
         //business logic: update review
         ReviewData reviewData = ReviewConverter.toReviewData(req.reviewDataReq());
-        review.updateReview(req, reviewData);
+        review.updateReview(req.title(), reviewData);
 
 
         boolean isUnlocked =  (user.getId() == review.getUser().getId())  ||

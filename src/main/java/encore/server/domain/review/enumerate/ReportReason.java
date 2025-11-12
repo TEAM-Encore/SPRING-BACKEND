@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ReportReason {
-    INAPPROPRIATE_REVIEW("무성의한 리뷰"),
+    INAPPROPRIATE_REVIEW("주제와 관련없는 내용"),
     COMMERCIAL_SELLING("상업적 판매/도배"),
     PROFANITY_INSULT("욕설/비하"),
     PORNOGRAPHY_INAPPROPRIATE("음란물/불건전한 대화"),

@@ -12,18 +12,18 @@ import java.util.Map;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record UserLoginReq(
-        @Schema(description = "이메일", example = "encore@gmail.com")
+
+        @Schema(
+            description = "로그인할 사용자의 이메일 주소.",
+            example = "encore@gmail.com",
+            required = true
+        )
         @NotNull
-        String email,
-        @Schema(description = "비밀번호", example = "password")
-        @NotNull
-        String password
+        String email
 ) {
     public static UserLoginReq fromOauthAttributes(Map<String,Object> oauthLoginUserInfoAttributes) {
         return UserLoginReq.builder()
                 .email((String) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.EMAIL_KEY))
-                .password((String) oauthLoginUserInfoAttributes.get(OAuth2UserInfo.EMAIL_KEY)) // 비밀번호와 이메일이 동일하게 설정되는 경우
                 .build();
-
     }
 }

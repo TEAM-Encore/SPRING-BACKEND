@@ -29,12 +29,6 @@ public class User extends BaseTimeEntity {
   @Column(nullable = false, columnDefinition = "varchar(255)", unique = true)
   private String email;
 
-  @Column(nullable = false, columnDefinition = "varchar(255)")
-  private String password;
-
-  @Column(nullable = false, columnDefinition = "varchar(50)")
-  private String name;
-
   @Column(nullable = false, columnDefinition = "varchar(255)", unique = true)
   private String nickName;
 
@@ -46,13 +40,7 @@ public class User extends BaseTimeEntity {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
-  @Column(nullable = true, columnDefinition = "varchar(255)")
-  @Enumerated(EnumType.STRING)
-  private ViewingFrequency viewingFrequency;
-
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private List<UserKeyword> userPreferredKeywords = new ArrayList<>();
-
+  @Builder.Default
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<UserTermOfUse> userTermOfUses = new ArrayList<>();
 
@@ -62,6 +50,7 @@ public class User extends BaseTimeEntity {
   @Column(columnDefinition = "TEXT")
   private String profileImageUrl;
 
+  @Builder.Default
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
   private List<FCMToken> fcmTokens = new ArrayList<>();
 
@@ -87,17 +76,6 @@ public class User extends BaseTimeEntity {
 
   public void updateProfileImageUrl(String profileImageUrl) {
     this.profileImageUrl = profileImageUrl;
-  }
-
-  public void updateViewingFrequency(ViewingFrequency viewingFrequency) {
-    this.viewingFrequency = viewingFrequency;
-  }
-
-  public void addUserPreferredKeywords(List<PreferredKeyword> preferredKeywords) {
-    for (PreferredKeyword keyword : preferredKeywords) {
-      UserKeyword userKeyword = UserKeyword.create(this, keyword); // 새로운 연관 엔티티 생성
-      this.userPreferredKeywords.add(userKeyword);
-    }
   }
 
   public void addUserTermOfUses(List<TermOfUse> termOfUses) {

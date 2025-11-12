@@ -1,14 +1,13 @@
 package encore.server.domain.review.converter;
 
+import encore.server.domain.review.dto.request.ReviewCreateReq;
 import encore.server.domain.review.dto.request.ReviewDataReq;
 import encore.server.domain.review.dto.response.*;
 import encore.server.domain.review.entity.ReviewData;
 import encore.server.domain.review.entity.ReviewTags;
-import encore.server.domain.review.entity.ViewImage;
 import encore.server.domain.review.enumerate.Tag;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.entity.Review;
-import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.user.entity.User;
 import encore.server.global.exception.ApplicationException;
@@ -19,13 +18,24 @@ import java.util.stream.Collectors;
 
 public class ReviewConverter {
 
-    public static Review toEntity(Ticket ticket, User user, ReviewReq req) {
+    public static Review toEntity(Ticket ticket, User user, ReviewCreateReq req) {
         Review review = Review.builder()
                 .ticket(ticket)
                 .user(user)
                 .title(req.title())
                 .reviewData(toReviewData(req.reviewDataReq()))
                 .build();
+
+        return review;
+    }
+
+    public static Review toEntity(Ticket ticket, User user, ReviewReq req) {
+        Review review = Review.builder()
+            .ticket(ticket)
+            .user(user)
+            .title(req.title())
+            .reviewData(toReviewData(req.reviewDataReq()))
+            .build();
 
         review.addTags(toReviewTags(req.tags(), review));
         return review;
