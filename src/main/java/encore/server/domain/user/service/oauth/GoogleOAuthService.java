@@ -55,8 +55,11 @@ public class GoogleOAuthService implements OAuthLoginService {
       login = userAuthService.login(OAuthProfileConverter.profileToLoginReq(userInfo));
     }
 
+    String bearerAccessToken = login.accessToken();
+    bearerAccessToken = bearerAccessToken.substring(7, bearerAccessToken.length() - 1);
+
     return UriComponentsBuilder.fromUriString("encore://oauth")
-        .queryParam("token", login.accessToken())
+        .queryParam("token", bearerAccessToken)
         .queryParam("isAgreedRequiredTerm", login.isAgreedRequiredTerm())
         .queryParam("isActivePenalty", login.isActivePenalty())
         .build().toUriString();
