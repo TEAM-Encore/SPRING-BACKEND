@@ -1,8 +1,9 @@
 package encore.server.domain.image.dto;
 
-import lombok.Builder;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-@Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record ImageNameDTO(
         String imageName
 ){}
