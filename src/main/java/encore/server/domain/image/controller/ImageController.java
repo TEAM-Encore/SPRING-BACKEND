@@ -2,6 +2,7 @@ package encore.server.domain.image.controller;
 
 
 import encore.server.domain.image.dto.ImageNameDTO;
+import encore.server.domain.image.dto.PreSignedUrlResponse;
 import encore.server.domain.image.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,8 +20,8 @@ public class ImageController {
 
     @PostMapping("/presigned-url")
     @Operation(summary = "이미지 업로드용 presigned url 발급", description = "이미지 업로드용 presigned url을 발급합니다.")
-    public ResponseEntity<String> saveImage(@RequestBody ImageNameDTO imageNameDto) {
-        String preSignedUrl = imageService.getPreSignedUrl("encore", imageNameDto.imageName());
-        return ResponseEntity.ok(preSignedUrl);
+    public ResponseEntity<PreSignedUrlResponse> saveImage(@RequestBody ImageNameDTO imageNameDto) {
+        PreSignedUrlResponse res = imageService.generateUploadUrl("dynamic", imageNameDto.imageName());
+        return ResponseEntity.ok(res);
     }
 }

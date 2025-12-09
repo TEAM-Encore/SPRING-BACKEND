@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
+import encore.server.domain.image.dto.PreSignedUrlResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,71 +17,75 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ImageService {
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
 
-    private final AmazonS3 amazonS3;
+  @Value("${cloud.aws.s3.bucket}")
+  private String bucket;
 
-    /**
-     * presigned url 발급
-     * @param prefix 버킷 디렉토리 이름
-     * @param fileName 클라이언트가 전달한 파일명 파라미터
-     * @return presigned url
-     */
-    public String getPreSignedUrl(String prefix, String fileName) {
-        if(!prefix.isEmpty()) {
-            fileName = createPath(prefix, fileName);
-        }
+  private final AmazonS3 amazonS3;
 
-        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(bucket, fileName);
-        URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
-        return url.toString();
+  /**
+   * Presigned URL 반환 (업로드할 파일의 key 포함)
+   *
+   * @param prefix           저장할 폴더 경로 (예: "dynamic", "profile")
+   * @param originalFileName 클라이언트가 전달한 원본 파일명
+   * @return key + presigned URL
+   */
+  public PreSignedUrlResponse generateUploadUrl(String prefix, String originalFileName) {
+    // 1) S3 filePath 경로 생성
+    String filePath = createS3Key(prefix, originalFileName);
+
+    // 2) presigned request 생성
+    GeneratePresignedUrlRequest request =
+        createPresignedPutRequest(bucket, filePath);
+
+    // 3) URL 생성
+    URL presignedUrl = amazonS3.generatePresignedUrl(request);
+
+    return new PreSignedUrlResponse(filePath, presignedUrl.toString());
+  }
+
+  /**
+   * Presigned PUT URL 생성
+   */
+  private GeneratePresignedUrlRequest createPresignedPutRequest(String bucket, String filePath) {
+    GeneratePresignedUrlRequest request =
+        new GeneratePresignedUrlRequest(bucket, filePath)
+            .withMethod(HttpMethod.PUT)
+            .withExpiration(getExpiration());
+
+    // PublicRead ACL 제거 (필요하다면 명시적으로 추가)
+    // request.addRequestParameter("x-amz-acl", "public-read");
+
+    return request;
+  }
+
+  /**
+   * URL 유효 시간: 2분
+   */
+  private Date getExpiration() {
+    Date expiration = new Date();
+    expiration.setTime(expiration.getTime() + (1000 * 60 * 2));
+    return expiration;
+  }
+
+  /**
+   * S3 파일 저장 경로 생성 prefix/uuid.ext
+   */
+  private String createS3Key(String prefix, String originalFilename) {
+    String uuid = UUID.randomUUID().toString();
+    String extension = extractExtension(originalFilename);
+
+    return prefix + "/" + uuid + extension;
+  }
+
+  /**
+   * 확장자 추출 (.jpg, .png 등)
+   */
+  private String extractExtension(String filename) {
+    int idx = filename.lastIndexOf(".");
+    if (idx == -1) {
+      return "";  // 확장자 없으면 빈 문자열
     }
-
-    /**
-     * 파일 업로드용(PUT) presigned url 생성
-     * @param bucket 버킷 이름
-     * @param fileName S3 업로드용 파일 이름
-     * @return presigned url
-     */
-    private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName) {
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucket, fileName)
-                        .withMethod(HttpMethod.PUT)
-                        .withExpiration(getPreSignedUrlExpiration());
-        generatePresignedUrlRequest.addRequestParameter(
-                Headers.S3_CANNED_ACL,
-                CannedAccessControlList.PublicRead.toString());
-        return generatePresignedUrlRequest;
-    }
-
-    /**
-     * presigned url 유효 기간 설정
-     * @return 유효기간
-     */
-    private Date getPreSignedUrlExpiration() {
-        Date expiration = new Date();
-        long expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 2;
-        expiration.setTime(expTimeMillis);
-        return expiration;
-    }
-
-    /**
-     * 파일 고유 ID를 생성
-     * @return 36자리의 UUID
-     */
-    private String createFileId() {
-        return UUID.randomUUID().toString();
-    }
-
-    /**
-     * 파일의 전체 경로를 생성
-     * @param prefix 디렉토리 경로
-     * @return 파일의 전체 경로
-     */
-    private String createPath(String prefix, String fileName) {
-        String fileId = createFileId();
-        return String.format("%s/%s", prefix, fileId + fileName);
-    }
+    return filename.substring(idx);
+  }
 }
