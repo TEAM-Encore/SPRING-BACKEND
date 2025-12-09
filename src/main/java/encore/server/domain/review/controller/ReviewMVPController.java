@@ -6,6 +6,7 @@ import encore.server.domain.review.dto.response.ReviewCreateRes;
 import encore.server.domain.review.dto.response.ReviewDeleteRes;
 import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.domain.review.dto.response.ReviewGetListRes;
+import encore.server.domain.review.dto.response.ReviewListCursorBasedRes;
 import encore.server.domain.review.dto.response.ReviewMVPLikeRes;
 import encore.server.domain.review.dto.response.ReviewReportRes;
 import encore.server.domain.review.dto.response.ReviewUpdateRes;
@@ -42,7 +43,7 @@ public class ReviewMVPController {
 
   @GetMapping("/list")
   @Operation(summary = "리뷰 리스트 페이징 조회", description = "리뷰 리스트를 조회합니다.")
-  public ApplicationResponse<Slice<ReviewGetListRes>> getReviewList(
+  public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getReviewList(
       @RequestParam(name = "search_keyword", required = false) String keyword,
       @RequestParam(name = "cursor", required = false) Long cursor,
       @PageableDefault(size = 3, sort = "createdAt") Pageable pageable,

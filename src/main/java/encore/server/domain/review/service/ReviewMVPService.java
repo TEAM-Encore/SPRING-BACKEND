@@ -7,6 +7,7 @@ import encore.server.domain.review.dto.response.ReviewCreateRes;
 import encore.server.domain.review.dto.response.ReviewDeleteRes;
 import encore.server.domain.review.dto.response.ReviewDetailRes;
 import encore.server.domain.review.dto.response.ReviewGetListRes;
+import encore.server.domain.review.dto.response.ReviewListCursorBasedRes;
 import encore.server.domain.review.dto.response.ReviewMVPLikeRes;
 import encore.server.domain.review.dto.response.ReviewReportRes;
 import encore.server.domain.review.dto.response.ReviewUpdateRes;
@@ -87,7 +88,7 @@ public class ReviewMVPService {
     return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
   }
 
-  public Slice<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, Pageable pageable) {
+  public ReviewListCursorBasedRes<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, Pageable pageable) {
 
     // business logic: get review list
     //0. 검색어 로그에 저장
@@ -103,12 +104,15 @@ public class ReviewMVPService {
 
     //3. 리뷰 리스트 조회 성공
     boolean hasNext = reviews.size() > pageable.getPageSize();
+
+    Long nextCursor = reviews.get(reviews.size() - 1).getId();
+
     List<ReviewGetListRes> reviewSimpleResList = reviews.stream()
         .limit(pageable.getPageSize())
         .map(review -> ReviewGetListRes.of(review, review.getElapsedTime()))
         .collect(Collectors.toList());
 
-    return new SliceImpl<>(reviewSimpleResList, pageable, hasNext);
+    return new ReviewListCursorBasedRes<>(reviewSimpleResList, hasNext, nextCursor);
   }
 
   @Transactional
