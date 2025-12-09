@@ -105,10 +105,15 @@ public class ReviewMVPService {
     //3. 리뷰 리스트 조회 성공
     boolean hasNext = reviews.size() > pageable.getPageSize();
 
-    Long nextCursor = reviews.get(reviews.size() - 1).getId();
+    List<Review> pageReviews =
+        reviews.stream().limit(pageable.getPageSize()).toList();
 
-    List<ReviewGetListRes> reviewSimpleResList = reviews.stream()
-        .limit(pageable.getPageSize())
+    Long nextCursor = null;
+    if (hasNext) {
+      nextCursor = pageReviews.get(pageReviews.size() - 1).getId();
+    }
+
+    List<ReviewGetListRes> reviewSimpleResList = pageReviews.stream()
         .map(review -> ReviewGetListRes.of(review, review.getElapsedTime()))
         .collect(Collectors.toList());
 
