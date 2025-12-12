@@ -2,10 +2,10 @@ package encore.server.domain.image.service;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
+import encore.server.domain.image.dto.ImageGetPresignedUrlRequest;
+import encore.server.domain.image.dto.ImageGetPresignedUrlResponse;
 import encore.server.domain.image.dto.PreSignedUrlResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +22,22 @@ public class ImageService {
   private String bucket;
 
   private final AmazonS3 amazonS3;
+
+  /**
+   * Presigned URL 반환 (조회용)
+   *
+   * @param req  이미지 파일 경로
+   * @return presignedUrl
+   */
+  public ImageGetPresignedUrlResponse generateGetPresignedUrl(ImageGetPresignedUrlRequest req) {
+    GeneratePresignedUrlRequest request =
+        new GeneratePresignedUrlRequest(bucket, req.filePath())
+            .withMethod(HttpMethod.GET)
+            .withExpiration(getExpiration());
+
+    URL url = amazonS3.generatePresignedUrl(request);
+    return new ImageGetPresignedUrlResponse(url.toString());
+  }
 
   /**
    * Presigned URL 반환 (업로드할 파일의 key 포함)
