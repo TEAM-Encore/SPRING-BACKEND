@@ -24,6 +24,22 @@ public class ImageService {
   private final AmazonS3 amazonS3;
 
   /**
+   * Presigned URL 반환 (조회용)
+   *
+   * @param filePath         이미지 파일 경로
+   * @return presignedUrl
+   */
+  public String generateGetPresignedUrl(String filePath) {
+    GeneratePresignedUrlRequest request =
+        new GeneratePresignedUrlRequest(bucket, filePath)
+            .withMethod(HttpMethod.GET)
+            .withExpiration(getExpiration());
+
+    URL url = amazonS3.generatePresignedUrl(request);
+    return url.toString();
+  }
+
+  /**
    * Presigned URL 반환 (업로드할 파일의 key 포함)
    *
    * @param prefix           저장할 폴더 경로 (예: "dynamic", "profile")

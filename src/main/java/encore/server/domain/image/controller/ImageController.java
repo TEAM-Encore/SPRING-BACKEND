@@ -24,4 +24,11 @@ public class ImageController {
         PreSignedUrlResponse res = imageService.generateUploadUrl("dynamic", imageNameDto.imageName());
         return ResponseEntity.ok(res);
     }
+
+    @PostMapping("/view/presigned-url")
+    @Operation(summary = "이미지 조회용 presigned url 발급", description = "private 이미지 조회용 presigned GET URL을 발급합니다.")
+    public ResponseEntity<String> viewImage(@RequestBody String filepath) {
+        String url = imageService.generateGetPresignedUrl(filepath);
+        return ResponseEntity.ok(url);
+    }
 }
