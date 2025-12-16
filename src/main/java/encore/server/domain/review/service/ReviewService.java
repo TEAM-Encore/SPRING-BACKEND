@@ -1,5 +1,7 @@
 package encore.server.domain.review.service;
 
+import encore.server.domain.point.enumerate.PointType;
+import encore.server.domain.point.service.PointService;
 import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewReq;
 import encore.server.domain.review.dto.response.*;
@@ -42,6 +44,7 @@ public class ReviewService {
     private final ReviewRecentSearchService reviewRecentSearchService;
     private final ReviewRelatedSearchService reviewRelatedSearchService;
     private final ReviewReportRepository reviewReportRepository;
+    private final PointService pointService;
 
     @Transactional
     public ReviewDetailRes createReview(Long ticketId, Long userId, ReviewReq req) {
@@ -63,7 +66,8 @@ public class ReviewService {
         reviewRelatedSearchService.updateAllSuggestions(userId, review);
 
         // 작성자에게 포인트 제공
-        user.addPoint(50L);
+        String description = "[" + review.getTitle() + "] 후기 작성";
+        pointService.earnPoints(userId, 10L, description, PointType.REVIEW_WRITE, review.getId());
 
         // 업로드 시점
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
@@ -128,11 +132,10 @@ public class ReviewService {
         }
 
         //business logic & return: unlock review
-        if(user.getPoint() < 40){
-            throw new ApplicationException(ErrorCode.POINT_NOT_ENOUGH_EXCEPTION);
-        }
+        // 포인트 차감
+        String description = "[" + review.getTitle() + "] 후기 열람";
+        pointService.usePoints(userId, 10L, description, PointType.REVIEW_VIEW, reviewId);
 
-        user.usePoint(40L);
         UserReview userReview = UserReview.builder()
                 .user(user)
                 .review(review)
@@ -183,6 +186,10 @@ public class ReviewService {
                     .likeType(likeType)
                     .build();
             reviewLikeRepository.save(reviewLike);
+
+            // 하루 한 번 좋아요 포인트 지급
+            String pointDescription = "[하루 한 번 좋아요] 이벤트 참여";
+            pointService.earnDailyPoints(userId, 5L, pointDescription, PointType.DAILY_LIKE, reviewId);
         } else {
             reviewLike.toggleLike(likeType);
         }
