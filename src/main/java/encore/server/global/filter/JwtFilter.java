@@ -26,14 +26,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
   private final JwtUtils jwtUtils;
-  private final List<String> publicURLs = List.of("/api/mvp/users/signup", "/api/mvp/users/login");
+  private final List<String> publicURLs = List.of("/api/mvp/users/signup",
+      "/api/mvp/users/login");
+  private final List<String> publicURLPrefixes = List.of("/swagger-ui");
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String uri = request.getRequestURI();
+
     if (publicURLs.stream()
         .anyMatch(f -> f.equals(uri))) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
+    if (publicURLPrefixes.stream()
+        .anyMatch(f -> f.startsWith(uri))
+    ) {
       filterChain.doFilter(request, response);
       return;
     }
