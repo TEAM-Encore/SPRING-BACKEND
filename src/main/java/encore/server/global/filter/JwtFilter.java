@@ -32,8 +32,6 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String uri = request.getRequestURI();
-    log.info(uri);
-
     if (publicURLs.stream()
         .anyMatch(f -> f.equals(uri))) {
       filterChain.doFilter(request, response);
@@ -42,23 +40,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     String tokenValue = jwtUtils.getTokenFromRequest(request);
 
-    if (!(StringUtils.hasText(tokenValue))) {
-      //todo: 완전한 로그인 시스템 구현 후 삭제
-      setUserIdToSecurityContextHolder(1L, "encore123@naver.com");
-      filterChain.doFilter(request, response);
-      return;
-      //jwtUtils.validateToken(tokenValue)
-      //throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+    if (!jwtUtils.validateToken(tokenValue)) {
+      throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
     }
-    log.info("tokenValue: " + tokenValue);
-    Claims claim = jwtUtils.getUserInfoFromToken(tokenValue);
 
+    log.info("tokenValue: " + tokenValue);
+
+    Claims claim = jwtUtils.getUserInfoFromToken(tokenValue);
     setUserIdToSecurityContextHolder(Long.parseLong(String.valueOf(claim.get(jwtUtils.ID_KEY))),
         (String) claim.get(jwtUtils.EMAIL_KEY));
 
     filterChain.doFilter(request, response);
-
-
   }
 
   public void setUserIdToSecurityContextHolder(Long userId, String email) {
