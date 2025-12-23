@@ -32,7 +32,13 @@ public record UserGetMeRes(
         description = "사용자 이메일 주소",
         example = "encore@gmail.com"
     )
-    String email
+    String email,
+
+    @Schema(
+        description = "사용자 프로필 조회용 Presigned URL",
+        example = "https://s2example/dynamic/uuid"
+    )
+    String profileImageUrl
 ) {
 
 }

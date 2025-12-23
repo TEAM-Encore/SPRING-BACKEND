@@ -1,5 +1,6 @@
 package encore.server.domain.user.service;
 
+import encore.server.domain.image.service.ImageService;
 import encore.server.domain.post.repository.PostRepository;
 import encore.server.domain.subscription.service.SubscriptionService;
 import encore.server.domain.user.converter.UserConverter;
@@ -21,14 +22,15 @@ public class UserInfoService {
 
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+  private final ImageService imageService;
 
   public UserGetMeRes getMyInfo(Long userId) {
     User me = userRepository.findById(userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
     long numOfWritePost = postRepository.countByUserAndDeletedAtIsNull(me);
-
-    return UserConverter.toUserGetMeRes(me, numOfWritePost);
+    String profileImageDownLoadPresignedUrl = imageService.generateGetPresignedUrl(me.getProfileImageUrl());
+    return UserConverter.toUserGetMeRes(me, numOfWritePost, profileImageDownLoadPresignedUrl);
   }
 
   public UserGetRes getUserInfo(Long userId) {
