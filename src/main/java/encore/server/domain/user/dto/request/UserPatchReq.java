@@ -18,8 +18,8 @@ public record UserPatchReq(
     String nickName,
 
     @Schema(
-        description = "변경할 프로필 이미지의 URL.",
-        example = "https://cdn.encore.com/profile/encore123.png",
+        description = "변경할 프로필 이미지의 URL 실제 파일 경로 (Presigned Url X)",
+        example = "https://cdn.encore.com/dynamic/uuid.png",
         required = false
     )
     String profileImageUrl,

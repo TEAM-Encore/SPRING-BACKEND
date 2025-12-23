@@ -20,12 +20,13 @@ public class UserConverter {
         .build();
   }
 
-  public static UserGetMeRes toUserGetMeRes(User user, long numOfWritePost) {
+  public static UserGetMeRes toUserGetMeRes(User user, long numOfWritePost, String profileImageDownLoadPresignedUrl) {
     return UserGetMeRes.builder()
         .point(user.getPoint())
         .nickname(user.getNickName())
         .numOfWritePost(numOfWritePost)
         .email(user.getEmail())
+        .profileImageUrl(profileImageDownLoadPresignedUrl)
         .build();
   }
 

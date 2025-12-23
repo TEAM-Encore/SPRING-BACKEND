@@ -11,4 +11,5 @@ import lombok.Data;
 public class PreSignedUrlResponse {
   private String filePath;        // S3 파일 경로
   private String uploadUrl;  // Presigned PUT URL
+  private String downloadUrl;
 }
