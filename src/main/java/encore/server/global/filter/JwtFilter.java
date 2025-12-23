@@ -36,13 +36,13 @@ public class JwtFilter extends OncePerRequestFilter {
     String uri = request.getRequestURI();
 
     if (publicURLs.stream()
-        .anyMatch(f -> uri.equals(f))) {
+        .anyMatch(f -> f.equals(uri))) {
       filterChain.doFilter(request, response);
       return;
     }
 
     if (publicURLPrefixes.stream()
-        .anyMatch(f -> f.startsWith(uri))
+        .anyMatch(f -> uri.startsWith(f))
     ) {
       filterChain.doFilter(request, response);
       return;
