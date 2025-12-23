@@ -26,7 +26,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
   private final JwtUtils jwtUtils;
-  private final List<String> publicURLs = List.of("/api/v1/users/signup", "/api/v1/users/login");
+  private final List<String> publicURLs = List.of("/api/mvp/users/signup", "/api/mvp/users/login");
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
