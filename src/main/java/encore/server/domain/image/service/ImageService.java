@@ -23,41 +23,46 @@ public class ImageService {
 
   private final AmazonS3 amazonS3;
 
-  /**
-   * Presigned URL 반환 (조회용)
-   *
-   * @param req  이미지 파일 경로
-   * @return presignedUrl
-   */
-  public ImageGetPresignedUrlResponse generateGetPresignedUrl(ImageGetPresignedUrlRequest req) {
+  public PreSignedUrlResponse generatedUploadAndDownloadUrl(String prefix, String originalFileName) {
+    // 1) S3 filePath 경로 생성
+    String filePath = createS3Key(prefix, originalFileName);
+
+    String uploadUrl = generateUploadUrl(filePath);
+
+    String downloadUrl = generateGetPresignedUrl(filePath);
+
+    return new PreSignedUrlResponse(filePath, uploadUrl, downloadUrl);
+  }
+
+  public ImageGetPresignedUrlResponse getDownloadPresignedUrl(ImageGetPresignedUrlRequest req) {
+    return new ImageGetPresignedUrlResponse(generateGetPresignedUrl(req.filePath()));
+  }
+
+  public String generateGetPresignedUrl(String filePath) {
     GeneratePresignedUrlRequest request =
-        new GeneratePresignedUrlRequest(bucket, req.filePath())
+        new GeneratePresignedUrlRequest(bucket, filePath)
             .withMethod(HttpMethod.GET)
             .withExpiration(getExpiration());
 
     URL url = amazonS3.generatePresignedUrl(request);
-    return new ImageGetPresignedUrlResponse(url.toString());
+    return url.toString();
   }
 
   /**
    * Presigned URL 반환 (업로드할 파일의 key 포함)
    *
-   * @param prefix           저장할 폴더 경로 (예: "dynamic", "profile")
-   * @param originalFileName 클라이언트가 전달한 원본 파일명
+   * @param s3FilePath        S3 에 저장될 FilePath
    * @return key + presigned URL
    */
-  public PreSignedUrlResponse generateUploadUrl(String prefix, String originalFileName) {
-    // 1) S3 filePath 경로 생성
-    String filePath = createS3Key(prefix, originalFileName);
-
-    // 2) presigned request 생성
+  private String generateUploadUrl(String s3FilePath) {
+    // 1) presigned request 생성
     GeneratePresignedUrlRequest request =
-        createPresignedPutRequest(bucket, filePath);
+        createPresignedPutRequest(bucket, s3FilePath);
 
-    // 3) URL 생성
+    // 2) URL 생성
     URL presignedUrl = amazonS3.generatePresignedUrl(request);
 
-    return new PreSignedUrlResponse(filePath, presignedUrl.toString());
+    return presignedUrl.toString();
   }
 
   /**
