@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -111,7 +112,7 @@ public class ReviewController {
             @RequestParam(name= "search_keyword", required = false) String keyword,
             @RequestParam(name = "cursor", required = false) Long cursor,
             @RequestParam(name = "tag", required = false) String tag,
-            @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 3, sort = "createdAt") Pageable pageable) {
         Long userId = getUserId();
         return ApplicationResponse.ok(reviewService.getReviewList(userId, keyword, cursor, tag, pageable));
     }

@@ -9,6 +9,7 @@ import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,7 +28,7 @@ public class MusicalController {
     @GetMapping("/search")
     public ApplicationResponse<Page<MusicalRes>> searchMusicals(
             @RequestParam String keyword,
-            @PageableDefault(page = 0, size = 20) Pageable pageable
+            @ParameterObject @PageableDefault(page = 0, size = 20) Pageable pageable
     ) {
         Page<MusicalRes> responses = musicalService.searchMusicalsByTitle(keyword, pageable);
         return ApplicationResponse.ok(responses);
