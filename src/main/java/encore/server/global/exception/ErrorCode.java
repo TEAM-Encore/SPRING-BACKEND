@@ -85,7 +85,7 @@ public enum ErrorCode {
     INVALID_JWT_SIGNATURE(HttpStatus.UNAUTHORIZED, 14000, "유효하지 않은 JWT 서명입니다."),
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, 14001, "JWT 가 만료되었습니다."),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, 14002, "지원되지 않는 JWT 입니다."),
-    JWT_CLAIMS_IS_EMPTY(HttpStatus.UNAUTHORIZED, 14003, "잘못된 JWT 입니다."),
+    JWT_CLAIMS_IS_EMPTY(HttpStatus.UNAUTHORIZED, 14003, "JWT 가 포함되지 않았습니다."),
     JWT_NOT_FOUND(HttpStatus.NOT_FOUND, 14004, "헤더에서 JWT 를 찾을 수 없습니다.");
 
 
