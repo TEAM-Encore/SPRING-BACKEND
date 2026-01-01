@@ -53,7 +53,7 @@ public class KakaoOAuthService implements OAuthLoginService {
       login = userAuthService.login(OAuthProfileConverter.profileToLoginReq(userInfo));
     }
 
-    String bearerAccessToken = login.accessToken();
+    String bearerAccessToken = login.accessToken().substring(7);
 
     return UriComponentsBuilder.fromUriString("encore://oauth")
         .queryParam("token", bearerAccessToken)
