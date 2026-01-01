@@ -100,7 +100,7 @@ public class JwtUtils {
   }
 
   // 토큰 검증
-  public boolean validateToken(String token) {
+  public boolean validateToken(String token) throws ApplicationException {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
       return true;

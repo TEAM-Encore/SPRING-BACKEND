@@ -3,6 +3,7 @@ package encore.server.global.filter;
 import encore.server.global.auth.UserDetailsImpl;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
+import encore.server.global.exception.FilterExceptionHandler;
 import encore.server.global.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -54,8 +55,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     String tokenValue = jwtUtils.getTokenFromRequest(request);
 
-    if (!jwtUtils.validateToken(tokenValue)) {
-      throw new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION);
+    try {
+      jwtUtils.validateToken(tokenValue);
+    } catch (ApplicationException e) {
+      FilterExceptionHandler.handle(e, response);
+      return;
     }
 
     log.info("tokenValue: " + tokenValue);
