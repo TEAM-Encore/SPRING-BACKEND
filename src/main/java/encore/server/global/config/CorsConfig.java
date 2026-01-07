@@ -1,8 +1,10 @@
 package encore.server.global.config;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -12,10 +14,9 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 
 @Configuration
+@ConfigurationProperties(prefix = "cors")
 public class CorsConfig {
-
-    @Value("${cors.allowed-origins}")
-    private List<String> allowedOrigins;
+    private List<String> allowedOrigins = new ArrayList<>();
 
     @Bean
     public CorsFilter corsFilter() {
