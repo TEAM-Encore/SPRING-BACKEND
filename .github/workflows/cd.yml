@@ -43,26 +43,9 @@ jobs:
           echo "${{ secrets.FIREBASE_CONFIG_JSON }}" | base64 --decode > ./src/main/resources/firebase-config.json
         shell: bash
 
-      # application.yml 생성
-      - name: Make application-secret.yml
-        run: |
-          cd ./src/main
-          [ ! -d "resources" ] && mkdir resources
-          cd ./resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION_SECRET_YML}}" > ./application.yml
-        shell: bash
-
       # Gradle clean bootJar
       - name: Build Gradle
         run: ./gradlew clean bootJar
-
-      # resources 디렉토리 내용 출력 (디버깅용)
-      - name: List resources directory
-        run: |
-          ls -l ./src/main/resources
-          if [ -f ./src/main/resources/adjective.txt ]; then echo "adjective.txt exists"; else echo "adjective.txt does not exist"; fi
-        shell: bash
 
       # Docker Image Push
       - name: Docker Image push
@@ -77,10 +60,9 @@ jobs:
         with:
           host: ${{ secrets.EC2_SERVER_IP }}
           username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
-            cd encore/
-            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            cd /home/ubuntu/encore/
             docker-compose stop ${{ secrets.DOCKER_SERVICE_NAME }}
             docker-compose rm -f ${{ secrets.DOCKER_SERVICE_NAME }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY}}
