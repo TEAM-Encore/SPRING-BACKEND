@@ -1,6 +1,8 @@
 package encore.server.global.config;
 
 
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -12,12 +14,15 @@ import java.util.Arrays;
 @Configuration
 public class CorsConfig {
 
+    @Value("${cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE","OPTIONS"));
         config.setExposedHeaders(Arrays.asList("Authorization", "Content-Type", "Cookie", "Set-Cookie", "X-Requested-With"));
@@ -27,6 +32,4 @@ public class CorsConfig {
         return new CorsFilter(source);
 
     }
-
-
 }
