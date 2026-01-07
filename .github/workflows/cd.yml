@@ -83,14 +83,17 @@ jobs:
           echo "command_id=$COMMAND_ID" >> $GITHUB_OUTPUT
           echo "SSM CommandId: $COMMAND_ID"
 
-      - name: Wait for command to finish & print logs
+      - name: Wait for command & print logs (always)
+        if: always()
         run: |
+          set +e
           aws ssm wait command-executed \
             --command-id "${{ steps.ssm.outputs.command_id }}" \
-            --instance-id "${{ secrets.EC2_INSTANCE_ID  }}"
-
+            --instance-id "${{ secrets.EC2_INSTANCE_ID }}"
+          
           aws ssm get-command-invocation \
             --command-id "${{ steps.ssm.outputs.command_id }}" \
-            --instance-id "${{ secrets.EC2_INSTANCE_ID  }}" \
-            --query "{Status:Status,StdOut:StandardOutputContent,StdErr:StandardErrorContent}" \
+            --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+            --query "{Status:Status,ResponseCode:ResponseCode,StdOut:StandardOutputContent,StdErr:StandardErrorContent}" \
             --output json
+          exit 0
