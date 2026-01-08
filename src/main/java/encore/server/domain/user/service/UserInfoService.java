@@ -8,8 +8,11 @@ import encore.server.domain.user.dto.response.UserGetMeRes;
 import encore.server.domain.user.dto.response.UserGetRes;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
+import encore.server.domain.user.repository.WithdrawalQuerydslRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
+import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class UserInfoService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
   private final ImageService imageService;
+  private final WithdrawalQuerydslRepository withdrawalQuerydslRepository;
+  private final EntityManager em;
 
   public UserGetMeRes getMyInfo(Long userId) {
     User me = userRepository.findById(userId)
@@ -42,4 +47,14 @@ public class UserInfoService {
     return UserConverter.toUserGetRes(user, numOfWritePost);
   }
 
+  @Transactional
+  public void deleteMyAccount(Long loginUserId) {
+    LocalDateTime now = LocalDateTime.now();
+
+    withdrawalQuerydslRepository.withdrawBoard(loginUserId, now);
+    withdrawalQuerydslRepository.withdrawReviewTicket(loginUserId, now);
+    withdrawalQuerydslRepository.withdrawMisc(loginUserId, now);
+    withdrawalQuerydslRepository.anonymizeAndDeleteUser(loginUserId, now);
+    em.clear();
+  }
 }

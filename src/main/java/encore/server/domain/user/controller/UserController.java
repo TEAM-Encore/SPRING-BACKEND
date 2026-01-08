@@ -110,6 +110,20 @@ public class UserController {
         return ApplicationResponse.ok(userInfoService.getMyInfo(loginUserId));
     }
 
+    @DeleteMapping("/me")
+    @Operation(
+        summary = "(MVP) 회원 탈퇴",
+        description = """
+        현재 로그인된 회원에 대한 탈퇴를 진행합니다.
+        """
+    )
+    public ApplicationResponse<Void> deleteMyAccount(
+        @Parameter(hidden = true) @LoginUserId Long loginUserId
+    ) {
+        userInfoService.deleteMyAccount(loginUserId);
+        return ApplicationResponse.ok();
+    }
+
     @Hidden
     @GetMapping("/{userId}")
     @Operation(summary = "(MVP) 유저 정보 조회", description = "주어진 아이디로 유저 정보를 조회합니다.")
