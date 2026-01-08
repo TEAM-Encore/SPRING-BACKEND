@@ -69,13 +69,8 @@ public class Post extends BaseTimeEntity {
     private Long commentCount;
 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "post_term",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "term_id")
-    )
-    private Set<Term> terms = new HashSet<>();
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<PostTerm> terms = new HashSet<>();
 
     @Builder
     public Post(User user, String title, String content,Boolean isNotice, Boolean isTemporarySave, PostType postType,
@@ -100,8 +95,9 @@ public class Post extends BaseTimeEntity {
 
 
     public void addMusicalTerm(Term musicalTerm) {
-        this.terms.add(musicalTerm);
-        musicalTerm.addPost(this);
+        PostTerm postTerm = new PostTerm(this, musicalTerm);
+        this.terms.add(postTerm);
+        musicalTerm.addPost(postTerm);
     }
 
     public void addMusicalTerms(List<Term> terms) {

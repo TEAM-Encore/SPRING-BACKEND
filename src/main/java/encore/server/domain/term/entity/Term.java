@@ -1,6 +1,6 @@
 package encore.server.domain.term.entity;
 
-import encore.server.domain.post.entity.Post;
+import encore.server.domain.post.entity.PostTerm;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,10 +23,10 @@ public class Term {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ManyToMany(mappedBy = "terms")
-    private Set<Post> posts = new HashSet<>();
+    @OneToMany(mappedBy = "term", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<PostTerm> posts = new HashSet<>();
 
-    public void addPost(Post post) {
-        this.posts.add(post);
+    public void addPost(PostTerm postTerm) {
+        this.posts.add(postTerm);
     }
 }

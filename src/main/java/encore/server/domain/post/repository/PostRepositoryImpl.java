@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import encore.server.domain.hashtag.entity.PostHashtag;
 import encore.server.domain.post.entity.Post;
 import encore.server.domain.post.entity.PostImage;
+import encore.server.domain.post.entity.PostTerm;
 import encore.server.domain.post.enumerate.Category;
 import encore.server.domain.post.enumerate.PostType;
 import encore.server.domain.review.entity.Review;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static encore.server.domain.hashtag.entity.QPostHashtag.postHashtag;
+import static encore.server.domain.post.entity.QPostTerm.postTerm;
 import static encore.server.domain.review.entity.QReview.review;
 import static encore.server.domain.term.entity.QTerm.term;
 import static encore.server.domain.post.entity.QPost.post;
@@ -87,7 +89,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         // Term 가져오기
         List<Term> musicalTerms = queryFactory.selectFrom(term)
-                .join(term.posts, post)
+                .join(term.posts, postTerm)
+                .join(postTerm.post, post)
                 .where(post.eq(fetchedPost))
                 .fetch();
         fetchedPost.addMusicalTerms(musicalTerms);
