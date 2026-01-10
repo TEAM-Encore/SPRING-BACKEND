@@ -57,4 +57,11 @@ public class UserInfoService {
     withdrawalQuerydslRepository.anonymizeAndDeleteUser(loginUserId, now);
     em.clear();
   }
+
+  @Transactional
+  public void setupComplete(Long loginUserId) {
+    User me = userRepository.findById(loginUserId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+    me.setupSuccess();
+  }
 }

@@ -124,6 +124,21 @@ public class UserController {
         return ApplicationResponse.ok();
     }
 
+    @PatchMapping("/me/setup/complete")
+    @Operation(
+        summary = "(MVP) 회원 설정 완료",
+        description = """
+        현재 로그인된 회원의 설정을 완료했을 시 플래그를 세우기 위한 API.
+        """
+    )
+    public ApplicationResponse<Void> setupComplete(
+        @Parameter(hidden = true) @LoginUserId Long loginUserId
+    ) {
+        userInfoService.setupComplete(loginUserId);
+        return ApplicationResponse.ok();
+    }
+
+
     @Hidden
     @GetMapping("/{userId}")
     @Operation(summary = "(MVP) 유저 정보 조회", description = "주어진 아이디로 유저 정보를 조회합니다.")
