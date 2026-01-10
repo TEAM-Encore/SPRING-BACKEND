@@ -17,6 +17,7 @@ public class UserConverter {
         .role(userSignupReq.role())
         .point(0L)
         .profileImageUrl(null)
+        .isInitialized(false)
         .build();
   }
 

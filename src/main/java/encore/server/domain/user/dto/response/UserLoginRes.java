@@ -33,7 +33,12 @@ public record UserLoginRes(
         implementation = UserPenaltyInfo.class,
         deprecated = true
     )
-    UserPenaltyInfo userPenaltyInfo
+    UserPenaltyInfo userPenaltyInfo,
+
+    @Schema(
+        description = "계정 초기화 여부"
+    )
+    Boolean isInitialized
 ) {
 
 }

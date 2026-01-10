@@ -54,6 +54,9 @@ public class User extends BaseTimeEntity {
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
   private List<FCMToken> fcmTokens = new ArrayList<>();
 
+  @Column(nullable = false)
+  private Boolean isInitialized;
+
   @Builder
   public User(String nickName, Long point) {
     this.nickName = nickName;
@@ -83,5 +86,9 @@ public class User extends BaseTimeEntity {
       UserTermOfUse userTermOfUse = UserTermOfUse.create(this, termOfUse);
       this.userTermOfUses.add(userTermOfUse);
     }
+  }
+
+  public void setupSuccess() {
+    this.isInitialized = true;
   }
 }

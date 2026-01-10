@@ -59,7 +59,7 @@ public class GoogleOAuthService implements OAuthLoginService {
 
     return UriComponentsBuilder.fromUriString("encore://oauth")
         .queryParam("token", bearerAccessToken)
-        .queryParam("isAgreedRequiredTerm", login.isAgreedRequiredTerm())
+        .queryParam("isInitialized", login.isInitialized())
         .queryParam("isActivePenalty", login.isActivePenalty())
         .build().toUriString();
   }

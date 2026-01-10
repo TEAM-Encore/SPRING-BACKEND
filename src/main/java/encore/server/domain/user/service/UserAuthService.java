@@ -106,6 +106,7 @@ public class UserAuthService {
         .accessToken(accessToken)
         .isAgreedRequiredTerm(numOfAgreedRequiredTerm == numOfTermsByIsOptionalFalse)
         .isActivePenalty(false)
+        .isInitialized(findUser.getIsInitialized())
         .build();
   }
 
