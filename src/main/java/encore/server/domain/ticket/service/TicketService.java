@@ -13,11 +13,13 @@ import encore.server.domain.ticket.entity.Actor;
 import encore.server.domain.ticket.entity.Ticket;
 import encore.server.domain.ticket.entity.TicketActor;
 import encore.server.domain.ticket.repository.ActorRepository;
+import encore.server.domain.ticket.repository.TicketActorRepository;
 import encore.server.domain.ticket.repository.TicketRepository;
 import encore.server.domain.user.entity.User;
 import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final MusicalRepository musicalRepository;
     private final UserRepository userRepository;
+    private final TicketActorRepository ticketActorRepository;
     private final ActorRepository actorRepository;
     private final ReviewRepository reviewRepository;
 
@@ -199,20 +202,18 @@ public class TicketService {
 //                .collect(Collectors.toList());
 //    }
 //
-//    //리뷰 작성하지 않은 티켓북만 조회
-//    public List<TicketRes> getUnreviewedTicketList(Long userId) {
-//        // validation
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-//
-//        //business login
-//        // 전체 티켓 조회
-//        List<Ticket> tickets = ticketRepository.findByUserId(userId);
-//
-//        // 리뷰 없는 티켓만 필터링
-//        return tickets.stream()
-//                .filter(ticket -> reviewRepository.findByTicketId(ticket.getId()).isEmpty())
-//                .map(ticket -> TicketConverter.toTicketRes(ticket, Optional.empty()))
-//                .collect(Collectors.toList());
-//    }
+    //리뷰 작성하지 않은 티켓북만 조회
+    public List<TicketRes> getUnreviewedTicketList(Long userId) {
+        // validation
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        //business login
+        // 리뷰하지 않았고, 이미지가 업로드된 티켓만 필터링하여 조회
+        List<Ticket> filteredTickets = ticketRepository.findUnreviewedWithImageByUserFetchAll(user);
+
+        return filteredTickets.stream()
+            .map(TicketConverter::toTicketRes)
+            .toList();
+    }
 }

@@ -11,6 +11,7 @@ import encore.server.domain.ticket.service.TicketService;
 import encore.server.global.aop.annotation.LoginUserId;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -94,11 +95,11 @@ public class TicketController {
 //        List<TicketSimpleRes> ticketList = ticketService.getTicketsByMusicalTitle(title);
 //        return ApplicationResponse.ok(ticketList);
 //    }
-//
-//    @Operation(summary = "리뷰 작성되지 않은 티켓 내역 리스트 조회", description = "리뷰가 작성되지 않은 티켓 내역 목록을 조회합니다.")
-//    @GetMapping("/unreviewed")
-//    public ApplicationResponse<List<TicketRes>> getUnreviewedTicketList(@LoginUserId Long userId) {
-//        List<TicketRes> tickets = ticketService.getUnreviewedTicketList(userId);
-//        return ApplicationResponse.ok(tickets);
-//    }
+
+    @Operation(summary = "리뷰 작성되지 않은 티켓 내역 리스트 조회", description = "리뷰가 작성되지 않은 티켓 내역 목록을 조회합니다.")
+    @GetMapping("/unreviewed")
+    public ApplicationResponse<List<TicketRes>> getUnreviewedTicketList(@Parameter(hidden = true) @LoginUserId Long userId) {
+        List<TicketRes> tickets = ticketService.getUnreviewedTicketList(userId);
+        return ApplicationResponse.ok(tickets);
+    }
 }

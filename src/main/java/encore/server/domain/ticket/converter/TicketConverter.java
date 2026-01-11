@@ -1,5 +1,6 @@
 package encore.server.domain.ticket.converter;
 
+import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.ticket.dto.response.ActorRes;
 import encore.server.domain.ticket.dto.response.TicketRes;
 import encore.server.domain.ticket.entity.Actor;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 public class TicketConverter {
 
     public static TicketRes toTicketRes(Ticket ticket) {
-        var musical = ticket.getMusical();
+        Musical musical = ticket.getMusical();
 
         // TODO: N+1 문제 해결
         List<ActorRes> actors = ticket.getTicketActorList().stream()
