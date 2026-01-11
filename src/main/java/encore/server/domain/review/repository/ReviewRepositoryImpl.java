@@ -7,11 +7,15 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import encore.server.domain.review.entity.Review;
+import encore.server.domain.review.entity.ReviewLike;
 import encore.server.domain.review.enumerate.Tag;
+import encore.server.domain.user.entity.User;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -42,6 +46,29 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
             .orderBy(getSortOrder(pageable))
             .limit(pageable.getPageSize() + 1)
             .fetch();
+    }
+
+    @Override
+    public Slice<Review> findReviewListByUserAndCursor(User user,
+        Long cursor, Pageable pageable) {
+        BooleanBuilder predicate = new BooleanBuilder();
+        predicate.and(review.deletedAt.isNull())
+            .and(addCursorCondition(cursor))
+            .and(review.user.eq(user));
+
+        List<Review> results = queryFactory
+            .selectFrom(review)
+            .where(predicate)
+            .orderBy(getSortOrder(pageable))
+            .limit(pageable.getPageSize() + 1)   // +1로 다음 페이지 존재 여부 판단
+            .fetch();
+
+        boolean hasNext = results.size() > pageable.getPageSize();
+        if (hasNext) {
+            results = results.subList(0, pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
     }
 
     public Optional<Review> findReviewDetail(Long reviewId) {

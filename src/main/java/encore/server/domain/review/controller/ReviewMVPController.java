@@ -16,9 +16,11 @@ import encore.server.domain.review.service.ReviewMVPService;
 import encore.server.global.aop.annotation.LoginUserId;
 import encore.server.global.common.ApplicationResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.wavefront.WavefrontProperties.Application;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -46,9 +48,27 @@ public class ReviewMVPController {
   public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getReviewList(
       @RequestParam(name = "search_keyword", required = false) String keyword,
       @RequestParam(name = "cursor", required = false) Long cursor,
-      @PageableDefault(size = 3, sort = "createdAt") Pageable pageable,
+      @PageableDefault(size = 3, sort = "id") Pageable pageable,
       @LoginUserId Long userId) {
     return ApplicationResponse.ok(reviewService.getReviewList(userId, keyword, cursor, pageable));
+  }
+
+  @GetMapping("/list/me")
+  public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getMyReviewList(
+      @RequestParam(name = "cursor", required = false) Long cursor,
+      @PageableDefault(size = 3, sort = "id") Pageable pageable,
+      @Parameter(hidden = true) @LoginUserId Long userId
+  ){
+    return ApplicationResponse.ok(reviewService.getMyReviewList(userId, cursor, pageable));
+  }
+
+  @GetMapping("/list/me/like")
+  public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getMyLikedReviewList(
+      @RequestParam(name = "cursor", required = false) Long cursor,
+      @PageableDefault(size = 3, sort = "id") Pageable pageable,
+      @Parameter(hidden = true) @LoginUserId Long userId
+  ) {
+    return ApplicationResponse.ok(reviewService.getMyLikedReviewList(userId, cursor, pageable));
   }
 
   @PostMapping("/")

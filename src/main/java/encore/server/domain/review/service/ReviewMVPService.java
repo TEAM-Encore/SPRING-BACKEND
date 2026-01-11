@@ -37,9 +37,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,7 +93,9 @@ public class ReviewMVPService {
 
     // business logic: get review list
     //0. 검색어 로그에 저장
-    reviewRecentSearchService.saveRecentSearchLog(searchKeyword, userId);
+    if (searchKeyword != null && !searchKeyword.isBlank()) {
+      reviewRecentSearchService.saveRecentSearchLog(searchKeyword, userId);
+    }
 
     //1. cursor 기반으로 리뷰 리스트 조회
     List<Review> reviews = reviewRepository.findReviewListByCursorAndSearchKeyword(searchKeyword, cursor, pageable);
@@ -114,6 +117,72 @@ public class ReviewMVPService {
     }
 
     List<ReviewGetListRes> reviewSimpleResList = pageReviews.stream()
+        .map(review -> ReviewGetListRes.of(review, review.getElapsedTime()))
+        .collect(Collectors.toList());
+
+    return new ReviewListCursorBasedRes<>(reviewSimpleResList, hasNext, nextCursor);
+  }
+
+  public ReviewListCursorBasedRes<ReviewGetListRes> getMyReviewList(Long userId,
+      Long cursor, Pageable pageable) {
+
+    // business logic: get review list
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+    // 커서 페이징에서는 offset 의미 없게 0 고정
+    Pageable firstPageable = PageRequest.of(
+        0,
+        pageable.getPageSize(),
+        pageable.getSort().isSorted() ? pageable.getSort() : Sort.by(Sort.Direction.DESC, "id")
+    );
+
+    //1. cursor 기반으로 리뷰 리스트 조회
+    Slice<Review> slice = reviewRepository.findReviewListByUserAndCursor(user, cursor, firstPageable);
+    List<Review> reviews = slice.getContent();
+
+    //2. 리뷰 리스트가 없는 경우
+    if (reviews.isEmpty()) {
+      return new ReviewListCursorBasedRes<>(List.of(), false, null);
+    }
+
+    //3. 리뷰 리스트 조회 성공
+    boolean hasNext = slice.hasNext();
+    Long nextCursor = reviews.get(reviews.size() - 1).getId();
+
+    List<ReviewGetListRes> reviewSimpleResList = reviews.stream()
+        .map(review -> ReviewGetListRes.of(review, review.getElapsedTime()))
+        .collect(Collectors.toList());
+
+    return new ReviewListCursorBasedRes<>(reviewSimpleResList, hasNext, nextCursor);
+  }
+
+  public ReviewListCursorBasedRes<ReviewGetListRes> getMyLikedReviewList(Long userId, Long cursor,
+      Pageable pageable) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+    // 커서 페이징에서는 offset 의미 없게 0 고정
+    Pageable firstPageable = PageRequest.of(
+        0,
+        pageable.getPageSize(),
+        pageable.getSort().isSorted() ? pageable.getSort() : Sort.by(Sort.Direction.DESC, "id")
+    );
+
+    Slice<ReviewLike> slice = reviewLikeRepository.findByUserAndCursor(user, cursor, firstPageable);
+    List<ReviewLike> reviewLikes = slice.getContent();
+
+    // 보통 커서 리스트는 0개면 예외 말고 빈 리스트 반환
+    if (reviewLikes.isEmpty()) {
+      return new ReviewListCursorBasedRes<>(List.of(), false, null);
+    }
+
+    //3. 리뷰 리스트 조회 성공
+    boolean hasNext = slice.hasNext();
+    Long nextCursor = reviewLikes.get(reviewLikes.size() - 1).getId();
+
+    List<ReviewGetListRes> reviewSimpleResList = reviewLikes.stream()
+        .map(ReviewLike::getReview)
         .map(review -> ReviewGetListRes.of(review, review.getElapsedTime()))
         .collect(Collectors.toList());
 
