@@ -134,7 +134,7 @@ public class ReviewMVPService {
     Pageable firstPageable = PageRequest.of(
         0,
         pageable.getPageSize(),
-        pageable.getSort().isSorted() ? pageable.getSort() : Sort.by(Sort.Direction.DESC, "id")
+        Sort.by(Sort.Direction.DESC, "id")
     );
 
     //1. cursor 기반으로 리뷰 리스트 조회
@@ -166,7 +166,7 @@ public class ReviewMVPService {
     Pageable firstPageable = PageRequest.of(
         0,
         pageable.getPageSize(),
-        pageable.getSort().isSorted() ? pageable.getSort() : Sort.by(Sort.Direction.DESC, "id")
+        Sort.by(Sort.Direction.DESC, "id")
     );
 
     Slice<ReviewLike> slice = reviewLikeRepository.findByUserAndCursor(user, cursor, firstPageable);
