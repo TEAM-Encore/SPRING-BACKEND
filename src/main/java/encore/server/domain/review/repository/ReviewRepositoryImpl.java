@@ -43,7 +43,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         return queryFactory
             .selectFrom(review)
             .where(predicate)
-            .orderBy(getSortOrder(pageable))
+            .orderBy(review.id.desc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
     }
@@ -59,7 +59,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         List<Review> results = queryFactory
             .selectFrom(review)
             .where(predicate)
-            .orderBy(getSortOrder(pageable))
+            .orderBy(review.id.desc())
             .limit(pageable.getPageSize() + 1)   // +1로 다음 페이지 존재 여부 판단
             .fetch();
 
