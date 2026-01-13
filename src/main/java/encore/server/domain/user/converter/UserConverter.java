@@ -9,14 +9,14 @@ import java.util.Objects;
 
 public class UserConverter {
 
-  public static User toEntity(UserSignupReq userSignupReq, String uniqueNickName) {
+  public static User toEntity(UserSignupReq userSignupReq, String uniqueNickName, String defaultImagePath) {
     return User.builder()
         .email(userSignupReq.email())
         .nickName(uniqueNickName)
         .authProvider(userSignupReq.provider())
         .role(userSignupReq.role())
         .point(0L)
-        .profileImageUrl(null)
+        .profileImageUrl(defaultImagePath)
         .isInitialized(false)
         .build();
   }
