@@ -39,6 +39,10 @@ public class ImageService {
   }
 
   public String generateGetPresignedUrl(String filePath) {
+    if (filePath.startsWith("/")) {
+      filePath = filePath.substring(1);
+    }
+
     GeneratePresignedUrlRequest request =
         new GeneratePresignedUrlRequest(bucket, filePath)
             .withMethod(HttpMethod.GET)
