@@ -46,8 +46,10 @@ public class UserAuthService {
     }
 
     // business logic: 요청값, 랜덤 생성된 겹치지 않는 닉네임을 통해 User Entity를 만들고 저장함.
+    //todo: 환경변수로 변경
+    String defaultImagePath = "dynamic/encore-default.png";
     String email = userRepository.save(
-        UserConverter.toEntity(userSignupReq, getUniqueNickName())).getEmail();
+        UserConverter.toEntity(userSignupReq, getUniqueNickName(), defaultImagePath)).getEmail();
 
     // return: 유저 email 반환
     return UserSignupRes.builder()
