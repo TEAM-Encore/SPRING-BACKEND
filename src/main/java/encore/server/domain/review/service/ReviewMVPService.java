@@ -102,7 +102,7 @@ public class ReviewMVPService {
 
     //2. 리뷰 리스트가 없는 경우
     if (reviews.isEmpty()) {
-      throw new ApplicationException(ErrorCode.REVIEW_NOT_FOUND_EXCEPTION);
+      return new ReviewListCursorBasedRes<>(List.of(), false, null);
     }
 
     //3. 리뷰 리스트 조회 성공
