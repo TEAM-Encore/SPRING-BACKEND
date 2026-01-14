@@ -48,27 +48,27 @@ public class ReviewMVPController {
   public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getReviewList(
       @RequestParam(name = "search_keyword", required = false) String keyword,
       @RequestParam(name = "cursor", required = false) Long cursor,
-      @PageableDefault(size = 3, sort = "id") Pageable pageable,
+      @RequestParam(name = "size", required = false, defaultValue = "30") Integer size,
       @LoginUserId Long userId) {
-    return ApplicationResponse.ok(reviewService.getReviewList(userId, keyword, cursor, pageable));
+    return ApplicationResponse.ok(reviewService.getReviewList(userId, keyword, cursor, size));
   }
 
   @GetMapping("/list/me")
   public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getMyReviewList(
       @RequestParam(name = "cursor", required = false) Long cursor,
-      @PageableDefault(size = 3, sort = "id") Pageable pageable,
+      @RequestParam(name = "size", required = false, defaultValue = "30") Integer size,
       @Parameter(hidden = true) @LoginUserId Long userId
   ){
-    return ApplicationResponse.ok(reviewService.getMyReviewList(userId, cursor, pageable));
+    return ApplicationResponse.ok(reviewService.getMyReviewList(userId, cursor, size));
   }
 
   @GetMapping("/list/me/like")
   public ApplicationResponse<ReviewListCursorBasedRes<ReviewGetListRes>> getMyLikedReviewList(
       @RequestParam(name = "cursor", required = false) Long cursor,
-      @PageableDefault(size = 3, sort = "id") Pageable pageable,
+      @RequestParam(name = "size", required = false, defaultValue = "30") Integer size,
       @Parameter(hidden = true) @LoginUserId Long userId
   ) {
-    return ApplicationResponse.ok(reviewService.getMyLikedReviewList(userId, cursor, pageable));
+    return ApplicationResponse.ok(reviewService.getMyLikedReviewList(userId, cursor, size));
   }
 
   @PostMapping("/")

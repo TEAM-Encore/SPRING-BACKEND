@@ -89,7 +89,7 @@ public class ReviewMVPService {
     return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
   }
 
-  public ReviewListCursorBasedRes<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, Pageable pageable) {
+  public ReviewListCursorBasedRes<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, Integer size) {
 
     // business logic: get review list
     //0. 검색어 로그에 저장
@@ -97,8 +97,15 @@ public class ReviewMVPService {
       reviewRecentSearchService.saveRecentSearchLog(searchKeyword, userId);
     }
 
+    // 커서 페이징에서는 offset 의미 없게 0 고정
+    Pageable firstPageable = PageRequest.of(
+        0,
+        Objects.requireNonNullElse(size, 30),
+        Sort.by(Sort.Direction.DESC, "id")
+    );
+
     //1. cursor 기반으로 리뷰 리스트 조회
-    List<Review> reviews = reviewRepository.findReviewListByCursorAndSearchKeyword(searchKeyword, cursor, pageable);
+    List<Review> reviews = reviewRepository.findReviewListByCursorAndSearchKeyword(searchKeyword, cursor, firstPageable);
 
     //2. 리뷰 리스트가 없는 경우
     if (reviews.isEmpty()) {
@@ -106,10 +113,10 @@ public class ReviewMVPService {
     }
 
     //3. 리뷰 리스트 조회 성공
-    boolean hasNext = reviews.size() > pageable.getPageSize();
+    boolean hasNext = reviews.size() > firstPageable.getPageSize();
 
     List<Review> pageReviews =
-        reviews.stream().limit(pageable.getPageSize()).toList();
+        reviews.stream().limit(firstPageable.getPageSize()).toList();
 
     Long nextCursor = null;
     if (hasNext) {
@@ -124,7 +131,7 @@ public class ReviewMVPService {
   }
 
   public ReviewListCursorBasedRes<ReviewGetListRes> getMyReviewList(Long userId,
-      Long cursor, Pageable pageable) {
+      Long cursor, Integer size) {
 
     // business logic: get review list
     User user = userRepository.findById(userId)
@@ -133,7 +140,7 @@ public class ReviewMVPService {
     // 커서 페이징에서는 offset 의미 없게 0 고정
     Pageable firstPageable = PageRequest.of(
         0,
-        pageable.getPageSize(),
+        Objects.requireNonNullElse(size, 30),
         Sort.by(Sort.Direction.DESC, "id")
     );
 
@@ -158,14 +165,14 @@ public class ReviewMVPService {
   }
 
   public ReviewListCursorBasedRes<ReviewGetListRes> getMyLikedReviewList(Long userId, Long cursor,
-      Pageable pageable) {
+      Integer size) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
     // 커서 페이징에서는 offset 의미 없게 0 고정
     Pageable firstPageable = PageRequest.of(
         0,
-        pageable.getPageSize(),
+        Objects.requireNonNullElse(size, 30),
         Sort.by(Sort.Direction.DESC, "id")
     );
 
