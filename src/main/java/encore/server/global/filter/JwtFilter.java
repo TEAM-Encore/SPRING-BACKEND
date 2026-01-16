@@ -27,12 +27,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
   private final JwtUtils jwtUtils;
-  private final List<String> publicURLs = List.of("/api/mvp/users/signup",
+  private final List<String> publicURLs = List.of(
+      "/api/mvp/users/signup",
       "/api/mvp/users/login");
   private final List<String> publicURLPrefixes = List.of(
       "/swagger-ui",
       "/v3/api-docs",
-      "/api/v1/oauth2"
+      "/api/v1/oauth2",
+      "/actuator"
   );
 
   @Override
