@@ -62,6 +62,7 @@ public enum ErrorCode {
     REVIEW_LIKE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 8007, "존재하지 않는 리뷰 좋아요입니다."),
     REVIEW_SELF_REPORT_EXCEPTION(HttpStatus.FORBIDDEN,8005,"본인의 리뷰는 신고할 수 없습니다." ),
     REVIEW_REPORT_ALREADY_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, 8006, "이미 신고한 리뷰입니다."),
+    INVALID_SORT_FIELD(HttpStatus.BAD_REQUEST, 8007, "Sort 필드가 잘못되었습니다."),
 
     // 9000: Mission Error
     MISSION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 9000, "존재하지 않는 미션입니다."),

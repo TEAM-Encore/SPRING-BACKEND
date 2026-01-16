@@ -89,7 +89,7 @@ public class ReviewMVPService {
     return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
   }
 
-  public ReviewListCursorBasedRes<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, Integer size) {
+  public ReviewListCursorBasedRes<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, String sort, Integer size) {
 
     // business logic: get review list
     //0. 검색어 로그에 저장
@@ -101,7 +101,7 @@ public class ReviewMVPService {
     Pageable firstPageable = PageRequest.of(
         0,
         Objects.requireNonNullElse(size, 30),
-        Sort.by(Sort.Direction.DESC, "id")
+        checkSortSpecAndGet(sort)
     );
 
     //1. cursor 기반으로 리뷰 리스트 조회
@@ -131,7 +131,7 @@ public class ReviewMVPService {
   }
 
   public ReviewListCursorBasedRes<ReviewGetListRes> getMyReviewList(Long userId,
-      Long cursor, Integer size) {
+      Long cursor, String sort, Integer size) {
 
     // business logic: get review list
     User user = userRepository.findById(userId)
@@ -141,7 +141,7 @@ public class ReviewMVPService {
     Pageable firstPageable = PageRequest.of(
         0,
         Objects.requireNonNullElse(size, 30),
-        Sort.by(Sort.Direction.DESC, "id")
+        checkSortSpecAndGet(sort)
     );
 
     //1. cursor 기반으로 리뷰 리스트 조회
@@ -165,7 +165,7 @@ public class ReviewMVPService {
   }
 
   public ReviewListCursorBasedRes<ReviewGetListRes> getMyLikedReviewList(Long userId, Long cursor,
-      Integer size) {
+      String sort, Integer size) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
@@ -173,7 +173,7 @@ public class ReviewMVPService {
     Pageable firstPageable = PageRequest.of(
         0,
         Objects.requireNonNullElse(size, 30),
-        Sort.by(Sort.Direction.DESC, "id")
+        checkSortSpecAndGet(sort)
     );
 
     Slice<ReviewLike> slice = reviewLikeRepository.findByUserAndCursor(user, cursor, firstPageable);
@@ -383,5 +383,19 @@ public class ReviewMVPService {
 
     //return: view image response
     return ViewImageRes.of(viewImages);
+  }
+
+  private Sort checkSortSpecAndGet(String sort) {
+    Sort sortSpec = Sort.by(Sort.Direction.DESC, "id"); // default
+
+    if (sort != null) {
+      switch (sort) {
+        case "id" -> sortSpec = Sort.by(Sort.Direction.DESC, "id");
+        case "createdAt" -> sortSpec = Sort.by(Sort.Direction.DESC, "createdAt");
+        case "likeCount" -> sortSpec = Sort.by(Sort.Direction.DESC, "likeCount");
+        default -> throw new ApplicationException(ErrorCode.INVALID_SORT_FIELD);
+      }
+    }
+    return sortSpec;
   }
 }
