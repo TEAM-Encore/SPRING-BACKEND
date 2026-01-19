@@ -42,6 +42,8 @@ public class TicketConverter {
 
                 .actors(actors)
 
+                .showTime(ticket.getShowTime())
+
                 .build();
     }
 

@@ -5,6 +5,8 @@ import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.user.entity.User;
 import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -45,7 +47,7 @@ public class Ticket extends BaseTimeEntity {
     private String number;
 
     @Column(nullable = false)
-    private String showTime;
+    private LocalTime showTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -96,10 +98,9 @@ public class Ticket extends BaseTimeEntity {
         }
     }
 
-    public void updateShowTime(String showTime) {
-        if (showTime != null && !showTime.isBlank()) {
-            this.showTime = showTime;
-        }
+    public void updateShowTime(LocalTime showTime) {
+        if (showTime == null) return;
+        this.showTime = showTime.truncatedTo(ChronoUnit.MINUTES);
     }
 
     public void updateReview(Review review) {

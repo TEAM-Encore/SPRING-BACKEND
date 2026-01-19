@@ -1,7 +1,9 @@
 package encore.server.domain.ticket.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.time.LocalTime;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -26,7 +28,10 @@ public record TicketRes(
         String col,
         String number,
 
-        List<ActorRes> actors
+        List<ActorRes> actors,
+
+        @JsonFormat(pattern = "HH:mm")
+        LocalTime showTime
 
         // TODO: 리뷰 관련
 //        Boolean hasReview,

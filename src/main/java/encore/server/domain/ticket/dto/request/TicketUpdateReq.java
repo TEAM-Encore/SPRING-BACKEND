@@ -2,6 +2,7 @@ package encore.server.domain.ticket.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.time.LocalTime;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -16,6 +17,6 @@ public record TicketUpdateReq(
         String zone,
         String col,
         String number,
-        String showTime,
+        LocalTime showTime,
         List<Long> actorIds
 ) { }
