@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class TicketConverter {
 
-    public static TicketRes toTicketRes(Ticket ticket) {
+    public static TicketRes toTicketRes(Ticket ticket, String presignedImageURL) {
         Musical musical = ticket.getMusical();
 
         // TODO: N+1 문제 해결
@@ -33,7 +33,7 @@ public class TicketConverter {
                 .musicalImageUrl(musical.getImageUrl())
 
                 .viewedDate(ticket.getViewedDate())
-                .ticketImageUrl(ticket.getTicketImageUrl())
+                .ticketImageUrl(presignedImageURL)
 
                 .floor(ticket.getFloor())
                 .zone(ticket.getZone())

@@ -1,5 +1,6 @@
 package encore.server.domain.ticket.service;
 
+import encore.server.domain.image.service.ImageService;
 import encore.server.domain.musical.entity.Musical;
 import encore.server.domain.musical.repository.MusicalRepository;
 import encore.server.domain.review.entity.Review;
@@ -39,6 +40,7 @@ public class TicketService {
     private final TicketActorRepository ticketActorRepository;
     private final ActorRepository actorRepository;
     private final ReviewRepository reviewRepository;
+    private final ImageService imageService;
 
 
     @Transactional
@@ -77,7 +79,7 @@ public class TicketService {
 
         ticket.getTicketActorList().addAll(ticketActors);
 
-        return TicketConverter.toTicketRes(ticketRepository.save(ticket));
+        return TicketConverter.toTicketRes(ticketRepository.save(ticket), imageService.generateGetPresignedUrl(ticket.getTicketImageUrl()));
     }
 
     //배우 검색
@@ -108,7 +110,7 @@ public class TicketService {
         }
 
         return tickets.stream()
-                .map(TicketConverter::toTicketRes)
+                .map(ticket -> TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl())))
                 .collect(Collectors.toList());
     }
 
@@ -130,7 +132,7 @@ public class TicketService {
         boolean hasReview = reviewOpt.isPresent();
         Long reviewId = hasReview ? reviewOpt.get().getId() : null;
 
-        return TicketConverter.toTicketRes(ticket);
+        return TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl()));
     }
 
     // 티켓 수정
@@ -168,7 +170,7 @@ public class TicketService {
         // TODO: 리뷰 업데이트
         // ticket.updateReview(reviewRepository.findById(request.reviewId()).orElse(null));
 
-        return TicketConverter.toTicketRes(ticket);
+        return TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl()));
     }
 
     // 티켓 삭제
@@ -213,7 +215,7 @@ public class TicketService {
         List<Ticket> filteredTickets = ticketRepository.findUnreviewedWithImageByUserFetchAll(user);
 
         return filteredTickets.stream()
-            .map(TicketConverter::toTicketRes)
+            .map(ticket -> TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl())))
             .toList();
     }
 }
