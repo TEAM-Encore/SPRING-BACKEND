@@ -3,6 +3,7 @@ package encore.server.domain.ticket.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import lombok.Builder;
 
@@ -30,6 +31,11 @@ public record TicketRes(
 
         List<ActorRes> actors,
 
+        @Schema(
+            type = "string",
+            example = "12:30",
+            description = "시간 (HH:mm)"
+        )
         @JsonFormat(pattern = "HH:mm")
         LocalTime showTime
 
