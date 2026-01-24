@@ -2,6 +2,7 @@ package encore.server.domain.ticket.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import lombok.Builder;
 
@@ -13,6 +14,11 @@ import java.util.List;
 public record TicketCreateReq(
         Long musicalId,
         LocalDate viewedDate,
+        @Schema(
+            type = "string",
+            example = "12:30",
+            description = "시간 (HH:mm)"
+        )
         LocalTime showTime,
         Long floor,
         String zone,
