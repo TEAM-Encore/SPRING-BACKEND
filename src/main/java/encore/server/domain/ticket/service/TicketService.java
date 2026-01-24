@@ -21,6 +21,8 @@ import encore.server.domain.user.repository.UserRepository;
 import encore.server.global.exception.ApplicationException;
 import encore.server.global.exception.ErrorCode;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,12 @@ public class TicketService {
     private final ReviewRepository reviewRepository;
     private final ImageService imageService;
 
+    public static String extractDynamicPath(String url) {
+        Pattern p = Pattern.compile("(dynamic/[^\\s?%]+\\.(?:jpg|jpeg|png|webp|JPG|JPEG|PNG|WEBP))", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(url);
+        if (!m.find()) throw new IllegalArgumentException("No match image url found");
+        return m.group(1);
+    }
 
     @Transactional
     public TicketRes createTicket(TicketCreateReq request, Long userId) {
@@ -62,7 +70,7 @@ public class TicketService {
                 .user(user)
                 .viewedDate(request.viewedDate())
                 .showTime(request.showTime())
-                .ticketImageUrl(request.ticketImageUrl())
+                .ticketImageUrl(extractDynamicPath(request.ticketImageUrl()))
                 .floor(request.floor())
                 .zone(request.zone())
                 .col(request.col())
