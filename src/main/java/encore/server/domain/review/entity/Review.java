@@ -105,7 +105,7 @@ public class Review extends BaseTimeEntity {
     }
 
     public String getElapsedTime() {
-        long minutesAgo = ChronoUnit.MINUTES.between(this.getCreatedAt(), LocalDateTime.now());
+        int minutesAgo = (int) ChronoUnit.MINUTES.between(this.getCreatedAt(), LocalDateTime.now());
 
         if (minutesAgo < 1) {
             return "방금 전";
