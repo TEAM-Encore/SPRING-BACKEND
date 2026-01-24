@@ -2,11 +2,14 @@ package encore.server.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.HandlerMethod;
 
 @Configuration
 public class SwaggerConfig {
@@ -30,5 +33,15 @@ public class SwaggerConfig {
                 .info(info)
                 .addSecurityItem(securityRequirement)
                 .components(components);
+    }
+
+    @Bean
+    public OperationCustomizer hideLoginUserIdParam() {
+        return (Operation operation, HandlerMethod handlerMethod) -> {
+            if (operation.getParameters() != null) {
+                operation.getParameters().removeIf(p -> "userId".equals(p.getName()));
+            }
+            return operation;
+        };
     }
 }
