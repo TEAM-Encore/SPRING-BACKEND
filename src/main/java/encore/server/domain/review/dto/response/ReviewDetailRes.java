@@ -26,6 +26,9 @@ public record ReviewDetailRes(
         @Schema(description = "유저 ID", example = "1")
         Long userId,
 
+        @Schema(description = "유저 닉네임", example = "뮤사랑")
+        String nickName,
+
         @Schema(description = "유저 프로필 이미지", example = "https://www.image.com")
         String profileImageUrl,
 
@@ -97,6 +100,7 @@ public record ReviewDetailRes(
                 .reviewId(review.getId())
                 .ticket(TicketRes.of(review.getTicket()))
                 .userId(review.getUser().getId())
+                .nickName(review.getUser().getNickName())
                 .profileImageUrl(review.getUser().getProfileImageUrl())
                 .title(review.getTitle())
                 .tags(tagToString(review.getTags()))
