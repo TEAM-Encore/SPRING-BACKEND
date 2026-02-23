@@ -7,6 +7,7 @@ import encore.server.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -24,90 +25,96 @@ import java.util.List;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Ticket extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(nullable = true, columnDefinition = "text")
-    private String ticketImageUrl;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private LocalDate viewedDate;
+  @Column(nullable = true, columnDefinition = "text")
+  private String ticketImageUrl;
 
-    @Column(nullable = true)
-    private Long floor;
+  @Column(nullable = false)
+  private LocalDate viewedDate;
 
-    @Column(nullable = true)
-    private String zone;
+  @Column(nullable = true)
+  private Long floor;
 
-    @Column(nullable = false)
-    private String col;
+  @Column(nullable = true)
+  private String zone;
 
-    @Column(nullable = false)
-    private String number;
+  @Column(nullable = false)
+  private String col;
 
-    @Column(nullable = false)
-    private LocalTime showTime;
+  @Column(nullable = false)
+  private String number;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @Column(nullable = false)
+  private LocalTime showTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "musical_id", nullable = false)
-    private Musical musical;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", unique = true, nullable = true)
-    private Review review;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "musical_id", nullable = false)
+  private Musical musical;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TicketActor> ticketActorList = new ArrayList<>();
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "review_id", unique = true, nullable = true)
+  private Review review;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<TicketActor> ticketActorList = new ArrayList<>();
 
 
-    public void updateTicketImageUrl(String ticketImageUrl) {
-        if (ticketImageUrl != null && !ticketImageUrl.isBlank()) {
-            this.ticketImageUrl = ticketImageUrl;
-        }
+  public void updateTicketImageUrl(String ticketImageUrl) {
+    if (ticketImageUrl != null && !ticketImageUrl.isBlank()) {
+      this.ticketImageUrl = ticketImageUrl;
     }
+  }
 
-    public void updateViewedDate(LocalDate viewedDate) {
-        if (viewedDate != null) {
-            this.viewedDate = viewedDate;
-        }
+  public void updateViewedDate(LocalDate viewedDate) {
+    if (viewedDate != null) {
+      this.viewedDate = viewedDate;
     }
+  }
 
-    public void updateFloor(Long floor) {
-        this.floor = floor;
-    }
+  public void updateFloor(Long floor) {
+    this.floor = floor;
+  }
 
-    public void updateZone(String zone) {
-        this.zone = zone;
-    }
+  public void updateZone(String zone) {
+    this.zone = zone;
+  }
 
-    public void updateCol(String col) {
-        if (col != null && !col.isBlank()) {
-            this.col = col;
-        }
+  public void updateCol(String col) {
+    if (col != null && !col.isBlank()) {
+      this.col = col;
     }
+  }
 
-    public void updateNumber(String number) {
-        if (number != null && !number.isBlank()) {
-            this.number = number;
-        }
+  public void updateNumber(String number) {
+    if (number != null && !number.isBlank()) {
+      this.number = number;
     }
+  }
 
-    public void updateShowTime(LocalTime showTime) {
-        if (showTime == null) return;
-        this.showTime = showTime.truncatedTo(ChronoUnit.MINUTES);
-    }
+  public void updateShowTime(LocalTime showTime) {
+      if (showTime == null) {
+          return;
+      }
+    this.showTime = showTime.truncatedTo(ChronoUnit.MINUTES);
+  }
 
-    public void updateReview(Review review) {
-        this.review = review;
-    }
+  public void updateReview(Review review) {
+    this.review = review;
+  }
 
-    public boolean isReviewable() {
-      return ticketImageUrl != null && !ticketImageUrl.isBlank();
+  public boolean isReviewable() {
+    if (Objects.equals(ticketImageUrl, "dynamic/encore-default.png")) {
+      return false;
     }
+    return ticketImageUrl != null && !ticketImageUrl.isBlank();
+  }
 }
