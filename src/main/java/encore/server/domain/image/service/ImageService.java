@@ -39,6 +39,9 @@ public class ImageService {
   }
 
   public String generateGetPresignedUrl(String filePath) {
+    if (filePath == null || filePath.isBlank()) {
+      filePath = "dynamic/encore-default.png";
+    }
     if (filePath.startsWith("/")) {
       filePath = filePath.substring(1);
     }
