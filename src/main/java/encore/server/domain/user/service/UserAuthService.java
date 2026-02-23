@@ -122,8 +122,6 @@ public class UserAuthService {
           .append("뮤사랑")
           .append(random.nextInt(10))
           .append(random.nextInt(10))
-          .append(random.nextInt(10))
-          .append(random.nextInt(10))
           .append(random.nextInt(10));
 
       uniqueNickName = uniqueNickNameStringBuilder.toString();
