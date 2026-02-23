@@ -106,4 +106,8 @@ public class Ticket extends BaseTimeEntity {
     public void updateReview(Review review) {
         this.review = review;
     }
+
+    public boolean isReviewable() {
+      return ticketImageUrl != null && !ticketImageUrl.isBlank();
+    }
 }

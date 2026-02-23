@@ -74,6 +74,7 @@ public enum ErrorCode {
 
     // 11000: Ticket Error
     TICKET_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 11000, "존재하지 않는 티켓입니다."),
+    TICKET_IMAGE_NOT_UPLOAD_EXCEPTION(HttpStatus.NOT_FOUND, 11001, "티켓 이미지가 업로드되지 않았습니다."),
 
     // 12000: Actor Error
     ACTOR_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, 12000, "존재하지 않는 배우입니다."),

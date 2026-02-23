@@ -205,6 +205,10 @@ public class ReviewMVPService {
     Ticket ticket = ticketRepository.findByIdAndUserId(req.ticketId(), userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.FORBIDDEN_EXCEPTION));
 
+    if (!ticket.isReviewable()) {
+      throw new ApplicationException(ErrorCode.TICKET_IMAGE_NOT_UPLOAD_EXCEPTION);
+    }
+
     reviewRepository.findByTicketId(req.ticketId())
         .ifPresent(existingReview -> {
           throw new ApplicationException(ErrorCode.REVIEW_ALREADY_EXIST_EXCEPTION);
