@@ -45,6 +45,9 @@ public class TicketService {
     private final ImageService imageService;
 
     public static String extractDynamicPath(String url) {
+        if (url == null || url.isBlank()) {
+            url = "dynamic/encore-default.png";
+        }
         Pattern p = Pattern.compile("(dynamic/[^\\s?%]+\\.(?:jpg|jpeg|png|webp|JPG|JPEG|PNG|WEBP))", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(url);
         if (!m.find()) throw new IllegalArgumentException("No match image url found");
