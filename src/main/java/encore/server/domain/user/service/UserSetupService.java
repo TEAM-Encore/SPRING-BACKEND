@@ -40,7 +40,7 @@ public class UserSetupService {
     }
     
     // 2. 허용 문자 검증
-    if (!nickname.matches("^[가-힣a-zA-Z0-9]+$")) {
+    if (!nickname.matches("^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]+$")) {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_INVALID_FORMAT_EXCEPTION);
     }
 
