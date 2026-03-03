@@ -46,7 +46,7 @@ public class TicketService {
 
   public static String extractDynamicPath(String url) {
     if (url == null || url.isBlank()) {
-      url = "dynamic/encore-default.png";
+      url = "dynamic/default-poster.png";
     }
     Pattern p = Pattern.compile("(dynamic/[^\\s?%]+\\.(?:jpg|jpeg|png|webp|JPG|JPEG|PNG|WEBP))",
         Pattern.CASE_INSENSITIVE);
