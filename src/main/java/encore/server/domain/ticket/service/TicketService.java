@@ -71,12 +71,16 @@ public class TicketService {
       throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
     }
 
+    boolean isTicketUploaded =
+        request.ticketImageUrl() != null && !request.ticketImageUrl().isBlank();
+
     Ticket ticket = Ticket.builder()
         .musical(musical)
         .user(user)
         .viewedDate(request.viewedDate())
         .showTime(request.showTime())
         .ticketImageUrl(extractDynamicPath(request.ticketImageUrl()))
+        .isTicketUploaded(isTicketUploaded)
         .floor(request.floor())
         .zone(request.zone())
         .col(request.col())

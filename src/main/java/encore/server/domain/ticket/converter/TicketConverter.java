@@ -34,6 +34,7 @@ public class TicketConverter {
 
                 .viewedDate(ticket.getViewedDate())
                 .ticketImageUrl(presignedImageURL)
+                .isTicketUploaded(ticket.isTicketUploaded())
 
                 .floor(ticket.getFloor())
                 .zone(ticket.getZone())

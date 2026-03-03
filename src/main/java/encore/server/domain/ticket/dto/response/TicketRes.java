@@ -23,7 +23,7 @@ public record TicketRes(
 
         LocalDate viewedDate,
         String ticketImageUrl,
-
+        boolean isTicketUploaded,
         Long floor,
         String zone,
         String col,

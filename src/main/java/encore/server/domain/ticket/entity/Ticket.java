@@ -34,6 +34,9 @@ public class Ticket extends BaseTimeEntity {
   private String ticketImageUrl;
 
   @Column(nullable = false)
+  private boolean isTicketUploaded;
+
+  @Column(nullable = false)
   private LocalDate viewedDate;
 
   @Column(nullable = true)
