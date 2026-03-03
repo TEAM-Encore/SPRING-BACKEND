@@ -24,12 +24,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserSetupService {
 
   private final UserRepository userRepository;
-  private final PreferredKeywordRepository preferredKeywordRepository;
   private final TermOfUseRepository termOfUseRepository;
   private final UserTermOfUseRepository userTermOfUseRepository;
-  private final UserKeywordRepository userKeywordRepository;
 
-  public UserNicknameValidationRes validateUserNickname(String nickname) {
+  public UserNicknameValidationRes validateUserNickname(String nickname, Long loginUserId) {
+    // 이미 나의 닉네임일시 검증 성공
+    User user = userRepository.findById(loginUserId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+    if (user.getNickName().equals(nickname)) {
+      return UserNicknameValidationRes.builder()
+          .isValid(true)
+          .build();
+    }
+
     // business logic
     // 1. 공백 및 null 여부 검증
     if (nickname == null || nickname.trim().isEmpty()) {
@@ -44,10 +52,6 @@ public class UserSetupService {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_INVALID_FORMAT_EXCEPTION);
     }
 
-    // 3. 길이 검증
-    if (nickname.length() < 3) {
-      throw new ApplicationException(ErrorCode.USER_NICKNAME_TOO_SHORT_EXCEPTION);
-    }
     if (nickname.length() > 6) {
       throw new ApplicationException(ErrorCode.USER_NICKNAME_TOO_LONG_EXCEPTION);
     }
@@ -72,7 +76,7 @@ public class UserSetupService {
     // business logic
     // 요청에 변경할 닉네임이 있을 경우 유효한 닉네임인지 검증 후 변경.
     if (request.nickName() != null) {
-      validateUserNickname(request.nickName());
+      validateUserNickname(request.nickName(), userId);
       userToUpdate.updateNickname(request.nickName());
     }
     // 요청에 프로필 이미지 URL 이 있을 경우 변경.

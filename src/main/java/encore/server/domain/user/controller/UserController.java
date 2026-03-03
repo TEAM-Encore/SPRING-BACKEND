@@ -77,8 +77,9 @@ public class UserController {
             - `USER_NICKNAME_ALREADY_EXIST_EXCEPTION`: 중복 닉네임\s
         """
     )
-    public ApplicationResponse<UserNicknameValidationRes> validateUserNickname(@RequestParam String nickname) {
-        return ApplicationResponse.ok(userSetupService.validateUserNickname(nickname));
+    public ApplicationResponse<UserNicknameValidationRes> validateUserNickname(@RequestParam String nickname,
+        @Parameter(hidden = true) @LoginUserId Long loginUserId) {
+        return ApplicationResponse.ok(userSetupService.validateUserNickname(nickname, loginUserId));
     }
 
     @PatchMapping("/me")
