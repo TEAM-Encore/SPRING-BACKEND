@@ -36,164 +36,188 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TicketService {
-    private final TicketRepository ticketRepository;
-    private final MusicalRepository musicalRepository;
-    private final UserRepository userRepository;
-    private final TicketActorRepository ticketActorRepository;
-    private final ActorRepository actorRepository;
-    private final ReviewRepository reviewRepository;
-    private final ImageService imageService;
 
-    public static String extractDynamicPath(String url) {
-        if (url == null || url.isBlank()) {
-            url = "dynamic/encore-default.png";
-        }
-        Pattern p = Pattern.compile("(dynamic/[^\\s?%]+\\.(?:jpg|jpeg|png|webp|JPG|JPEG|PNG|WEBP))", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(url);
-        if (!m.find()) throw new IllegalArgumentException("No match image url found");
-        return m.group(1);
+  private final TicketRepository ticketRepository;
+  private final MusicalRepository musicalRepository;
+  private final UserRepository userRepository;
+  private final ActorRepository actorRepository;
+  private final ReviewRepository reviewRepository;
+  private final ImageService imageService;
+
+  public static String extractDynamicPath(String url) {
+    if (url == null || url.isBlank()) {
+      url = "dynamic/encore-default.png";
+    }
+    Pattern p = Pattern.compile("(dynamic/[^\\s?%]+\\.(?:jpg|jpeg|png|webp|JPG|JPEG|PNG|WEBP))",
+        Pattern.CASE_INSENSITIVE);
+    Matcher m = p.matcher(url);
+    if (!m.find()) {
+      throw new IllegalArgumentException("No match image url found");
+    }
+    return m.group(1);
+  }
+
+  @Transactional
+  public TicketRes createTicket(TicketCreateReq request, Long userId) {
+    // 1. Validation
+    Musical musical = musicalRepository.findById(request.musicalId())
+        .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
+
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+    List<Actor> actors = actorRepository.findAllByIdIn(request.actorIds());
+    if (actors.size() != request.actorIds().size()) {
+      throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
     }
 
-    @Transactional
-    public TicketRes createTicket(TicketCreateReq request, Long userId) {
-        // 1. Validation
-        Musical musical = musicalRepository.findById(request.musicalId())
-                .orElseThrow(() -> new ApplicationException(ErrorCode.MUSICAL_NOT_FOUND_EXCEPTION));
+    Ticket ticket = Ticket.builder()
+        .musical(musical)
+        .user(user)
+        .viewedDate(request.viewedDate())
+        .showTime(request.showTime())
+        .ticketImageUrl(extractDynamicPath(request.ticketImageUrl()))
+        .floor(request.floor())
+        .zone(request.zone())
+        .col(request.col())
+        .number(request.number())
+        .build();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+    // 조회한 Actor 리스트를 TicketActor 엔티티로 변환
+    List<TicketActor> ticketActors = actors.stream()
+        .map(actor -> TicketActor.builder()
+            .ticket(ticket)
+            .actor(actor)
+            .build())
+        .toList();
 
-        List<Actor> actors = actorRepository.findAllByIdIn(request.actorIds());
-        if (actors.size() != request.actorIds().size()) {
-            throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
-        }
+    ticket.getTicketActorList().addAll(ticketActors);
 
-        Ticket ticket = Ticket.builder()
-                .musical(musical)
-                .user(user)
-                .viewedDate(request.viewedDate())
-                .showTime(request.showTime())
-                .ticketImageUrl(extractDynamicPath(request.ticketImageUrl()))
-                .floor(request.floor())
-                .zone(request.zone())
-                .col(request.col())
-                .number(request.number())
-                .build();
+    String imageUrl = getImageUrlOrElseDefault(ticket);
 
-        // 조회한 Actor 리스트를 TicketActor 엔티티로 변환
-        List<TicketActor> ticketActors = actors.stream()
-                .map(actor -> TicketActor.builder()
-                        .ticket(ticket)
-                        .actor(actor)
-                        .build())
-                .toList();
+    return TicketConverter.toTicketRes(ticketRepository.save(ticket),
+        imageService.generateGetPresignedUrl(imageUrl));
+  }
 
-        ticket.getTicketActorList().addAll(ticketActors);
+  //배우 검색
+  public List<ActorRes> searchActorsByName(String keyword) {
+    List<Actor> actors = actorRepository.findByNameContaining(keyword);
+    return actors.stream()
+        .map(TicketConverter::toActorRes)
+        .toList();
+  }
 
-        return TicketConverter.toTicketRes(ticketRepository.save(ticket), imageService.generateGetPresignedUrl(ticket.getTicketImageUrl()));
+  // 티켓 리스트 조회
+  public List<TicketRes> getTicketList(Long userId, String dateRange) {
+
+    if (!userRepository.existsById(userId)) {
+      throw new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION);
     }
 
-    //배우 검색
-    public List<ActorRes> searchActorsByName(String keyword) {
-        List<Actor> actors = actorRepository.findByNameContaining(keyword);
-        return actors.stream()
-                .map(TicketConverter::toActorRes)
-                .toList();
+    LocalDate startDate = switch (dateRange) {
+      case "WEEK" -> LocalDate.now().minusWeeks(1);
+      case "MONTH" -> LocalDate.now().minusMonths(1);
+      default -> null; // ALL: 전체 조회
+    };
+
+    List<Ticket> tickets;
+
+    if (startDate != null) {
+      tickets = ticketRepository.findByUserIdAndViewedDateAfter(userId, startDate);
+    } else {
+      tickets = ticketRepository.findByUserId(userId);
     }
 
-    // 티켓 리스트 조회
-    public List<TicketRes> getTicketList(Long userId, String dateRange) {
-
-        if (!userRepository.existsById(userId)) {throw new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION);}
-
-        LocalDate startDate = switch (dateRange) {
-            case "WEEK" -> LocalDate.now().minusWeeks(1);
-            case "MONTH" -> LocalDate.now().minusMonths(1);
-            default -> null; // ALL: 전체 조회
-        };
-
-        List<Ticket> tickets;
-
-        if (startDate != null) {
-            tickets = ticketRepository.findByUserIdAndViewedDateAfter(userId, startDate);
-        } else {
-            tickets = ticketRepository.findByUserId(userId);
-        }
-
-        return tickets.stream()
-                .map(ticket -> TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl())))
-                .collect(Collectors.toList());
-    }
-
-    // 티켓 개별 조회
-    @Transactional(readOnly = true)
-    public TicketRes getTicket(Long ticketId, Long userId) {
-
-        // validation: user, ticket
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
-        Ticket ticket = ticketRepository.findByIdAndUserId(ticketId, userId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION));
-
-        Musical musical = ticket.getMusical();
-
-        //연관 리뷰 정보
-        Optional<Review> reviewOpt = reviewRepository.findByTicketIdAndUserId(ticketId, userId);
-        boolean hasReview = reviewOpt.isPresent();
-        Long reviewId = hasReview ? reviewOpt.get().getId() : null;
-
-        return TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl()));
-    }
-
-    // 티켓 수정
-    @Transactional
-    public TicketRes updateTicket(Long ticketId, TicketUpdateReq request) {
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION));
-
-        ticket.updateTicketImageUrl(request.ticketImageUrl());
-        ticket.updateViewedDate(request.viewedDate());
-        ticket.updateFloor(request.floor());
-        ticket.updateZone(request.zone());
-        ticket.updateCol(request.col());
-        ticket.updateNumber(request.number());
-        ticket.updateShowTime(request.showTime());
-
-        if (request.actorIds() != null) {
-            ticket.getTicketActorList().clear();
-
-            List<Actor> newActors = actorRepository.findAllByIdIn(request.actorIds());
-            if (newActors.size() != request.actorIds().size()) {
-                throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
+    return tickets.stream()
+        .map(ticket -> {
+              String imageUrl = getImageUrlOrElseDefault(ticket);
+              return TicketConverter.toTicketRes(ticket,
+                  imageService.generateGetPresignedUrl(imageUrl));
             }
+        )
+        .collect(Collectors.toList());
+  }
 
-            List<TicketActor> updatedActors = newActors.stream()
-                    .map(actor -> TicketActor.builder()
-                            .ticket(ticket)
-                            .actor(actor)
-                            .build())
-                    .toList();
+  // 티켓 개별 조회
+  @Transactional(readOnly = true)
+  public TicketRes getTicket(Long ticketId, Long userId) {
 
-            ticket.getTicketActorList().addAll(updatedActors);
-        }
+    // validation: user, ticket
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        // TODO: 리뷰 업데이트
-        // ticket.updateReview(reviewRepository.findById(request.reviewId()).orElse(null));
+    Ticket ticket = ticketRepository.findByIdAndUserId(ticketId, userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION));
 
-        return TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl()));
+    Musical musical = ticket.getMusical();
+
+    //연관 리뷰 정보
+    Optional<Review> reviewOpt = reviewRepository.findByTicketIdAndUserId(ticketId, userId);
+    boolean hasReview = reviewOpt.isPresent();
+    Long reviewId = hasReview ? reviewOpt.get().getId() : null;
+
+    String imageUrl = getImageUrlOrElseDefault(ticket);
+
+    return TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(imageUrl));
+  }
+
+  private static String getImageUrlOrElseDefault(Ticket ticket) {
+    String imageUrl = ticket.getTicketImageUrl();
+    if (imageUrl == null || imageUrl.isBlank()) {
+      imageUrl = "dynamic/default-poster.png";
+    }
+    return imageUrl;
+  }
+
+  // 티켓 수정
+  @Transactional
+  public TicketRes updateTicket(Long ticketId, TicketUpdateReq request) {
+    Ticket ticket = ticketRepository.findById(ticketId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION));
+
+    ticket.updateTicketImageUrl(request.ticketImageUrl());
+    ticket.updateViewedDate(request.viewedDate());
+    ticket.updateFloor(request.floor());
+    ticket.updateZone(request.zone());
+    ticket.updateCol(request.col());
+    ticket.updateNumber(request.number());
+    ticket.updateShowTime(request.showTime());
+
+    if (request.actorIds() != null) {
+      ticket.getTicketActorList().clear();
+
+      List<Actor> newActors = actorRepository.findAllByIdIn(request.actorIds());
+      if (newActors.size() != request.actorIds().size()) {
+        throw new ApplicationException(ErrorCode.ACTOR_NOT_FOUND_EXCEPTION);
+      }
+
+      List<TicketActor> updatedActors = newActors.stream()
+          .map(actor -> TicketActor.builder()
+              .ticket(ticket)
+              .actor(actor)
+              .build())
+          .toList();
+
+      ticket.getTicketActorList().addAll(updatedActors);
     }
 
-    // 티켓 삭제
-    @Transactional
-    public void deleteTicket(Long ticketId) {
-        if(!ticketRepository.existsById(ticketId)){
-            throw new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION);
-        }
-        ticketRepository.deleteById(ticketId);
-    }
+    // TODO: 리뷰 업데이트
+    // ticket.updateReview(reviewRepository.findById(request.reviewId()).orElse(null));
+    String imageUrl = getImageUrlOrElseDefault(ticket);
+    return TicketConverter.toTicketRes(ticket,
+        imageService.generateGetPresignedUrl(imageUrl));
+  }
 
-    //    // 새로운 배우 추가
+  // 티켓 삭제
+  @Transactional
+  public void deleteTicket(Long ticketId) {
+    if (!ticketRepository.existsById(ticketId)) {
+      throw new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION);
+    }
+    ticketRepository.deleteById(ticketId);
+  }
+
+  //    // 새로운 배우 추가
 //    @Transactional
 //    public Actor createNewActor(ActorCreateReq actorCreateReq) {
 //        // actorImageUrl이 null일 경우 그냥 null로 설정
@@ -207,7 +231,7 @@ public class TicketService {
 //        return actorRepository.save(actor);
 //    }
 
-//    public List<TicketSimpleRes> getTicketsByMusicalTitle(String musicalTitle) {
+  //    public List<TicketSimpleRes> getTicketsByMusicalTitle(String musicalTitle) {
 //        List<Ticket> tickets = ticketRepository.findByMusical_TitleContaining(musicalTitle);
 //
 //        return tickets.stream()
@@ -215,18 +239,20 @@ public class TicketService {
 //                .collect(Collectors.toList());
 //    }
 //
-    //리뷰 작성하지 않은 티켓북만 조회
-    public List<TicketRes> getUnreviewedTicketList(Long userId) {
-        // validation
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+  //리뷰 작성하지 않은 티켓북만 조회
+  public List<TicketRes> getUnreviewedTicketList(Long userId) {
+    // validation
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        //business login
-        // 리뷰하지 않았고, 이미지가 업로드된 티켓만 필터링하여 조회
-        List<Ticket> filteredTickets = ticketRepository.findUnreviewedWithImageByUserFetchAll(user);
+    //business login
+    // 리뷰하지 않았고, 이미지가 업로드된 티켓만 필터링하여 조회
+    List<Ticket> filteredTickets = ticketRepository.findUnreviewedWithImageByUserFetchAll(user);
 
-        return filteredTickets.stream()
-            .map(ticket -> TicketConverter.toTicketRes(ticket, imageService.generateGetPresignedUrl(ticket.getTicketImageUrl())))
-            .toList();
-    }
+    return filteredTickets.stream()
+        .map(ticket ->
+            TicketConverter.toTicketRes(ticket,
+                imageService.generateGetPresignedUrl(getImageUrlOrElseDefault(ticket))))
+        .toList();
+  }
 }
