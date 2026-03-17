@@ -1,5 +1,7 @@
 package encore.server.domain.review.service;
 
+import encore.server.domain.point.enumerate.PointType;
+import encore.server.domain.point.service.PointService;
 import encore.server.domain.review.converter.ReviewConverter;
 import encore.server.domain.review.dto.request.ReviewCreateReq;
 import encore.server.domain.review.dto.request.ReviewUpdateReq;
@@ -59,6 +61,8 @@ public class ReviewMVPService {
   private final ReviewRecentSearchService reviewRecentSearchService;
   private final ReviewRelatedSearchService reviewRelatedSearchService;
   private final ReviewReportRepository reviewReportRepository;
+  private final PointService pointService;
+
 
   public ReviewDetailRes getReview(Long userId, Long reviewId) {
     // validation: user, review, isUnlocked
@@ -86,7 +90,7 @@ public class ReviewMVPService {
     String elapsedTime = review.getElapsedTime();
 
     // return: review detail response
-    return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
+    return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime, review.getUser().getId().equals(userId));
   }
 
   public ReviewListCursorBasedRes<ReviewGetListRes> getReviewList(Long userId, String searchKeyword, Long cursor, String sort, Integer size) {
@@ -220,7 +224,7 @@ public class ReviewMVPService {
     reviewRelatedSearchService.updateAllSuggestions(userId, review);
 
     // 작성자에게 포인트 제공
-    user.addPoint(50L);
+    pointService.earnPoints(userId, 10L, "후기 작성 완료", PointType.REVIEW_WRITE, userId);
 
     // return: review response
     return ReviewCreateRes.builder()
@@ -304,11 +308,9 @@ public class ReviewMVPService {
     }
 
     //business logic & return: unlock review
-    if(user.getPoint() < 40){
-      throw new ApplicationException(ErrorCode.POINT_NOT_ENOUGH_EXCEPTION);
-    }
+    // 포인트 증감
+    pointService.usePoints(userId, 5L, "리뷰 조회", PointType.REVIEW_VIEW, review.getId());
 
-    user.usePoint(40L);
     UserReview userReview = UserReview.builder()
         .user(user)
         .review(review)
