@@ -64,6 +64,9 @@ public class User extends BaseTimeEntity {
   }
 
   public Long usePoint(Long point) {
+    if (this.point < point) {
+      return null;
+    }
     this.point -= point;
     return this.point;
   }
