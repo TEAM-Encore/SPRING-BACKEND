@@ -78,7 +78,7 @@ public class ReviewService {
 
 
         // return: review response
-        return ReviewDetailRes.of(review, true, likeType, elapsedTime);
+        return ReviewDetailRes.of(review, true, likeType, elapsedTime, true);
     }
 
     public ViewImageRes viewImage() {
@@ -115,7 +115,7 @@ public class ReviewService {
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
         // return: review detail response
-        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
+        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime, true);
     }
 
     @Transactional
@@ -327,7 +327,7 @@ public class ReviewService {
         String elapsedTime = getElapsedTime(ChronoUnit.MINUTES.between(review.getCreatedAt(), LocalDateTime.now()));
 
         // return: review detail response
-        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime);
+        return ReviewDetailRes.of(review, isUnlocked, likeType, elapsedTime, true);
     }
 
     @Transactional
