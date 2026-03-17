@@ -95,7 +95,7 @@ public record ReviewDetailRes(
                 .collect(Collectors.toList());
     }
 
-    public static ReviewDetailRes of(Review review, Boolean isUnlocked, LikeType likeType, String elapsedTime) {
+    public static ReviewDetailRes of(Review review, Boolean isUnlocked, LikeType likeType, String elapsedTime, Boolean isMyReview) {
         return ReviewDetailRes.builder()
                 .reviewId(review.getId())
                 .ticket(TicketRes.of(review.getTicket()))
@@ -106,7 +106,7 @@ public record ReviewDetailRes(
                 .tags(tagToString(review.getTags()))
                 .reviewDataRes(ReviewDataRes.of(review.getReviewData()))
                 .isUnlocked(isUnlocked)
-                .isMyReview(review.getUser().getId().equals(review.getUser().getId()))
+                .isMyReview(isMyReview)
                 .viewCount(review.getViewCount())
                 .elapsedTime(elapsedTime)
                 .likeRes(ReviewLikeRes.of(likeType, review))
