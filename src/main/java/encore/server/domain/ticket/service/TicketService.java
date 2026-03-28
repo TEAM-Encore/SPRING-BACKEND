@@ -150,7 +150,7 @@ public class TicketService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-    Ticket ticket = ticketRepository.findByIdAndUserId(ticketId, userId)
+    Ticket ticket = ticketRepository.findById(ticketId)
         .orElseThrow(() -> new ApplicationException(ErrorCode.TICKET_NOT_FOUND_EXCEPTION));
 
     Musical musical = ticket.getMusical();
