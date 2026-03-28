@@ -224,7 +224,7 @@ public class ReviewMVPService {
     reviewRelatedSearchService.updateAllSuggestions(userId, review);
 
     // 작성자에게 포인트 제공
-    pointService.earnPoints(userId, 10L, "후기 작성 완료", PointType.REVIEW_WRITE, userId);
+    pointService.earnPoints(userId, 10L, "[프리미엄 리뷰 작성하기] 이벤트 참여", PointType.REVIEW_WRITE, userId);
 
     // return: review response
     return ReviewCreateRes.builder()
@@ -308,8 +308,9 @@ public class ReviewMVPService {
     }
 
     //business logic & return: unlock review
+    String pointTitle = "[" + review.getTitle() + "]" + " 열람";
     // 포인트 증감
-    pointService.usePoints(userId, 5L, "리뷰 조회", PointType.REVIEW_VIEW, review.getId());
+    pointService.usePoints(userId, 5L, pointTitle, PointType.REVIEW_VIEW, review.getId());
 
     UserReview userReview = UserReview.builder()
         .user(user)
